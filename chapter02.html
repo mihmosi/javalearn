@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Паттерны проектирования: полный справочник (Часть 2)</title>
+<style>
+:root {
+--bg: #1e1e1e; --text: #d4d4d4; --header-bg: #2d2d2d; --summary-bg: #333;
+--summary-hover: #3c3c3c; --border: #555; --code-bg: #252526; --code-border: #404040;
+--button-bg: #444; --button-text: #ddd; --button-hover: #555; --link: #569cd6;
+--scrollbar-thumb: #666; --scrollbar-track: #2d2d2d; --details-content-bg: var(--bg);
+--table-bg: #2a2a2a; --table-header: #3a3a3a;
+}
+body.light {
+--bg: #ffffff; --text: #1e1e1e; --header-bg: #f3f3f3; --summary-bg: #e8e8e8;
+--summary-hover: #ddd; --border: #ccc; --code-bg: #f9f9f9; --code-border: #ddd;
+--button-bg: #e0e0e0; --button-text: #000; --button-hover: #ccc; --link: #0451a5;
+--scrollbar-thumb: #aaa; --scrollbar-track: #f0f0f0; --details-content-bg: #fff;
+--table-bg: #fff; --table-header: #e0e0e0;
+}
+body.sepia {
+--bg: #f4ecd8; --text: #5b4636; --header-bg: #e8dcc8; --summary-bg: #ddd0b8;
+--summary-hover: #cfc1a8; --border: #b8a88a; --code-bg: #eee3d0; --code-border: #c0b090;
+--button-bg: #d6c9ae; --button-text: #3e2f22; --button-hover: #c2b498; --link: #8b5e3c;
+--scrollbar-thumb: #b8a080; --scrollbar-track: #e8dcc8; --details-content-bg: #f4ecd8;
+--table-bg: #f4ecd8; --table-header: #ddd0b8;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+background-color: var(--bg); color: var(--text);
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6;
+padding: 10px; transition: background-color 0.3s, color 0.3s; font-size: 16px;
+}
+header {
+background-color: var(--header-bg); padding: 15px; border-radius: 6px;
+margin-bottom: 20px; display: flex; flex-wrap: wrap; align-items: center;
+justify-content: space-between; gap: 10px;
+}
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+button {
+background-color: var(--button-bg); color: var(--button-text);
+border: 1px solid var(--border); padding: 6px 12px; border-radius: 4px;
+cursor: pointer; font-size: 0.9em; transition: 0.2s;
+}
+button:hover { background-color: var(--button-hover); }
+.font-controls { display: flex; gap: 4px; }
+.font-size-label { align-self: center; margin: 0 4px; font-weight: bold; }
+.container { max-width: 1000px; margin: 0 auto; }
+h2 { border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-top: 30px; margin-bottom: 15px; }
+h3 { margin-top: 25px; margin-bottom: 10px; color: #e8c170; }
+h4 { margin-top: 15px; margin-bottom: 8px; color: var(--link); }
+details {
+background-color: var(--summary-bg); border: 1px solid var(--border);
+border-radius: 6px; margin-bottom: 10px; overflow: hidden; transition: 0.2s;
+}
+details[open] { background-color: var(--details-content-bg); }
+summary {
+padding: 12px 16px; font-weight: 600; cursor: pointer;
+background-color: var(--summary-bg); transition: background-color 0.2s;
+list-style-position: inside; font-size: 1.05em;
+}
+summary:hover { background-color: var(--summary-hover); }
+summary::-webkit-details-marker { color: var(--link); }
+.details-content {
+padding: 0 16px 16px 16px; max-height: 65vh; overflow-y: auto;
+scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+.details-content::-webkit-scrollbar { width: 8px; }
+.details-content::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+.details-content::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 4px; }
+.close-btn-container {
+text-align: right; position: sticky; bottom: 0;
+background: linear-gradient(transparent, var(--details-content-bg) 70%);
+padding: 15px 0 5px; margin-top: 10px;
+}
+.close-btn { font-size: 0.85em; padding: 5px 14px; }
+pre {
+background-color: var(--code-bg); border: 1px solid var(--code-border);
+border-radius: 4px; padding: 12px; overflow-x: auto;
+font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+font-size: 0.9em; margin: 10px 0; line-height: 1.5; white-space: pre-wrap; word-break: break-word;
+}
+code { font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace; }
+.section-intro { margin-bottom: 20px; padding: 10px; background-color: var(--header-bg); border-radius: 5px; }
+p { margin: 10px 0; }
+ul, ol { margin: 10px 0 10px 20px; }
+li { margin: 5px 0; }
+table { width: 100%; border-collapse: collapse; margin: 10px 0; background-color: var(--table-bg); }
+th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+th { background-color: var(--table-header); font-weight: 600; }
+strong { color: var(--link); }
+.note {
+background-color: var(--code-bg); border-left: 3px solid #e8c170;
+padding: 10px; margin: 10px 0; border-radius: 0 4px 4px 0;
+}
+@media (max-width: 600px) {
+body { font-size: 14px; }
+header { flex-direction: column; align-items: flex-start; }
+.controls { width: 100%; }
+}
+</style>
+</head>
+<body class="dark">
+<header>
+<h1>📘 Паттерны проектирования: Часть 2</h1>
+<div class="controls">
+<div class="theme-controls">
+<button onclick="setTheme('dark')">🌙 Тёмная</button>
+<button onclick="setTheme('light')">☀️ Светлая</button>
+<button onclick="setTheme('sepia')">📜 Сепия</button>
+</div>
+<div class="font-controls">
+<button onclick="changeFontSize(-1)">A-</button>
+<span class="font-size-label" id="fontSizeLabel">16px</span>
+<button onclick="changeFontSize(1)">A+</button>
+</div>
+</div>
+</header>
+<div class="container">
+<div class="section-intro">
+<p><strong>Часть 2:</strong> Структурные паттерны — Adapter, Decorator, Proxy, Composite, Facade, Bridge. Как соединять объекты между собой.</p>
+</div>
+
+<h2>🟠 Структурные паттерны (Structural)</h2>
+
+<details id="adapter"><summary>🔌 Adapter (Адаптер)</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Adapter преобразует интерфейс одного класса в интерфейс, ожидаемый клиентом. Позволяет объектам с несовместимыми интерфейсами работать вместе.</p>
+<h4>Проблема</h4>
+<pre><code>// Есть старый класс
+class OldPrinter {
+    void printOld() { System.out.println("Печать старым способом"); }
+}
+
+// Новый код ожидает интерфейс
+interface Printer {
+    void print();
+}</code></pre>
+<h4>Решение: Adapter</h4>
+<pre><code>class PrinterAdapter implements Printer {
+    private OldPrinter printer;
+
+    public PrinterAdapter(OldPrinter printer) {
+        this.printer = printer;
+    }
+
+    @Override
+    public void print() {
+        printer.printOld(); // делегирование старому классу
+    }
+}
+
+// Использование
+OldPrinter oldPrinter = new OldPrinter();
+Printer printer = new PrinterAdapter(oldPrinter);
+printer.print(); // Печать старым способом</code></pre>
+<h4>Где используется в Java</h4>
+<ul>
+<li><strong>InputStreamReader</strong> — адаптирует InputStream (byte) к Reader (char)</li>
+<li><strong>Arrays.asList()</strong> — адаптирует массив к интерфейсу List</li>
+<li><strong>Collections.enumeration()</strong> — адаптирует коллекцию к Enumeration</li>
+</ul>
+<pre><code>// Пример из JDK: InputStreamReader
+InputStream byteStream = new FileInputStream("file.txt");
+Reader charReader = new InputStreamReader(byteStream, StandardCharsets.UTF_8);
+// InputStreamReader — адаптер между миром байтов и миром символов</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('adapter')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="decorator"><summary>🎀 Decorator (Декоратор)</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Decorator позволяет динамически добавлять объекту новое поведение без изменения его класса. Главное преимущество перед наследованием — композиция вместо наследования, что делает код более гибким и соответствует OCP.</p>
+<h4>Проблема наследования (комбинаторный взрыв)</h4>
+<pre><code>// Для Coffee с добавками через наследование пришлось бы создавать:
+// MilkCoffee, SugarCoffee, MilkSugarCoffee, MilkCreamCoffee,
+// SugarCreamCoffee, MilkSugarCreamCoffee... — комбинаторный взрыв!</code></pre>
+<h4>Решение через Decorator</h4>
+<pre><code>interface Coffee {
+    double cost();
+    String description();
+}
+
+class SimpleCoffee implements Coffee {
+    public double cost() { return 2.0; }
+    public String description() { return "Кофе"; }
+}
+
+abstract class CoffeeDecorator implements Coffee {
+    protected Coffee decorated;
+    CoffeeDecorator(Coffee c) { this.decorated = c; }
+}
+
+class MilkDecorator extends CoffeeDecorator {
+    MilkDecorator(Coffee c) { super(c); }
+    public double cost() { return decorated.cost() + 0.5; }
+    public String description() { return decorated.description() + ", молоко"; }
+}
+
+class SugarDecorator extends CoffeeDecorator {
+    SugarDecorator(Coffee c) { super(c); }
+    public double cost() { return decorated.cost() + 0.3; }
+    public String description() { return decorated.description() + ", сахар"; }
+}
+
+// Использование: любые комбинации без новых классов
+Coffee coffee = new SimpleCoffee();
+coffee = new MilkDecorator(coffee);
+coffee = new SugarDecorator(coffee);
+System.out.println(coffee.description() + " = " + coffee.cost());
+// Кофе, молоко, сахар = 2.8</code></pre>
+<h4>Основные преимущества</h4>
+<ol>
+<li><strong>Поведение можно менять во время выполнения</strong> — в отличие от наследования, где тип фиксирован.</li>
+<li><strong>Нет комбинаторного взрыва классов</strong> — достаточно базовых декораторов.</li>
+<li><strong>Соблюдение Open/Closed Principle</strong> — новый функционал через новый декоратор.</li>
+<li><strong>Повторное использование</strong> — один декоратор можно применять к разным реализациям интерфейса.</li>
+</ol>
+<h4>Decorator в java.io</h4>
+<pre><code>// Классический пример из JDK
+InputStream in = new BufferedInputStream(          // добавляет буферизацию
+                     new DataInputStream(          // добавляет чтение примитивов
+                         new FileInputStream("data.bin"))); // читает файл
+// Каждый класс расширяет поведение предыдущего, не изменяя его код</code></pre>
+<p><strong>Другие примеры в JDK:</strong> BufferedReader, PrintWriter, Collections.synchronizedList(), Collections.unmodifiableList().</p>
+<h4>Decorator vs Наследование</h4>
+<table>
+<tr><th>Наследование</th><th>Decorator</th></tr>
+<tr><td>Поведение определяется при создании класса</td><td>Поведение можно менять во время выполнения</td></tr>
+<tr><td>Жёсткая связь с родителем</td><td>Гибкая композиция объектов</td></tr>
+<tr><td>Быстро растёт количество классов</td><td>Небольшое количество независимых декораторов</td></tr>
+<tr><td>Изменения затрагивают иерархию</td><td>Новое поведение без изменения существующего кода</td></tr>
+</table>
+<h4>Недостатки</h4>
+<ul>
+<li>Увеличивается количество небольших классов</li>
+<li>Длинная цепочка объектов усложняет отладку</li>
+</ul>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('decorator')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="proxy"><summary>🛡️ Proxy (Заместитель)</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Proxy — структурный паттерн, предоставляющий объект-заместитель, контролирующий доступ к реальному объекту. Клиент работает не напрямую, а через заместителя.</p>
+<pre><code>Client → Proxy → RealService
+// Proxy выполняет дополнительную логику: права, лог, кэш, lazy init</code></pre>
+<h3>Типы Proxy</h3>
+<h4>1. Virtual Proxy (Виртуальный Proxy)</h4>
+<p>Создаёт тяжёлый объект только когда он действительно понадобится (Lazy Initialization).</p>
+<pre><code>class ImageProxy implements Image {
+    private RealImage realImage;
+    private String filename;
+
+    public void display() {
+        if (realImage == null) {
+            realImage = new RealImage(filename); // загрузка только при первом обращении
+        }
+        realImage.display();
+    }
+}</code></pre>
+<p>Для: больших изображений, тяжёлых объектов, дорогостоящих подключений, загрузки файлов.</p>
+<h4>2. Protection Proxy (Защитный Proxy)</h4>
+<p>Контролирует доступ к объекту. Proxy проверяет права перед вызовом.</p>
+<pre><code>class UserServiceProxy implements UserService {
+    private UserService service;
+    private User currentUser;
+
+    public void deleteUser(Long id) {
+        if (currentUser.isAdmin()) {
+            service.deleteUser(id);
+        } else {
+            throw new AccessDeniedException("Admin access required");
+        }
+    }
+}</code></pre>
+<p>Используется в Spring Security, Java Security Manager.</p>
+<h4>3. Remote Proxy (Удалённый Proxy)</h4>
+<p>Представляет объект на другом сервере. Клиент работает как с локальным. Proxy: сериализует запрос → отправляет по сети → получает ответ → десериализует.</p>
+<p>Используется в: RMI, gRPC, REST-клиентах (OpenFeign в Spring Cloud).</p>
+<h4>4. Caching Proxy</h4>
+<pre><code>class CachingUserService implements UserService {
+    private UserService service;
+    private Map&lt;Long, User&gt; cache = new ConcurrentHashMap&lt;&gt;();
+
+    public User getUser(Long id) {
+        return cache.computeIfAbsent(id, service::getUser);
+    }
+}</code></pre>
+<p>Redis, Caffeine, Spring Cache, Hibernate Second-Level Cache.</p>
+<h4>5. Logging (Smart) Proxy</h4>
+<p>Добавляет логирование, измерение времени, подсчёт вызовов, метрики, аудит.</p>
+<pre><code>class LoggingProxy implements Service {
+    private Service service;
+    public Result execute(Input in) {
+        long start = System.nanoTime();
+        Result result = service.execute(in);
+        log.info("Method executed in {} ms", (System.nanoTime() - start) / 1_000_000);
+        return result;
+    }
+}</code></pre>
+<h4>Dynamic Proxy в Java</h4>
+<ul>
+<li><strong>JDK Dynamic Proxy:</strong> через <code>Proxy.newProxyInstance()</code> и <code>InvocationHandler</code>, только для интерфейсов.</li>
+<li><strong>CGLIB Proxy:</strong> наследуется от класса, переопределяет методы. Нельзя проксировать final классы и методы.</li>
+</ul>
+<pre><code>// JDK Dynamic Proxy
+InvocationHandler handler = (proxy, method, args) -> {
+    System.out.println("Before " + method.getName());
+    Object result = method.invoke(target, args);
+    System.out.println("After " + method.getName());
+    return result;
+};
+Service proxy = (Service) Proxy.newProxyInstance(
+    Service.class.getClassLoader(),
+    new Class[]{Service.class},
+    handler
+);</code></pre>
+<h4>Где используется в Java</h4>
+<ul>
+<li><strong>Spring AOP</strong> — прокси для аспектов</li>
+<li><strong>@Transactional</strong> — транзакции реализованы через Proxy</li>
+<li><strong>Spring Security</strong> — проверка прав</li>
+<li><strong>Hibernate</strong> — ленивые (LAZY) сущности через Proxy</li>
+<li><strong>Feign Client</strong> — удалённые вызовы</li>
+</ul>
+<h4>Proxy vs Decorator</h4>
+<table>
+<tr><th>Proxy</th><th>Decorator</th></tr>
+<tr><td>Контролирует доступ к объекту</td><td>Добавляет новую функциональность</td></tr>
+<tr><td>Часто создаётся фреймворком</td><td>Обычно собирается разработчиком</td></tr>
+<tr><td>Может скрывать удалённый объект, кэш, безопасность</td><td>Расширяет поведение объекта</td></tr>
+<tr><td>Клиент часто не знает, что работает через Proxy</td><td>Декораторы комбинируются для нового поведения</td></tr>
+</table>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('proxy')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="composite"><summary>🌳 Composite (Компоновщик)</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Composite группирует объекты в древовидные структуры для представления иерархий «часть-целое». Позволяет клиентам единообразно работать с отдельными объектами и их группами.</p>
+<pre><code>// Общий интерфейс для файлов и папок
+interface FileSystemComponent {
+    String getName();
+    long getSize();
+    void print(String indent);
+}
+
+// Лист — отдельный файл
+class File implements FileSystemComponent {
+    private String name;
+    private long size;
+    public long getSize() { return size; }
+    public void print(String indent) { System.out.println(indent + "📄 " + name); }
+}
+
+// Композит — папка, содержащая другие компоненты
+class Directory implements FileSystemComponent {
+    private String name;
+    private List&lt;FileSystemComponent&gt; children = new ArrayList&lt;&gt;();
+
+    public void add(FileSystemComponent component) { children.add(component); }
+    public long getSize() {
+        return children.stream().mapToLong(FileSystemComponent::getSize).sum();
+    }
+    public void print(String indent) {
+        System.out.println(indent + "📁 " + name);
+        for (FileSystemComponent child : children) {
+            child.print(indent + "  ");
+        }
+    }
+}</code></pre>
+<h4>Где используется в Java</h4>
+<ul>
+<li><strong>Swing</strong> — контейнеры содержат другие компоненты (JPanel содержит JButton, JLabel)</li>
+<li><strong>java.awt.Component</strong> — базовый класс для всех GUI-элементов</li>
+<li><strong>Парсинг XML/JSON</strong> — элементы могут содержать вложенные элементы</li>
+</ul>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('composite')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="facade"><summary>🏰 Facade (Фасад)</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Facade предоставляет унифицированный интерфейс к сложной подсистеме. Вместо множества вызовов клиент использует один простой метод.</p>
+<pre><code>// Сложная система: Engine, FuelSystem, Cooling, Battery, Starter
+class Engine { void start() {} }
+class FuelSystem { void pump() {} }
+class Cooling { void activate() {} }
+class Battery { void supply() {} }
+class Starter { void engage() {} }
+
+// Фасад
+class CarFacade {
+    private Engine engine = new Engine();
+    private FuelSystem fuel = new FuelSystem();
+    private Cooling cooling = new Cooling();
+    private Battery battery = new Battery();
+    private Starter starter = new Starter();
+
+    public void start() {
+        battery.supply();
+        fuel.pump();
+        cooling.activate();
+        starter.engage();
+        engine.start();
+        System.out.println("Машина заведена!");
+    }
+}
+
+// Клиент использует один простой вызов
+CarFacade car = new CarFacade();
+car.start();</code></pre>
+<h4>Где используется в Java</h4>
+<ul>
+<li><strong>JdbcTemplate (Spring)</strong> — фасад для работы с JDBC</li>
+<li><strong>HttpClient (Java 11+)</strong> — фасад для HTTP-запросов</li>
+<li><strong>SLF4J</strong> — фасад для различных систем логирования</li>
+</ul>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('facade')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="bridge"><summary>🌉 Bridge (Мост)</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Bridge отделяет абстракцию от её реализации, позволяя изменять их независимо. Предотвращает комбинаторный взрыв подклассов при наследовании по двум измерениям.</p>
+<pre><code>// Реализация — интерфейс устройства
+interface Device {
+    void turnOn();
+    void setVolume(int percent);
+}
+
+class TV implements Device {
+    public void turnOn() { System.out.println("Телевизор включён"); }
+    public void setVolume(int p) { System.out.println("Громкость TV: " + p + "%"); }
+}
+
+class Radio implements Device {
+    public void turnOn() { System.out.println("Радио включено"); }
+    public void setVolume(int p) { System.out.println("Громкость Radio: " + p + "%"); }
+}
+
+// Абстракция — пульт управления
+abstract class RemoteControl {
+    protected Device device;
+    RemoteControl(Device device) { this.device = device; }
+    abstract void togglePower();
+    abstract void volumeUp();
+}
+
+class BasicRemote extends RemoteControl {
+    BasicRemote(Device device) { super(device); }
+    void togglePower() { device.turnOn(); }
+    void volumeUp() { device.setVolume(50); }
+}
+
+// Использование: комбинируем любые пульты с любыми устройствами
+Device tv = new TV();
+RemoteControl remote = new BasicRemote(tv);
+remote.togglePower(); // Телевизор включён</code></pre>
+<h4>Где используется в Java</h4>
+<ul>
+<li><strong>JDBC</strong> — DriverManager (абстракция) и конкретные драйверы (реализация)</li>
+<li><strong>SLF4J</strong> — API логирования (абстракция) и Logback/Log4j (реализация)</li>
+<li><strong>java.awt</strong> — Component (абстракция) и нативные реализации для разных ОС</li>
+</ul>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('bridge')">⬆️ Свернуть</button></div>
+</div></details>
+
+</div>
+
+<div style="text-align: center; margin-top: 20px; padding: 10px;">
+<a href="index.html" style="
+display: inline-block;
+background-color: var(--button-bg);
+color: var(--button-text);
+border: 1px solid var(--border);
+padding: 10px 24px;
+border-radius: 4px;
+text-decoration: none;
+font-size: 0.9em;
+transition: 0.2s;
+" onmouseover="this.style.backgroundColor='var(--button-hover)'" 
+   onmouseout="this.style.backgroundColor='var(--button-bg)'">
+⬅️ Назад к содержанию
+</a>
+</div>
+
+<script>
+function setTheme(t) { document.body.className = t; }
+let fs = 16;
+function changeFontSize(d) { fs = Math.min(24, Math.max(12, fs + d)); document.body.style.fontSize = fs + 'px'; document.getElementById('fontSizeLabel').textContent = fs + 'px'; }
+function closeDetails(id) { const d = document.getElementById(id); if (d) d.removeAttribute('open'); }
+setTheme('dark');
+</script>
+</body>
+</html>

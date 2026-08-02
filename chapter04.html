@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Паттерны проектирования: полный справочник (Часть 4)</title>
+<style>
+:root {
+--bg: #1e1e1e; --text: #d4d4d4; --header-bg: #2d2d2d; --summary-bg: #333;
+--summary-hover: #3c3c3c; --border: #555; --code-bg: #252526; --code-border: #404040;
+--button-bg: #444; --button-text: #ddd; --button-hover: #555; --link: #569cd6;
+--scrollbar-thumb: #666; --scrollbar-track: #2d2d2d; --details-content-bg: var(--bg);
+--table-bg: #2a2a2a; --table-header: #3a3a3a;
+}
+body.light {
+--bg: #ffffff; --text: #1e1e1e; --header-bg: #f3f3f3; --summary-bg: #e8e8e8;
+--summary-hover: #ddd; --border: #ccc; --code-bg: #f9f9f9; --code-border: #ddd;
+--button-bg: #e0e0e0; --button-text: #000; --button-hover: #ccc; --link: #0451a5;
+--scrollbar-thumb: #aaa; --scrollbar-track: #f0f0f0; --details-content-bg: #fff;
+--table-bg: #fff; --table-header: #e0e0e0;
+}
+body.sepia {
+--bg: #f4ecd8; --text: #5b4636; --header-bg: #e8dcc8; --summary-bg: #ddd0b8;
+--summary-hover: #cfc1a8; --border: #b8a88a; --code-bg: #eee3d0; --code-border: #c0b090;
+--button-bg: #d6c9ae; --button-text: #3e2f22; --button-hover: #c2b498; --link: #8b5e3c;
+--scrollbar-thumb: #b8a080; --scrollbar-track: #e8dcc8; --details-content-bg: #f4ecd8;
+--table-bg: #f4ecd8; --table-header: #ddd0b8;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+background-color: var(--bg); color: var(--text);
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6;
+padding: 10px; transition: background-color 0.3s, color 0.3s; font-size: 16px;
+}
+header {
+background-color: var(--header-bg); padding: 15px; border-radius: 6px;
+margin-bottom: 20px; display: flex; flex-wrap: wrap; align-items: center;
+justify-content: space-between; gap: 10px;
+}
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+button {
+background-color: var(--button-bg); color: var(--button-text);
+border: 1px solid var(--border); padding: 6px 12px; border-radius: 4px;
+cursor: pointer; font-size: 0.9em; transition: 0.2s;
+}
+button:hover { background-color: var(--button-hover); }
+.font-controls { display: flex; gap: 4px; }
+.font-size-label { align-self: center; margin: 0 4px; font-weight: bold; }
+.container { max-width: 1000px; margin: 0 auto; }
+h2 { border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-top: 30px; margin-bottom: 15px; }
+h3 { margin-top: 25px; margin-bottom: 10px; color: #e8c170; }
+h4 { margin-top: 15px; margin-bottom: 8px; color: var(--link); }
+details {
+background-color: var(--summary-bg); border: 1px solid var(--border);
+border-radius: 6px; margin-bottom: 10px; overflow: hidden; transition: 0.2s;
+}
+details[open] { background-color: var(--details-content-bg); }
+summary {
+padding: 12px 16px; font-weight: 600; cursor: pointer;
+background-color: var(--summary-bg); transition: background-color 0.2s;
+list-style-position: inside; font-size: 1.05em;
+}
+summary:hover { background-color: var(--summary-hover); }
+summary::-webkit-details-marker { color: var(--link); }
+.details-content {
+padding: 0 16px 16px 16px; max-height: 65vh; overflow-y: auto;
+scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+.details-content::-webkit-scrollbar { width: 8px; }
+.details-content::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+.details-content::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 4px; }
+.close-btn-container {
+text-align: right; position: sticky; bottom: 0;
+background: linear-gradient(transparent, var(--details-content-bg) 70%);
+padding: 15px 0 5px; margin-top: 10px;
+}
+.close-btn { font-size: 0.85em; padding: 5px 14px; }
+pre {
+background-color: var(--code-bg); border: 1px solid var(--code-border);
+border-radius: 4px; padding: 12px; overflow-x: auto;
+font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+font-size: 0.9em; margin: 10px 0; line-height: 1.5; white-space: pre-wrap; word-break: break-word;
+}
+code { font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace; }
+.section-intro { margin-bottom: 20px; padding: 10px; background-color: var(--header-bg); border-radius: 5px; }
+p { margin: 10px 0; }
+ul, ol { margin: 10px 0 10px 20px; }
+li { margin: 5px 0; }
+table { width: 100%; border-collapse: collapse; margin: 10px 0; background-color: var(--table-bg); }
+th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+th { background-color: var(--table-header); font-weight: 600; }
+strong { color: var(--link); }
+.bad-code {
+background-color: #3d2020; border-left: 3px solid #e05555;
+padding: 10px; margin: 10px 0; border-radius: 0 4px 4px 0;
+}
+.good-code {
+background-color: #1e3d20; border-left: 3px solid #55e055;
+padding: 10px; margin: 10px 0; border-radius: 0 4px 4px 0;
+}
+.note {
+background-color: var(--code-bg); border-left: 3px solid #e8c170;
+padding: 10px; margin: 10px 0; border-radius: 0 4px 4px 0;
+}
+@media (max-width: 600px) {
+body { font-size: 14px; }
+header { flex-direction: column; align-items: flex-start; }
+.controls { width: 100%; }
+}
+</style>
+</head>
+<body class="dark">
+<header>
+<h1>📘 Паттерны проектирования: Часть 4</h1>
+<div class="controls">
+<div class="theme-controls">
+<button onclick="setTheme('dark')">🌙 Тёмная</button>
+<button onclick="setTheme('light')">☀️ Светлая</button>
+<button onclick="setTheme('sepia')">📜 Сепия</button>
+</div>
+<div class="font-controls">
+<button onclick="changeFontSize(-1)">A-</button>
+<span class="font-size-label" id="fontSizeLabel">16px</span>
+<button onclick="changeFontSize(1)">A+</button>
+</div>
+</div>
+</header>
+<div class="container">
+<div class="section-intro">
+<p><strong>Часть 4:</strong> Антипаттерны — распространённые, но неудачные решения. God Object, Spaghetti Code, Golden Hammer, Copy-Paste Programming, Magic Numbers, Singleton Abuse, Big Ball of Mud, Lava Flow, Premature Optimization, Hard Coding и Java-специфичные антипаттерны.</p>
+</div>
+
+<h2>🟣 Антипаттерны</h2>
+
+<details id="antipatterns-intro"><summary>Что такое антипаттерны?</summary><div class="details-content">
+<p><strong>Антипаттерны</strong> — это распространённые, но неудачные решения типичных задач, которые сначала кажутся правильными, но со временем приводят к сложному сопровождению, ошибкам, плохой производительности или высокой связанности кода.</p>
+<p>Если паттерн проектирования — это проверенное хорошее решение, то антипаттерн — это решение, которое часто встречается на практике, но создаёт проблемы в долгосрочной перспективе.</p>
+<h4>К чему приводят антипаттерны</h4>
+<ul>
+<li>сильная связанность компонентов</li>
+<li>сложное тестирование</li>
+<li>плохая расширяемость</li>
+<li>большое количество ошибок</li>
+<li>снижение производительности</li>
+<li>трудное сопровождение</li>
+</ul>
+<h4>Антипаттерн vs Code Smell</h4>
+<p><strong>Code Smell</strong> — это признак возможной проблемы в коде (симптом). Например, слишком длинный метод или дублирование. Он не всегда означает ошибку, но сигнализирует, что код стоит пересмотреть.</p>
+<p><strong>Антипаттерн</strong> — это уже известное неудачное архитектурное или проектное решение (причина), которое систематически приводит к проблемам.</p>
+<h4>Как бороться</h4>
+<ul>
+<li>принципы SOLID</li>
+<li>рефакторинг</li>
+<li>code review</li>
+<li>модульные тесты</li>
+<li>статический анализ (SonarQube, SpotBugs, Checkstyle)</li>
+<li>соблюдение архитектурных правил</li>
+</ul>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('antipatterns-intro')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="god-object"><summary>👹 God Object (Blob)</summary><div class="details-content">
+<p><strong>Самый известный антипаттерн.</strong> Один класс делает всё: работает с БД, валидирует данные, отправляет email, рассчитывает стоимость, логирует, управляет транзакциями.</p>
+<div class="bad-code">
+<pre><code>// ❌ God Object — один класс делает всё
+class UserService {
+    void saveUser() { /* БД */ }
+    void sendEmail() { /* Email */ }
+    void calculateDiscount() { /* Скидки */ }
+    void printInvoice() { /* Печать */ }
+    void exportExcel() { /* Экспорт */ }
+    void uploadFile() { /* Загрузка */ }
+    void validateData() { /* Валидация */ }
+    void logActivity() { /* Логирование */ }
+    void manageTransaction() { /* Транзакции */ }
+}</code></pre>
+</div>
+<h4>Почему плохо</h4>
+<ul>
+<li>нарушается Single Responsibility Principle</li>
+<li>сложно тестировать — нужно мокать десятки зависимостей</li>
+<li>любое изменение может затронуть множество функций</li>
+<li>класс становится огромным (тысячи строк)</li>
+<li>несколько разработчиков не могут работать с классом параллельно</li>
+</ul>
+<div class="good-code">
+<pre><code>// ✅ Разделение ответственности
+class UserRepository { void save(User user) {} }
+class EmailService { void sendWelcome(User user) {} }
+class DiscountCalculator { BigDecimal calculate(User user) {} }
+class InvoicePrinter { void print(Order order) {} }
+class UserValidator { void validate(User user) {} }
+
+// Координирующий сервис — тонкий, только оркестрация
+class UserRegistrationService {
+    private final UserRepository repo;
+    private final EmailService email;
+    private final UserValidator validator;
+
+    public void register(User user) {
+        validator.validate(user);
+        repo.save(user);
+        email.sendWelcome(user);
+    }
+}</code></pre>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('god-object')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="spaghetti-code"><summary>🍝 Spaghetti Code</summary><div class="details-content">
+<p><strong>Код без понятной структуры:</strong> длинные методы, множество вложенных if, запутанные зависимости, непонятный поток выполнения.</p>
+<div class="bad-code">
+<pre><code>// ❌ Spaghetti Code
+public void process(Order order) {
+    if (order != null) {
+        if (order.getStatus() == "NEW") {
+            if (order.getAmount() > 0) {
+                if (checkInventory(order)) {
+                    order.setStatus("PAID");
+                    if (order.getUser() != null) {
+                        if (order.getUser().getEmail() != null) {
+                            sendEmail(order.getUser().getEmail());
+                        } else {
+                            if (order.getUser().getPhone() != null) {
+                                sendSms(order.getUser().getPhone());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}</code></pre>
+</div>
+<h4>Признаки</h4>
+<ul>
+<li>глубокая вложенность (стрелка вправо — стрела ада)</li>
+<li>методы на сотни строк</li>
+<li>смешение уровней абстракции</li>
+<li>циклические зависимости</li>
+<li>трудно понять, что делает код</li>
+</ul>
+<div class="good-code">
+<pre><code>// ✅ Рефакторинг: выделение методов, Guard Clauses
+public void process(Order order) {
+    if (order == null) throw new IllegalArgumentException("Order is null");
+    if (!order.isNew()) return;
+    if (!order.hasPositiveAmount()) return;
+
+    if (inventoryService.reserve(order)) {
+        order.markAsPaid();
+        notifyUser(order.getUser(), "Order confirmed");
+    }
+}
+
+private void notifyUser(User user, String message) {
+    if (user.getEmail() != null) {
+        emailService.send(user.getEmail(), message);
+    } else if (user.getPhone() != null) {
+        smsService.send(user.getPhone(), message);
+    }
+}</code></pre>
+</div>
+<h4>Решение</h4>
+<ul>
+<li>рефакторинг: выделение методов</li>
+<li>Guard Clauses вместо вложенных if</li>
+<li>применение паттернов проектирования (Strategy, State)</li>
+<li>соблюдение SOLID</li>
+</ul>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('spaghetti-code')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="golden-hammer"><summary>🔨 Golden Hammer</summary><div class="details-content">
+<p><strong>"Если у тебя есть молоток — всё кажется гвоздём."</strong> Разработчик использует один инструмент для всех задач.</p>
+<h4>Примеры</h4>
+<ul>
+<li>везде применяет Singleton, даже где не нужен</li>
+<li>любую задачу решает через наследование вместо композиции</li>
+<li>использует микросервисы там, где достаточно монолита</li>
+<li>применяет сложные паттерны к простым задачам</li>
+</ul>
+<pre><code>// ❌ Golden Hammer: Singleton для всего
+class UserValidator { /* Singleton */ }
+class PriceCalculator { /* Singleton */ }
+class EmailFormatter { /* Singleton */ }
+// Все классы — синглтоны, даже утилиты без состояния</code></pre>
+<div class="note">
+<p><strong>Решение:</strong> выбирать инструмент под задачу, а не наоборот. Оценивать контекст, сложность и требования перед выбором решения.</p>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('golden-hammer')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="copy-paste"><summary>📋 Copy-Paste Programming</summary><div class="details-content">
+<p><strong>Одинаковый код копируется во множество мест.</strong></p>
+<div class="bad-code">
+<pre><code>// ❌ validateUser() скопирован в 15 классов
+class UserController {
+    boolean validateUser(User user) {
+        if (user.getName() == null || user.getName().isEmpty()) return false;
+        if (user.getEmail() == null || !user.getEmail().contains("@")) return false;
+        return true;
+    }
+}
+class OrderService {
+    boolean validateUser(User user) { /* ТОТ ЖЕ КОД */ }
+}
+class PaymentService {
+    boolean validateUser(User user) { /* ТОТ ЖЕ КОД */ }
+}</code></pre>
+</div>
+<h4>Проблема</h4>
+<ul>
+<li>исправление ошибки требует менять код в каждом месте</li>
+<li>легко пропустить одно из мест при обновлении</li>
+<li>кодовая база раздувается</li>
+<li>нарушается DRY (Don't Repeat Yourself)</li>
+</ul>
+<div class="good-code">
+<pre><code>// ✅ Выделить общий код
+public class UserValidator {
+    public static boolean isValid(User user) {
+        if (user.getName() == null || user.getName().isEmpty()) return false;
+        if (user.getEmail() == null || !user.getEmail().contains("@")) return false;
+        return true;
+    }
+}
+// Использование во всех классах
+UserValidator.isValid(user);</code></pre>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('copy-paste')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="magic-numbers"><summary>🔢 Magic Numbers / Magic Strings</summary><div class="details-content">
+<p><strong>Появляются непонятные значения:</strong> <code>if (status == 7)</code> или <code>if ("ADMIN".equals(role))</code>. Непонятно: почему именно 7, что означает "ADMIN".</p>
+<div class="bad-code">
+<pre><code>// ❌ Magic Numbers
+if (user.getStatus() == 3) { ... }
+if (order.getAmount() > 10000) { ... }
+Thread.sleep(3000); // что за 3000?
+connection.setTimeout(5000); // что за 5000?
+
+// ❌ Magic Strings
+if ("ADMIN".equals(role)) { ... }
+if (response.getCode().equals("ERR_001")) { ... }</code></pre>
+</div>
+<div class="good-code">
+<pre><code>// ✅ Именованные константы и enum
+enum UserStatus { NEW(1), ACTIVE(2), BLOCKED(3); }
+
+if (user.getStatus() == UserStatus.BLOCKED) { ... }
+
+private static final BigDecimal VIP_THRESHOLD = new BigDecimal("10000");
+if (order.getAmount().compareTo(VIP_THRESHOLD) > 0) { ... }
+
+private static final int CONNECTION_TIMEOUT_MS = 5000;
+connection.setTimeout(CONNECTION_TIMEOUT_MS);</code></pre>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('magic-numbers')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="singleton-abuse"><summary>💎 Singleton Abuse</summary><div class="details-content">
+<p>Сам по себе Singleton — не антипаттерн. Но злоупотребление им приводит к проблемам: все сервисы сделаны Singleton и обращаются друг к другу через глобальное состояние.</p>
+<div class="bad-code">
+<pre><code>// ❌ Все сервисы — синглтоны, зависят друг от друга через getInstance()
+class OrderService {
+    public void create(Order order) {
+        Database.getInstance().save(order);
+        Logger.getInstance().log("Order created");
+        EmailService.getInstance().send(order.getUser(), "Confirmed");
+        Cache.getInstance().invalidate("orders");
+    }
+}</code></pre>
+</div>
+<h4>Проблемы</h4>
+<ul>
+<li>сложно тестировать — нельзя подменить моками</li>
+<li>скрытые зависимости — не видно, что нужно сервису</li>
+<li>нарушение DIP — зависимость от конкретных классов</li>
+<li>жёсткая связанность — замена Logger требует изменений везде</li>
+</ul>
+<div class="good-code">
+<pre><code>// ✅ Dependency Injection
+@Service
+class OrderService {
+    private final Database database;
+    private final Logger logger;
+    private final EmailService emailService;
+    private final Cache cache;
+
+    // Зависимости явно видны в конструкторе
+    public OrderService(Database database, Logger logger,
+                        EmailService emailService, Cache cache) {
+        this.database = database;
+        this.logger = logger;
+        this.emailService = emailService;
+        this.cache = cache;
+    }
+}</code></pre>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('singleton-abuse')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="big-ball-of-mud"><summary>🟤 Big Ball of Mud</summary><div class="details-content">
+<p><strong>Большой проект без архитектуры.</strong> Все классы зависят друг от друга, циклические зависимости, невозможно понять структуру системы.</p>
+<h4>Признаки</h4>
+<ul>
+<li>циклические зависимости между пакетами</li>
+<li>невозможно выделить слои приложения</li>
+<li>любое изменение вызывает ошибки в неожиданных местах</li>
+<li>нет чётких границ между модулями</li>
+<li>тесты не проходят после любого рефакторинга</li>
+</ul>
+<h4>Как возникает</h4>
+<p>Проект долго развивается без архитектурного контроля. Каждый разработчик добавляет код "как получится". Нет code review, нет рефакторинга, нет общих правил.</p>
+<div class="note">
+<p><strong>Решение:</strong> архитектурный контроль, выделение модулей, построение диаграмм зависимостей, постепенный рефакторинг, инструменты вроде ArchUnit для проверки архитектурных правил.</p>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('big-ball-of-mud')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="lava-flow"><summary>🌋 Lava Flow</summary><div class="details-content">
+<p><strong>В проекте остаётся старый код, который никто не удаляет.</strong> Причины: "вдруг пригодится", никто не знает используется ли он, страх сломать что-то.</p>
+<pre><code>// ❌ Примеры Lava Flow
+@Deprecated // висит годами
+public void oldMethod() { ... }
+
+// Класс не используется, но все боятся удалить
+class LegacyReportGenerator { ... }
+
+// Закомментированный код
+// if (oldFlag) { doSomethingOld(); }</code></pre>
+<h4>Результат</h4>
+<ul>
+<li>мёртвый код занимает место</li>
+<li>лишние классы усложняют навигацию</li>
+<li>сложнее понимать систему</li>
+<li>новые разработчики пытаются использовать устаревший код</li>
+</ul>
+<div class="note">
+<p><strong>Решение:</strong> регулярно удалять неиспользуемый код, полагаться на систему контроля версий (Git) для истории, использовать анализаторы (IntelliJ IDEA показывает unused code), покрывать код тестами перед удалением.</p>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('lava-flow')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="premature-optimization"><summary>⚡ Premature Optimization</summary><div class="details-content">
+<p><strong>"Преждевременная оптимизация — корень многих проблем."</strong> Разработчик начинает оптимизировать код без измерений.</p>
+<div class="bad-code">
+<pre><code>// ❌ Оптимизация без профилирования
+// Использует сложные структуры данных без необходимости
+Map&lt;String, List&lt;Integer&gt;&gt; cache = new ConcurrentHashMap&lt;&gt;();
+// Пишет низкоуровневые оптимизации
+int result = (a << 1) + b; // вместо a * 2 + b
+// Использует примитивы вместо объектов для экономии на Boxing</code></pre>
+</div>
+<div class="good-code">
+<pre><code>// ✅ Правильный подход
+// 1. Сделать код понятным
+int result = a * 2 + b;
+
+// 2. Измерить производительность (профилирование)
+// 3. Оптимизировать только узкие места
+// 4. Повторить измерение для проверки эффекта</code></pre>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('premature-optimization')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="hard-coding"><summary>📌 Hard Coding</summary><div class="details-content">
+<p><strong>Данные жёстко прописаны в коде.</strong></p>
+<div class="bad-code">
+<pre><code>// ❌ Hard Coding
+String url = "jdbc:mysql://192.168.1.100:3306/mydb";
+int timeout = 3000;
+String apiKey = "sk-1234567890abcdef";
+String adminEmail = "admin@company.com";
+int maxRetries = 3;</code></pre>
+</div>
+<div class="good-code">
+<pre><code>// ✅ Вынос в конфигурацию
+// application.properties
+database.url=jdbc:mysql://localhost:3306/mydb
+database.timeout=3000
+api.key=${API_KEY}
+notification.admin-email=admin@company.com
+retry.max-attempts=3
+
+// Использование
+@Value("${database.url}")
+private String databaseUrl;
+
+@Value("${retry.max-attempts}")
+private int maxRetries;</code></pre>
+</div>
+<h4>Куда выносить</h4>
+<ul>
+<li>application.properties / application.yml</li>
+<li>переменные окружения (секреты, ключи API)</li>
+<li>конфигурационные классы</li>
+<li>Consul / Vault / AWS Parameter Store</li>
+</ul>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('hard-coding')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="java-antipatterns"><summary>☕ Антипаттерны, специфичные для Java</summary><div class="details-content">
+<h4>1. == вместо equals()</h4>
+<div class="bad-code">
+<pre><code>// ❌ Сравнение ссылок вместо содержимого
+if (user.getRole() == "ADMIN") { ... } // false, если строка не из пула
+if (new Integer(100) == new Integer(100)) { ... } // может быть false</code></pre>
+</div>
+<div class="good-code">
+<pre><code>// ✅ Правильное сравнение
+if ("ADMIN".equals(user.getRole())) { ... }
+if (Objects.equals(a, b)) { ... }</code></pre>
+</div>
+<h4>2. Использование null вместо Optional</h4>
+<div class="bad-code">
+<pre><code>// ❌ Возврат null
+public User findUser(Long id) {
+    return null; // вызывающий код должен помнить про проверку
+}</code></pre>
+</div>
+<div class="good-code">
+<pre><code>// ✅ Optional для явного указания возможности отсутствия
+public Optional&lt;User&gt; findUser(Long id) {
+    return Optional.ofNullable(user);
+}</code></pre>
+</div>
+<h4>3. Чрезмерное использование статических методов</h4>
+<div class="bad-code">
+<pre><code>// ❌ Статические методы везде — глобальное состояние
+class Util {
+    static void doSomething() {}
+    static void doAnother() {}
+    static void doMore() {}
+}</code></pre>
+</div>
+<h4>4. Слишком длинные методы (Long Method)</h4>
+<p>Методы на сотни строк, делающие множество разных вещей. Решение: выделение подметодов (рефакторинг Extract Method).</p>
+<h4>5. Исключения для обычной логики</h4>
+<div class="bad-code">
+<pre><code>// ❌ Исключения для управления потоком
+try {
+    Integer.parseInt(s);
+} catch (NumberFormatException e) {
+    return 0;
+}</code></pre>
+</div>
+<h4>6. Неправильное использование многопоточности</h4>
+<div class="bad-code">
+<pre><code>// ❌ Общий ArrayList без синхронизации
+List&lt;String&gt; list = new ArrayList&lt;&gt;();
+// Поток 1: list.add("a");
+// Поток 2: list.add("b");
+// Результат непредсказуем</code></pre>
+</div>
+<div class="good-code">
+<pre><code>// ✅ Потокобезопасные коллекции
+List&lt;String&gt; list = new CopyOnWriteArrayList&lt;&gt;();
+List&lt;String&gt; list = Collections.synchronizedList(new ArrayList&lt;&gt;());</code></pre>
+</div>
+<h4>7. God Class с большим количеством полей</h4>
+<p>Класс с десятками полей и обязанностей. Решение: разделить на несколько классов по ответственности.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('java-antipatterns')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="antipatterns-summary"><summary>📊 Сводная таблица антипаттернов</summary><div class="details-content">
+<table>
+<tr><th>Антипаттерн</th><th>Проблема</th><th>Решение</th></tr>
+<tr><td><strong>God Object</strong></td><td>Один класс делает всё, нарушает SRP</td><td>Разделить на специализированные сервисы</td></tr>
+<tr><td><strong>Spaghetti Code</strong></td><td>Запутанный код без структуры</td><td>Рефакторинг, выделение методов, SOLID</td></tr>
+<tr><td><strong>Golden Hammer</strong></td><td>Один инструмент для всех задач</td><td>Выбирать инструмент под задачу</td></tr>
+<tr><td><strong>Copy-Paste</strong></td><td>Дублирование кода</td><td>Выделить общий код</td></tr>
+<tr><td><strong>Magic Numbers</strong></td><td>Непонятные значения в коде</td><td>Именованные константы, enum</td></tr>
+<tr><td><strong>Singleton Abuse</strong></td><td>Глобальное состояние, скрытые зависимости</td><td>Dependency Injection</td></tr>
+<tr><td><strong>Big Ball of Mud</strong></td><td>Отсутствие архитектуры</td><td>Архитектурный контроль, модульность</td></tr>
+<tr><td><strong>Lava Flow</strong></td><td>Мёртвый код, который никто не удаляет</td><td>Регулярная чистка, анализаторы</td></tr>
+<tr><td><strong>Premature Optimization</strong></td><td>Оптимизация без измерений</td><td>Сначала профилирование, потом оптимизация</td></tr>
+<tr><td><strong>Hard Coding</strong></td><td>Данные жёстко прописаны в коде</td><td>Вынести в конфигурацию</td></tr>
+</table>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('antipatterns-summary')">⬆️ Свернуть</button></div>
+</div></details>
+
+</div>
+
+<div style="text-align: center; margin-top: 20px; padding: 10px;">
+<a href="index.html" style="
+display: inline-block;
+background-color: var(--button-bg);
+color: var(--button-text);
+border: 1px solid var(--border);
+padding: 10px 24px;
+border-radius: 4px;
+text-decoration: none;
+font-size: 0.9em;
+transition: 0.2s;
+" onmouseover="this.style.backgroundColor='var(--button-hover)'" 
+   onmouseout="this.style.backgroundColor='var(--button-bg)'">
+⬅️ Назад к содержанию
+</a>
+</div>
+
+<script>
+function setTheme(t) { document.body.className = t; }
+let fs = 16;
+function changeFontSize(d) { fs = Math.min(24, Math.max(12, fs + d)); document.body.style.fontSize = fs + 'px'; document.getElementById('fontSizeLabel').textContent = fs + 'px'; }
+function closeDetails(id) { const d = document.getElementById(id); if (d) d.removeAttribute('open'); }
+setTheme('dark');
+</script>
+</body>
+</html>

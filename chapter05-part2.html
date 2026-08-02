@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HashMap / equals / hashCode: полный справочник (Часть 2)</title>
+<style>
+:root {
+--bg: #1e1e1e; --text: #d4d4d4; --header-bg: #2d2d2d; --summary-bg: #333;
+--summary-hover: #3c3c3c; --border: #555; --code-bg: #252526; --code-border: #404040;
+--button-bg: #444; --button-text: #ddd; --button-hover: #555; --link: #569cd6;
+--scrollbar-thumb: #666; --scrollbar-track: #2d2d2d; --details-content-bg: var(--bg);
+--table-bg: #2a2a2a; --table-header: #3a3a3a; --accent: #e8c170;
+}
+body.light {
+--bg: #ffffff; --text: #1e1e1e; --header-bg: #f3f3f3; --summary-bg: #e8e8e8;
+--summary-hover: #ddd; --border: #ccc; --code-bg: #f9f9f9; --code-border: #ddd;
+--button-bg: #e0e0e0; --button-text: #000; --button-hover: #ccc; --link: #0451a5;
+--scrollbar-thumb: #aaa; --scrollbar-track: #f0f0f0; --details-content-bg: #fff;
+--table-bg: #fff; --table-header: #e0e0e0; --accent: #b8860b;
+}
+body.sepia {
+--bg: #f4ecd8; --text: #5b4636; --header-bg: #e8dcc8; --summary-bg: #ddd0b8;
+--summary-hover: #cfc1a8; --border: #b8a88a; --code-bg: #eee3d0; --code-border: #c0b090;
+--button-bg: #d6c9ae; --button-text: #3e2f22; --button-hover: #c2b498; --link: #8b5e3c;
+--scrollbar-thumb: #b8a080; --scrollbar-track: #e8dcc8; --details-content-bg: #f4ecd8;
+--table-bg: #f4ecd8; --table-header: #ddd0b8; --accent: #6b4e16;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+background-color: var(--bg); color: var(--text);
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6;
+padding: 10px; transition: background-color 0.3s, color 0.3s; font-size: 16px;
+}
+header {
+background-color: var(--header-bg); padding: 15px; border-radius: 6px;
+margin-bottom: 20px; display: flex; flex-wrap: wrap; align-items: center;
+justify-content: space-between; gap: 10px;
+}
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+button {
+background-color: var(--button-bg); color: var(--button-text);
+border: 1px solid var(--border); padding: 6px 12px; border-radius: 4px;
+cursor: pointer; font-size: 0.9em; transition: 0.2s;
+}
+button:hover { background-color: var(--button-hover); }
+.font-controls { display: flex; gap: 4px; }
+.font-size-label { align-self: center; margin: 0 4px; font-weight: bold; }
+.container { max-width: 1000px; margin: 0 auto; }
+h2 { border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-top: 30px; margin-bottom: 15px; }
+h4 { margin-top: 15px; margin-bottom: 8px; color: var(--link); }
+details {
+background-color: var(--summary-bg); border: 1px solid var(--border);
+border-radius: 6px; margin-bottom: 10px; overflow: hidden; transition: 0.2s;
+}
+details[open] { background-color: var(--details-content-bg); }
+summary {
+padding: 12px 16px; font-weight: 600; cursor: pointer;
+background-color: var(--summary-bg); transition: background-color 0.2s;
+list-style-position: inside; font-size: 1.05em;
+}
+summary:hover { background-color: var(--summary-hover); }
+summary::-webkit-details-marker { color: var(--link); }
+.details-content {
+padding: 0 16px 16px 16px; max-height: 65vh; overflow-y: auto;
+scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+.details-content::-webkit-scrollbar { width: 8px; }
+.details-content::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+.details-content::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 4px; }
+.close-btn-container {
+text-align: right; position: sticky; bottom: 0;
+background: linear-gradient(transparent, var(--details-content-bg) 70%);
+padding: 15px 0 5px; margin-top: 10px;
+}
+.close-btn { font-size: 0.85em; padding: 5px 14px; }
+pre {
+background-color: var(--code-bg); border: 1px solid var(--code-border);
+border-radius: 4px; padding: 12px; overflow-x: auto;
+font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+font-size: 0.9em; margin: 10px 0; line-height: 1.5; white-space: pre-wrap; word-break: break-word;
+}
+code { font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace; }
+.section-intro { margin-bottom: 20px; padding: 10px; background-color: var(--header-bg); border-radius: 5px; }
+p { margin: 10px 0; }
+ul, ol { margin: 10px 0 10px 20px; }
+li { margin: 5px 0; }
+table { width: 100%; border-collapse: collapse; margin: 10px 0; background-color: var(--table-bg); }
+th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+th { background-color: var(--table-header); font-weight: 600; }
+strong { color: var(--link); }
+@media (max-width: 600px) {
+body { font-size: 14px; }
+header { flex-direction: column; align-items: flex-start; }
+.controls { width: 100%; }
+}
+</style>
+</head>
+<body class="dark">
+<header>
+<h1>📘 HashMap / equals / hashCode: Часть 2</h1>
+<div class="controls">
+<div class="theme-controls">
+<button onclick="setTheme('dark')">🌙 Тёмная</button>
+<button onclick="setTheme('light')">☀️ Светлая</button>
+<button onclick="setTheme('sepia')">📜 Сепия</button>
+</div>
+<div class="font-controls">
+<button onclick="changeFontSize(-1)">A-</button>
+<span class="font-size-label" id="fontSizeLabel">16px</span>
+<button onclick="changeFontSize(1)">A+</button>
+</div>
+</div>
+</header>
+<div class="container">
+<div class="section-intro">
+<p><strong>Часть 2:</strong> Изменяемые ключи, load factor, capacity, rehashing, временная сложность, многопоточность, ConcurrentHashMap, null-ключи и значения, сравнение с Hashtable, WeakHashMap, выбор capacity, ArrayList vs HashMap.</p>
+</div>
+
+<h2>🟢 Ключи HashMap</h2>
+
+<details id="mutable-key"><summary>Можно ли использовать изменяемый объект как ключ в HashMap?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Формально — можно, практически — <strong>нельзя</strong>. Если ключ изменяется после вставки так, что меняется его hashCode() или equals(), он "теряется" в старой корзине. get() вернёт null, containsKey() — false, хотя объект физически остаётся в карте, занимая память и создавая утечку.</p>
+<h4>Демонстрация проблемы</h4>
+<pre><code>class MutableKey {
+    private String name;
+    public void setName(String name) { this.name = name; }
+    @Override public boolean equals(Object o) { /* по name */ }
+    @Override public int hashCode() { return Objects.hash(name); }
+}
+MutableKey key = new MutableKey("Alice");
+Map<MutableKey, String> map = new HashMap<>();
+map.put(key, "value1");
+key.setName("Bob"); // КЛЮЧ ИЗМЕНИЛСЯ!
+map.get(key); // null — НЕ НАЙДЕН!</code></pre>
+<h4>Механика потери ключа</h4>
+<pre><code>put(key): key.name="Alice" → hashCode=12345 → index=9 → table[9]=key
+key.setName("Bob"): key.name="Bob" → hashCode=67890 — НО ОБЪЕКТ В table[9]!
+get(key): hashCode=67890 → index=10 → table[10]=null → return null</code></pre>
+<h4>Все три сценария изменения ключа</h4>
+<table>
+<tr><th>Изменение</th><th>hashCode</th><th>equals</th><th>get()</th></tr>
+<tr><td>Поле в hashCode и equals</td><td>Изменился</td><td>Изменился</td><td>null — другая корзина</td></tr>
+<tr><td>Поле только в hashCode</td><td>Изменился</td><td>Не изменился</td><td>null — другая корзина</td></tr>
+<tr><td>Поле только в equals</td><td>Не изменился</td><td>Изменился</td><td>null — та же корзина, но equals=false</td></tr>
+</table>
+<h4>Исключение: изменение полей, не участвующих в equals/hashCode</h4>
+<pre><code>class PartiallyMutableKey {
+    private final Long id;        // участвует в equals/hashCode — final
+    private String description;   // НЕ участвует — можно менять
+}
+key.setDescription("new desc"); // безопасно — id не изменился</code></pre>
+<h4>Безопасные типы ключей</h4>
+<pre><code>// ✅ Неизменяемые (immutable)
+String, Integer, Long, Double, LocalDate, UUID, Enum
+
+// ❌ Изменяемые — опасны
+ArrayList, mutable объекты с сеттерами</code></pre>
+<h4>Memory leak</h4>
+<pre><code>// 100 000 "потерянных" объектов — память занята, данные недоступны
+for (int i = 0; i < 100_000; i++) {
+    MutableKey key = new MutableKey("initial");
+    map.put(key, "value");
+    key.setName("changed" + i);
+}
+// map.size() = 100 000, но ни один не доступен по исходному ключу</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('mutable-key')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="change-key"><summary>Что случится, если изменить ключ после добавления в HashMap?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Ключ "потеряется". get() вернёт null, containsKey() — false, хотя объект физически останется в HashMap, занимая память. Причина: HashMap вычисляет корзину по hashCode() в момент вставки и никогда не пересчитывает её при изменении ключа.</p>
+<h4>Механика потери</h4>
+<pre><code>ШАГ 1: put(key) → key.name="Alice" → hashCode=12345 → index=9 → table[9]=key
+ШАГ 2: key.setName("Bob") → hashCode=67890, НО ОБЪЕКТ В table[9]!
+ШАГ 3: get(key) → hashCode=67890 → index=10 → table[10]=null → null</code></pre>
+<h4>Визуализация в памяти</h4>
+<pre><code>ДО:  table[9] → key("Alice") → "value1"  | get → ✅ найден
+ПОСЛЕ: table[9] → key("Bob") → "value1"  | table[10] → null
+      get → hashCode=67890 → корзина 10 → ❌ НЕ НАЙДЕН</code></pre>
+<h4>Итерация всё ещё видит потерянные элементы</h4>
+<pre><code>for (Map.Entry<MutableKey, String> entry : map.entrySet()) {
+    System.out.println(entry.getKey().getName() + " = " + entry.getValue());
+}
+// Вывод: Bob = value1 — элемент есть, но по ключу недоступен</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('change-key')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="key-requirements"><summary>Какие требования к ключу HashMap?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Ключ HashMap должен корректно реализовывать equals() и hashCode() по контракту, быть неизменяемым (или не изменяться после вставки) и не быть null с точки зрения логики приложения.</p>
+<h4>1. Корректная реализация equals() и hashCode()</h4>
+<pre><code>public final class UserKey {
+    private final Long id; private final String email;
+    @Override public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UserKey)) return false;
+        UserKey key = (UserKey) o;
+        return Objects.equals(id, key.id) && Objects.equals(email, key.email);
+    }
+    @Override public int hashCode() { return Objects.hash(id, email); }
+}</code></pre>
+<h4>2. Неизменяемость (immutability)</h4>
+<pre><code>// ✅ Идеальный ключ — полностью иммутабельный
+public final class Key { private final Long id; /* только геттеры, НЕТ сеттеров */ }
+// ❌ Проблемный ключ — мутабельный
+class BadKey { private String value; public void setValue(String v) { ... } }</code></pre>
+<h4>3. Стабильный hashCode()</h4>
+<pre><code>// ✅ hashCode зависит только от неизменяемых полей
+@Override public int hashCode() { return Objects.hash(id, name); }
+// ❌ hashCode с Math.random() — каждый вызов новый!</code></pre>
+<h4>4. null-ключ (особый случай)</h4>
+<pre><code>// HashMap разрешает ОДИН null-ключ (всегда в корзине 0)
+// Hashtable и ConcurrentHashMap — NullPointerException!</code></pre>
+<h4>Сводная таблица требований</h4>
+<table>
+<tr><th>Требование</th><th>Почему важно</th><th>Пример нарушения</th></tr>
+<tr><td>equals=true → hashCode одинаковый</td><td>Без этого get() не найдёт ключ</td><td>Только equals переопределён</td></tr>
+<tr><td>Неизменяемость полей в equals/hashCode</td><td>Изменение "теряет" ключ</td><td>Сеттер меняет поле ключа</td></tr>
+<tr><td>Одни и те же поля в обоих методах</td><td>Разные поля → разный hashCode</td><td>equals по name, hashCode по id</td></tr>
+<tr><td>Симметричность equals</td><td>Нарушение контракта</td><td>a.equals(b) ≠ b.equals(a)</td></tr>
+<tr><td>Стабильность hashCode</td><td>Повторные вызовы — одно значение</td><td>Math.random() в hashCode</td></tr>
+</table>
+<h4>Идеальный шаблон класса-ключа</h4>
+<pre><code>public final class Key {
+    private final Long id; private final String type;
+    public Key(Long id, String type) {
+        this.id = Objects.requireNonNull(id);
+        this.type = Objects.requireNonNull(type);
+    }
+    // equals + hashCode + toString
+}</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('key-requirements')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="string-as-key"><summary>Почему String часто используется как ключ в HashMap?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> String — идеальный ключ: <strong>иммутабельный</strong>, имеет <strong>кешированный hashCode()</strong>, эффективный equals(), хорошее распределение.</p>
+<h4>1. Иммутабельность</h4>
+<pre><code>String key = "user123"; map.put(key, data);
+key.toUpperCase(); // создаёт НОВУЮ строку, key не меняется</code></pre>
+<h4>2. Кешированный hashCode()</h4>
+<pre><code>public final class String {
+    private int hash; // кеш — по умолчанию 0
+    @Override public int hashCode() {
+        int h = hash;
+        if (h == 0 && value.length > 0) {
+            for (byte b : value) { h = 31 * h + (b & 0xff); }
+            hash = h; // сохраняем в кеш
+        }
+        return h; // повторные вызовы — мгновенный возврат
+    }
+}</code></pre>
+<h4>3. Эффективный equals()</h4>
+<pre><code>// Сначала this == anObject (сравнение ссылок, O(1))
+// Затем сравнение длины (разная длина → точно не равны)
+// Посимвольное сравнение только при совпадении длины</code></pre>
+<h4>4. Хорошее распределение hashCode()</h4>
+<pre><code>"apple".hashCode();  // 93029210
+"banana".hashCode(); // -1396355227
+// Множитель 31: простое число, 31*x = (x<<5)-x — оптимизация компилятором</code></pre>
+<h4>Сравнение с другими типами ключей</h4>
+<table>
+<tr><th>Тип ключа</th><th>Иммутабельность</th><th>Кеш hashCode</th><th>Распределение</th></tr>
+<tr><td>String</td><td>✅</td><td>✅</td><td>✅ Отличное</td></tr>
+<tr><td>Integer</td><td>✅</td><td>✅</td><td>✅ Отличное</td></tr>
+<tr><td>Long</td><td>✅</td><td>✅</td><td>✅ Хорошее</td></tr>
+<tr><td>ArrayList</td><td>❌</td><td>❌</td><td>Зависит от содержимого</td></tr>
+</table>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('string-as-key')">⬆️ Свернуть</button></div>
+</div></details>
+
+<h2>🔵 Параметры HashMap</h2>
+
+<details id="load-factor"><summary>Что такое load factor в HashMap?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> loadFactor — коэффициент загрузки, определяющий порог расширения. По умолчанию 0.75. Когда size > capacity × loadFactor, массив увеличивается вдвое. Это компромисс между скоростью и памятью.</p>
+<h4>Формула порога расширения</h4>
+<pre><code>int threshold = (int) (capacity * loadFactor);
+// capacity=16, loadFactor=0.75 → threshold=12
+// Когда size > 12 → resize() → capacity=32</code></pre>
+<h4>Как loadFactor влияет на поведение</h4>
+<table>
+<tr><th>loadFactor</th><th>Расширение при</th><th>Память</th><th>Коллизии</th><th>Производительность</th></tr>
+<tr><td>0.5</td><td>8 из 16 (50%)</td><td>Избыточная</td><td>Минимум</td><td>Высокая</td></tr>
+<tr><td>0.75</td><td>12 из 16 (75%)</td><td>Сбалансированная</td><td>Низкая</td><td>Оптимальная</td></tr>
+<tr><td>1.0</td><td>16 из 16 (100%)</td><td>Экономичная</td><td>Высокая</td><td>Сниженная</td></tr>
+</table>
+<h4>Почему именно 0.75</h4>
+<p>Распределение Пуассона: при loadFactor=0.75 вероятность 0 элементов в корзине — 60.6%, 1 элемент — 30.3%, 2 — 7.6%, 8 — 0.000006%. Эмпирические тесты + свойства хеш-функции.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('load-factor')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="capacity"><summary>Что такое capacity в HashMap?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> capacity — это размер внутреннего массива HashMap (количество корзин/buckets). Всегда степень двойки. Не путать с size (количество элементов).</p>
+<h4>Что такое capacity технически</h4>
+<pre><code>public class HashMap<K,V> {
+    transient Node<K,V>[] table;  // capacity = table.length
+    int size;                     // количество элементов
+}
+map.size();     // 2 — количество элементов
+// capacity — только через рефлексию</code></pre>
+<h4>Почему capacity — всегда степень двойки</h4>
+<pre><code>new HashMap<>(10);   // capacity = 16 (ближайшая степень 2 ≥ 10)
+new HashMap<>(50);   // capacity = 64
+// Для быстрого вычисления индекса: index = hash & (capacity - 1)</code></pre>
+<h4>Как правильно задавать начальную capacity</h4>
+<pre><code>// Формула: expectedSize / loadFactor + 1
+new HashMap<>(10000 / 0.75 + 1); // capacity=13334 → округлится до 16384
+// Guava: Maps.newHashMapWithExpectedSize(10000);
+// JDK 19+: HashMap.newHashMap(10000);</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('capacity')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="rehashing-when"><summary>Когда происходит rehashing в HashMap?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> (1) Когда size > capacity × loadFactor; (2) при попытке деревофикации с capacity < 64 — вместо дерева resize().</p>
+<h4>Основной триггер: превышение порога</h4>
+<pre><code>int threshold = (int) (capacity * loadFactor); // 16 * 0.75 = 12
+if (++size > threshold) resize();</code></pre>
+<h4>Второй триггер: деревофикация при capacity < 64</h4>
+<pre><code>if (binCount >= TREEIFY_THRESHOLD - 1) { // ≥ 8 элементов
+    if (table.length < MIN_TREEIFY_CAPACITY) resize(); // < 64
+    else treeifyBin(tab, hash);
+}</code></pre>
+<h4>Полный список триггеров</h4>
+<table>
+<tr><th>Ситуация</th><th>Условие</th><th>Действие</th></tr>
+<tr><td>Превышение порога</td><td>size > capacity × loadFactor</td><td>resize() — массив ×2</td></tr>
+<tr><td>Деревофикация с capacity < 64</td><td>≥ 8 элементов И capacity < 64</td><td>resize() вместо treeifyBin()</td></tr>
+<tr><td>putAll()</td><td>Добавление большой коллекции</td><td>Может вызвать resize</td></tr>
+</table>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('rehashing-when')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="rehashing-what"><summary>Что происходит при rehashing?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Создаётся новый массив корзин вдвое большего размера, и каждый элемент переносится с пересчётом индекса. Оптимизация: проверка одного бита hash & oldCap — 0 → та же корзина, 1 → oldIndex + oldCap.</p>
+<h4>Пошаговый разбор</h4>
+<pre><code>// Шаг 1: Новый массив
+Node<K,V>[] oldTab = table;
+int newCap = oldCap << 1; // 16 → 32
+Node<K,V>[] newTab = new Node[newCap];
+
+// Шаг 2: Обход всех корзин
+for (int i = 0; i < oldCap; i++) { ... }
+
+// Шаг 3: Распределение — lo/hi цепочки
+if ((e.hash & oldCap) == 0) { /* lo-цепочка — та же корзина */ }
+else { /* hi-цепочка — oldIndex + oldCap */ }
+
+// Шаг 4: Перенос
+newTab[i] = loHead;
+newTab[i + oldCap] = hiHead;</code></pre>
+<h4>Почему индекс либо сохраняется, либо +oldCap</h4>
+<pre><code>// hash=2:  oldIndex=2&15=2,  newIndex=2&31=2 → ОСТАЁТСЯ
+// hash=18: oldIndex=18&15=2, newIndex=18&31=18 → 2+16 (oldIndex+oldCap)</code></pre>
+<p>Всё решает один бит — hash & oldCap.</p>
+<h4>Стоимость rehashing</h4>
+<table>
+<tr><th>Операция</th><th>Сложность</th></tr>
+<tr><td>Создание нового массива</td><td>O(1)</td></tr>
+<tr><td>Обход всех элементов</td><td>O(n)</td></tr>
+<tr><td>Пересчёт индексов</td><td>O(1) на элемент</td></tr>
+<tr><td>Итого</td><td>O(n)</td></tr>
+</table>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('rehashing-what')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="complexity"><summary>Какова временная сложность операций get() и put() в HashMap?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> В среднем — O(1). В худшем (без дерева) — O(n). С деревом (Java 8+) — O(log n).</p>
+<h4>Средний случай: O(1)</h4>
+<pre><code>// Вычисление хеша — O(1), индекс корзины — O(1), в корзине 0-1 элемент
+map.put("alice", new User()); // O(1)
+map.get("alice"); // O(1)</code></pre>
+<h4>Разбор по шагам: get()</h4>
+<pre><code>int hash = hash(key);                  // O(1)
+int index = hash & (table.length - 1); // O(1)
+Node<K,V> current = table[index];      // обход цепочки: O(1) в среднем</code></pre>
+<h4>Худший случай: без деревофикации (Java 7)</h4>
+<pre><code>// Все ключи в одной корзине → get() = O(1000)
+class BadKey { @Override public int hashCode() { return 1; } }</code></pre>
+<h4>Худший случай: с деревофикацией (Java 8+)</h4>
+<pre><code>// Те же 1000 элементов → красно-чёрное дерево → get() = O(log 1000) ≈ O(10)</code></pre>
+<h4>Сводная таблица</h4>
+<table>
+<tr><th>Операция</th><th>Средний</th><th>Худший (Java 7)</th><th>Худший (Java 8+)</th></tr>
+<tr><td>get(key)</td><td>O(1)</td><td>O(n)</td><td>O(log n)</td></tr>
+<tr><td>put(key, value)</td><td>O(1)</td><td>O(n)</td><td>O(log n)</td></tr>
+<tr><td>remove(key)</td><td>O(1)</td><td>O(n)</td><td>O(log n)</td></tr>
+</table>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('complexity')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="when-on"><summary>Когда временная сложность может стать O(n)?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Когда все ключи попадают в одну корзину из-за плохой хеш-функции, и деревофикация не применяется (Java 7 или capacity < 64).</p>
+<h4>Основная причина: все ключи в одной корзине</h4>
+<pre><code>class BadKey {
+    @Override public int hashCode() { return 42; } // всегда одно значение
+}
+// 100 000 элементов → get() = O(100 000)</code></pre>
+<h4>Условия, при которых O(n) реально проявляется</h4>
+<table>
+<tr><th>Условие</th><th>Java 7</th><th>Java 8+</th></tr>
+<tr><td>Все ключи в одной корзине, capacity ≥ 64</td><td>O(n)</td><td>O(log n)</td></tr>
+<tr><td>Все ключи в одной корзине, capacity < 64</td><td>O(n)</td><td>O(n) — деревофикации нет</td></tr>
+</table>
+<h4>DoS-атака</h4>
+<pre><code>"Aa".hashCode(); // 2112
+"BB".hashCode(); // 2112 — коллизия!
+// Можно подобрать тысячи строк с одинаковым hashCode
+// Защита в Java 8+: деревофикация → O(log n)</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('when-on')">⬆️ Свернуть</button></div>
+</div></details>
+
+<h2>🟣 Многопоточность и альтернативы</h2>
+
+<details id="concurrent"><summary>Как работает HashMap в многопоточной среде?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> HashMap <strong>не потокобезопасен</strong>. Возможны: потеря элементов, зацикливание (Java 7 при resize), неверный size, NullPointerException.</p>
+<h4>Что именно ломается</h4>
+<pre><code>// Проблема 1: Потеря элементов при put()
+// Поток 1: table[5] = nodeA; Поток 2: table[5] = nodeB → один потерян
+
+// Проблема 2: Зацикливание при resize() (Java 7)
+// NodeA → NodeB → NodeA → ... → CPU 100%
+
+// Проблема 3: Неверный size (size++ не атомарно)
+
+// Проблема 4: NullPointerException при resize</code></pre>
+<h4>Зацикливание в Java 7 (классический баг)</h4>
+<pre><code>// При resize в Java 7 список инвертировался: A→B→C → C→B→A
+// Два потока могли создать циклическую ссылку
+// Исправлено в Java 8: элементы сохраняют порядок (lo/hi цепочки)</code></pre>
+<h4>Потокобезопасные альтернативы</h4>
+<pre><code>// Вариант 1: ConcurrentHashMap (рекомендованный)
+ConcurrentHashMap<String, User> map = new ConcurrentHashMap<>();
+// CAS для пустых корзин, synchronized на уровне корзины
+
+// Вариант 2: Collections.synchronizedMap()
+Map<String, User> map = Collections.synchronizedMap(new HashMap<>());
+// Все методы synchronized, итерация требует внешней синхронизации</code></pre>
+<h4>Сравнение потокобезопасных решений</h4>
+<table>
+<tr><th>Решение</th><th>Блокировка</th><th>Производительность</th><th>null-ключи</th></tr>
+<tr><td>ConcurrentHashMap</td><td>На уровне корзины</td><td>Высокая</td><td>❌ Нет</td></tr>
+<tr><td>Collections.synchronizedMap()</td><td>На всей карте</td><td>Низкая</td><td>✅ Да</td></tr>
+<tr><td>Hashtable</td><td>На всей карте</td><td>Низкая</td><td>❌ Нет</td></tr>
+</table>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('concurrent')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="concurrenthashmap"><summary>Что такое ConcurrentHashMap и чем он отличается от HashMap?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Потокобезопасная Map, использующая CAS для пустых корзин и synchronized на уровне корзины. Запрещает null-ключи и значения. Имеет атомарные операции (putIfAbsent, compute).</p>
+<h4>Ключевые различия</h4>
+<table>
+<tr><th>Характеристика</th><th>HashMap</th><th>ConcurrentHashMap</th></tr>
+<tr><td>Потокобезопасность</td><td>❌ Нет</td><td>✅ Да</td></tr>
+<tr><td>null-ключи</td><td>✅ Да (один)</td><td>❌ Нет (NPE)</td></tr>
+<tr><td>null-значения</td><td>✅ Да</td><td>❌ Нет (NPE)</td></tr>
+<tr><td>Блокировка при чтении</td><td>Нет</td><td>Нет (volatile read)</td></tr>
+<tr><td>Блокировка при записи</td><td>Нет</td><td>CAS + synchronized</td></tr>
+<tr><td>Итератор</td><td>Fail-fast</td><td>Weakly-consistent</td></tr>
+<tr><td>Атомарные операции</td><td>❌ Нет</td><td>✅ putIfAbsent, compute, merge</td></tr>
+</table>
+<h4>Почему запрещён null</h4>
+<pre><code>// В многопоточной среде невозможно отличить:
+// "ключа нет" от "ключ есть, но значение — null"
+if (map.get(key) == null) { ... }</code></pre>
+<h4>Эволюция ConcurrentHashMap</h4>
+<table>
+<tr><th>Версия</th><th>Реализация</th></tr>
+<tr><td>Java 5-7</td><td>Сегменты (Segment[]) — 16 сегментов с ReentrantLock</td></tr>
+<tr><td>Java 8+</td><td>Одна таблица, CAS для пустых корзин, synchronized + деревофикация</td></tr>
+</table>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('concurrenthashmap')">⬆️ Свернуть</button></div>
+</div></details>
+
+<h2>🟡 Null и сравнение реализаций</h2>
+
+<details id="null-key"><summary>Можно ли хранить null ключ в HashMap?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Да, ровно один null-ключ. Всегда в корзине №0 (hashCode = 0). ConcurrentHashMap и Hashtable запрещают (NullPointerException).</p>
+<pre><code>map.put(null, "value"); // OK
+map.put(null, "value2"); // заменяет, не добавляет новый
+// null-ключ всегда в корзине 0: hash(null) → 0, index = 0 & (capacity-1) = 0</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('null-key')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="null-value"><summary>Можно ли хранить null значение в HashMap?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Да, сколько угодно. Главная проблема: get() возвращает null и для отсутствующего ключа, и для ключа со значением null. Различать через containsKey().</p>
+<pre><code>map.put("key1", null); map.put("key2", null); // OK
+// Неоднозначность:
+map.get("alice"); // null — ключа нет или значение null?
+map.containsKey("alice"); // false → ключа действительно нет</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('null-value')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="hashmap-vs-hashtable"><summary>В чём разница между HashMap и Hashtable?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> HashMap — современная, несинхронизированная, разрешает null. Hashtable — устаревшая (Java 1.0), все методы synchronized, запрещает null.</p>
+<table>
+<tr><th>Характеристика</th><th>HashMap</th><th>Hashtable</th></tr>
+<tr><td>Потокобезопасность</td><td>❌ Нет</td><td>✅ Да (synchronized)</td></tr>
+<tr><td>null-ключи</td><td>✅ Да (один)</td><td>❌ Нет (NPE)</td></tr>
+<tr><td>null-значения</td><td>✅ Да</td><td>❌ Нет (NPE)</td></tr>
+<tr><td>Когда появился</td><td>Java 1.2</td><td>Java 1.0</td></tr>
+<tr><td>Наследование</td><td>extends AbstractMap</td><td>extends Dictionary (legacy)</td></tr>
+</table>
+<p>В современной разработке Hashtable не используется. Для многопоточности — ConcurrentHashMap.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('hashmap-vs-hashtable')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="weakhashmap"><summary>Что такое WeakHashMap?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Map, в которой ключи хранятся как WeakReference. Если на ключ нет сильных ссылок, GC удаляет запись. Полезно для кешей без риска memory leak.</p>
+<pre><code>WeakHashMap<Object, String> map = new WeakHashMap<>();
+Object key = new Object();
+map.put(key, "value");
+key = null; System.gc(); // запись удалена!
+
+// ⚠️ Строковые литералы НИКОГДА не удалятся (String Pool)
+map.put("constant", "value"); // "constant" всегда достижим</code></pre>
+<h4>WeakHashMap vs HashMap</h4>
+<table>
+<tr><th>Характеристика</th><th>HashMap</th><th>WeakHashMap</th></tr>
+<tr><td>Ссылки на ключи</td><td>Сильные</td><td>Слабые (WeakReference)</td></tr>
+<tr><td>Удаление записей</td><td>Только явно (remove)</td><td>Автоматически GC</td></tr>
+</table>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('weakhashmap')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="choose-capacity"><summary>Как правильно выбрать начальный capacity для HashMap?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Формула: expectedSize / loadFactor + 1. Для 1000 элементов: 1000/0.75+1 = 1334 → округлится до 2048. Позволяет избежать resize().</p>
+<pre><code>// ❌ Без указания capacity: 14 ресайзов для 100 000 элементов
+new HashMap<>();
+// ✅ С capacity: 0 ресайзов
+new HashMap<>(100000 / 0.75 + 1); // capacity=131072
+// Готовые решения
+Maps.newHashMapWithExpectedSize(10000); // Guava
+HashMap.newHashMap(10000); // JDK 19+</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('choose-capacity')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="arraylist-vs-hashmap"><summary>Что лучше: ArrayList или HashMap для хранения пар ключ-значение?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Для хранения пар ключ-значение <strong>всегда лучше HashMap</strong>. HashMap: O(1) поиск. ArrayList: O(n) — обход всего списка.</p>
+<h4>Сравнение</h4>
+<table>
+<tr><th>Критерий</th><th>ArrayList (список пар)</th><th>HashMap</th></tr>
+<tr><td>Поиск по ключу</td><td>O(n) — обход списка</td><td>O(1) — хеш-таблица</td></tr>
+<tr><td>Вставка</td><td>O(1) в конец</td><td>O(1)</td></tr>
+<tr><td>Дубликаты ключей</td><td>Возможны</td><td>Невозможны</td></tr>
+</table>
+<p>ArrayList оправдан только для 1-3 элементов, дубликатов ключей, или когда поиск не нужен. Для всего остального — HashMap (или LinkedHashMap для сохранения порядка).</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('arraylist-vs-hashmap')">⬆️ Свернуть</button></div>
+</div></details>
+
+<div style="text-align: center; margin-top: 20px; padding: 10px;">
+<a href="index.html" style="display: inline-block; background-color: var(--button-bg); color: var(--button-text); border: 1px solid var(--border); padding: 10px 24px; border-radius: 4px; text-decoration: none; font-size: 0.9em; transition: 0.2s;" onmouseover="this.style.backgroundColor='var(--button-hover)'" onmouseout="this.style.backgroundColor='var(--button-bg)'">⬅️ Назад к содержанию</a>
+</div>
+
+</div>
+<script>
+function setTheme(t) { document.body.className = t; }
+let fs = 16;
+function changeFontSize(d) { fs = Math.min(24, Math.max(12, fs + d)); document.body.style.fontSize = fs + 'px'; document.getElementById('fontSizeLabel').textContent = fs + 'px'; }
+function closeDetails(id) { const d = document.getElementById(id); if (d) d.removeAttribute('open'); }
+setTheme('dark');
+</script>
+</body>
+</html>

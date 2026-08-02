@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HashMap / equals / hashCode: полный справочник (Часть 1)</title>
+<style>
+:root {
+--bg: #1e1e1e; --text: #d4d4d4; --header-bg: #2d2d2d; --summary-bg: #333;
+--summary-hover: #3c3c3c; --border: #555; --code-bg: #252526; --code-border: #404040;
+--button-bg: #444; --button-text: #ddd; --button-hover: #555; --link: #569cd6;
+--scrollbar-thumb: #666; --scrollbar-track: #2d2d2d; --details-content-bg: var(--bg);
+--table-bg: #2a2a2a; --table-header: #3a3a3a; --accent: #e8c170;
+}
+body.light {
+--bg: #ffffff; --text: #1e1e1e; --header-bg: #f3f3f3; --summary-bg: #e8e8e8;
+--summary-hover: #ddd; --border: #ccc; --code-bg: #f9f9f9; --code-border: #ddd;
+--button-bg: #e0e0e0; --button-text: #000; --button-hover: #ccc; --link: #0451a5;
+--scrollbar-thumb: #aaa; --scrollbar-track: #f0f0f0; --details-content-bg: #fff;
+--table-bg: #fff; --table-header: #e0e0e0; --accent: #b8860b;
+}
+body.sepia {
+--bg: #f4ecd8; --text: #5b4636; --header-bg: #e8dcc8; --summary-bg: #ddd0b8;
+--summary-hover: #cfc1a8; --border: #b8a88a; --code-bg: #eee3d0; --code-border: #c0b090;
+--button-bg: #d6c9ae; --button-text: #3e2f22; --button-hover: #c2b498; --link: #8b5e3c;
+--scrollbar-thumb: #b8a080; --scrollbar-track: #e8dcc8; --details-content-bg: #f4ecd8;
+--table-bg: #f4ecd8; --table-header: #ddd0b8; --accent: #6b4e16;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+background-color: var(--bg); color: var(--text);
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6;
+padding: 10px; transition: background-color 0.3s, color 0.3s; font-size: 16px;
+}
+header {
+background-color: var(--header-bg); padding: 15px; border-radius: 6px;
+margin-bottom: 20px; display: flex; flex-wrap: wrap; align-items: center;
+justify-content: space-between; gap: 10px;
+}
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+button {
+background-color: var(--button-bg); color: var(--button-text);
+border: 1px solid var(--border); padding: 6px 12px; border-radius: 4px;
+cursor: pointer; font-size: 0.9em; transition: 0.2s;
+}
+button:hover { background-color: var(--button-hover); }
+.font-controls { display: flex; gap: 4px; }
+.font-size-label { align-self: center; margin: 0 4px; font-weight: bold; }
+.container { max-width: 1000px; margin: 0 auto; }
+h2 { border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-top: 30px; margin-bottom: 15px; }
+h4 { margin-top: 15px; margin-bottom: 8px; color: var(--link); }
+details {
+background-color: var(--summary-bg); border: 1px solid var(--border);
+border-radius: 6px; margin-bottom: 10px; overflow: hidden; transition: 0.2s;
+}
+details[open] { background-color: var(--details-content-bg); }
+summary {
+padding: 12px 16px; font-weight: 600; cursor: pointer;
+background-color: var(--summary-bg); transition: background-color 0.2s;
+list-style-position: inside; font-size: 1.05em;
+}
+summary:hover { background-color: var(--summary-hover); }
+summary::-webkit-details-marker { color: var(--link); }
+.details-content {
+padding: 0 16px 16px 16px; max-height: 65vh; overflow-y: auto;
+scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+.details-content::-webkit-scrollbar { width: 8px; }
+.details-content::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+.details-content::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 4px; }
+.close-btn-container {
+text-align: right; position: sticky; bottom: 0;
+background: linear-gradient(transparent, var(--details-content-bg) 70%);
+padding: 15px 0 5px; margin-top: 10px;
+}
+.close-btn { font-size: 0.85em; padding: 5px 14px; }
+pre {
+background-color: var(--code-bg); border: 1px solid var(--code-border);
+border-radius: 4px; padding: 12px; overflow-x: auto;
+font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+font-size: 0.9em; margin: 10px 0; line-height: 1.5; white-space: pre-wrap; word-break: break-word;
+}
+code { font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace; }
+.section-intro { margin-bottom: 20px; padding: 10px; background-color: var(--header-bg); border-radius: 5px; }
+p { margin: 10px 0; }
+ul, ol { margin: 10px 0 10px 20px; }
+li { margin: 5px 0; }
+table { width: 100%; border-collapse: collapse; margin: 10px 0; background-color: var(--table-bg); }
+th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+th { background-color: var(--table-header); font-weight: 600; }
+strong { color: var(--link); }
+@media (max-width: 600px) {
+body { font-size: 14px; }
+header { flex-direction: column; align-items: flex-start; }
+.controls { width: 100%; }
+}
+</style>
+</head>
+<body class="dark">
+<header>
+<h1>📘 HashMap / equals / hashCode: Часть 1</h1>
+<div class="controls">
+<div class="theme-controls">
+<button onclick="setTheme('dark')">🌙 Тёмная</button>
+<button onclick="setTheme('light')">☀️ Светлая</button>
+<button onclick="setTheme('sepia')">📜 Сепия</button>
+</div>
+<div class="font-controls">
+<button onclick="changeFontSize(-1)">A-</button>
+<span class="font-size-label" id="fontSizeLabel">16px</span>
+<button onclick="changeFontSize(1)">A+</button>
+</div>
+</div>
+</header>
+<div class="container">
+<div class="section-intro">
+<p><strong>Часть 1:</strong> Внутреннее устройство HashMap, bucket (корзины), коллизии, деревофикация, контракт equals() и hashCode(), последствия нарушения контракта. Каждый раздел содержит развёрнутое объяснение с примерами кода на Java.</p>
+</div>
+
+<h2>🔷 Устройство HashMap</h2>
+
+<details id="how-hashmap-works"><summary>Как устроена HashMap внутри?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> HashMap — это массив корзин (buckets), каждая из которых представляет собой связный список или красно-чёрное дерево. Ключ-значение хранится в виде объекта Node. Индекс корзины вычисляется как hash(key) & (capacity - 1). При коллизиях элементы добавляются в список/дерево. При достижении порога загрузки массив увеличивается вдвое и все элементы перехешируются.</p>
+<h4>1. Структура хранения</h4>
+<p>До Java 8 HashMap состоял из массива Entry&lt;K,V&gt;[] table (корзины), каждая корзина — связный список Entry (односвязный). С Java 8 структура усложнилась: массив Node&lt;K,V&gt;[] table, корзина может быть null (пустая), односвязным списком Node, или красно-чёрным деревом TreeNode.</p>
+<pre><code>class Node<K,V> {
+    final int hash;     // хеш ключа
+    final K key;
+    V value;
+    Node<K,V> next;     // следующий в цепочке
+}</code></pre>
+<h4>2. Как вычисляется индекс корзины</h4>
+<pre><code>int hash = key.hashCode();
+hash = hash ^ (hash >>> 16);  // "xor shift" для лучшего распределения
+int index = hash & (table.length - 1);</code></pre>
+<p>Почему hash ^ (hash >>> 16)? Старшие 16 бит перемешиваются с младшими, чтобы улучшить распределение. Почему & (table.length - 1)? Поскольку размер таблицы всегда степень двойки (16, 32, 64...), вычитание единицы даёт битовую маску (15 = 1111, 31 = 11111), а побитовое & работает как быстрое деление по модулю.</p>
+<h4>3. Разрешение коллизий</h4>
+<p>Когда два разных ключа попадают в одну корзину, они хранятся в цепочке. С Java 8: ≤ 8 элементов — связный список; > 8 (TREEIFY_THRESHOLD) — красно-чёрное дерево; < 6 — обратно в список (UNTREEIFY_THRESHOLD). Порог 8 выбран на основе распределения Пуассона (вероятность ~0.00000006).</p>
+<h4>4. Красно-чёрное дерево и сравнение ключей</h4>
+<p>Порядок поиска компаратора: 1) Comparable.compareTo(); 2) System.identityHashCode(); 3) tieBreakOrder() (сравнение имён классов).</p>
+<h4>5. Ключевые константы</h4>
+<table>
+<tr><th>Константа</th><th>Значение</th><th>Описание</th></tr>
+<tr><td>DEFAULT_INITIAL_CAPACITY</td><td>16</td><td>Начальный размер массива</td></tr>
+<tr><td>DEFAULT_LOAD_FACTOR</td><td>0.75</td><td>Порог загрузки</td></tr>
+<tr><td>TREEIFY_THRESHOLD</td><td>8</td><td>Порог для деревофикации</td></tr>
+<tr><td>UNTREEIFY_THRESHOLD</td><td>6</td><td>Порог для обратно в список</td></tr>
+<tr><td>MIN_TREEIFY_CAPACITY</td><td>64</td><td>Минимальный размер для деревофикации</td></tr>
+</table>
+<h4>6. Расширение массива (resize)</h4>
+<p>Когда size > capacity * loadFactor (16 * 0.75 = 12), массив увеличивается вдвое. Поскольку размер всегда степень двойки, элемент либо остаётся в той же корзине, либо перемещается в oldIndex + oldCapacity.</p>
+<h4>7. Требования к ключам</h4>
+<ul><li>hashCode() — должен быть стабильным</li><li>equals() — согласован с hashCode()</li><li>Если ключ изменяется после вставки — он "теряется"</li></ul>
+<h4>8. Производительность</h4>
+<table>
+<tr><th>Операция</th><th>Средний случай</th><th>Худший случай</th></tr>
+<tr><td>get/put</td><td>O(1)</td><td>O(log n) с деревом, O(n) без</td></tr>
+<tr><td>remove</td><td>O(1)</td><td>O(log n)</td></tr>
+<tr><td>containsKey</td><td>O(1)</td><td>O(log n)</td></tr>
+</table>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('how-hashmap-works')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="bucket"><summary>Что такое bucket (корзина) в HashMap?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Bucket (корзина) — это ячейка внутреннего массива HashMap, которая хранит один или несколько элементов с одинаковым индексом. Технически это элемент массива Node&lt;K,V&gt;[] table.</p>
+<h4>1. Как выглядит корзина в памяти</h4>
+<pre><code>HashMap
+├── table[0]  → null                           (пустая корзина)
+├── table[1]  → Node("key1") → Node("key2")     (связный список)
+├── table[2]  → TreeNode("key3")                (красно-чёрное дерево)
+│               ├── left: TreeNode
+│               └── right: TreeNode</code></pre>
+<h4>2. Как определяется корзина</h4>
+<pre><code>int hash = key.hashCode();
+hash = hash ^ (hash >>> 16);
+int bucketIndex = hash & (table.length - 1);
+// Пример: hash=18 → 18 & 15 = 2 (корзина №2)</code></pre>
+<h4>3. Что хранится в корзине</h4>
+<p>До Java 8 — голова связного списка Entry. С Java 8: null (пусто), Node (список ≤ 8), TreeNode (дерево > 8).</p>
+<pre><code>static class Node<K,V> {
+    final int hash; final K key; V value;
+    Node<K,V> next;
+}</code></pre>
+<h4>4. Условия деревофикации</h4>
+<p>≥ 8 элементов в корзине И размер таблицы ≥ 64. Если таблица < 64 — вместо деревофикации resize().</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('bucket')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="bucket-index"><summary>Как HashMap определяет, в какой bucket положить элемент?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Индекс корзины вычисляется в два шага: XOR-шифтинг хеша, затем побитовое И с маской (capacity - 1). Формула: index = (key.hashCode() ^ (key.hashCode() >>> 16)) & (table.length - 1).</p>
+<h4>Шаг 1: Получение хеша ключа</h4>
+<pre><code>int h = key.hashCode(); // например, для "apple" = 93029210</code></pre>
+<h4>Шаг 2: Перемешивание битов (XOR-шифтинг)</h4>
+<pre><code>int hash = h ^ (h >>> 16);
+// h        = 1110 1011 0101 0011 1100 0001 0010 1010
+// h >>> 16 = 0000 0000 0000 0000 1110 1011 0101 0011
+// h^h>>>16 = 1110 1011 0101 0011 0010 1010 0111 1001</code></pre>
+<p>Старшие биты "впечатываются" в младшие, улучшая распределение при малом размере таблицы.</p>
+<h4>Шаг 3: Вычисление индекса через битовую маску</h4>
+<pre><code>int index = hash & (table.length - 1);
+// length=16 → 15=0b1111, length=32 → 31=0b11111</code></pre>
+<p>Побитовое И с маской — быстрый аналог hash % length (1 такт вместо 10-30).</p>
+<h4>Полный пример</h4>
+<pre><code>// Ключ "apple"
+int h = "apple".hashCode();         // 93029210
+int hash = h ^ (h >>> 16);          // 93030397
+int index = hash & (16 - 1);        // 93030397 & 15 = 13 → корзина №13</code></pre>
+<h4>Особый случай: null-ключ</h4>
+<pre><code>if (key == null) return 0; // null всегда в корзине №0</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('bucket-index')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="collision"><summary>Что такое коллизия в HashMap?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Коллизия — это ситуация, когда два разных ключа получают одинаковый индекс корзины. Элементы с одинаковым индексом объединяются в цепочку — связный список или красно-чёрное дерево.</p>
+<h4>1. Почему возникают коллизии</h4>
+<pre><code>// capacity = 16
+"apple"  → hashCode() = 93029210  → hash & 15 = 10
+"orange" → hashCode() = -1008851410 → hash & 15 = 10 // коллизия!</code></pre>
+<p>Причины: разные hashCode могут дать одинаковый индекс; одинаковые hashCode у разных объектов (закон больших чисел для 32-битного int).</p>
+<h4>2. Два вида коллизий</h4>
+<p><strong>Вид 1:</strong> Разные hashCode → одинаковый индекс (самая частая). <strong>Вид 2:</strong> Одинаковый hashCode — "Aa" и "BB" → 2112.</p>
+<h4>3. Как HashMap различает ключи при коллизии</h4>
+<pre><code>while (current != null) {
+    if (current.hash == hash &&        // Сначала сравнение хешей (быстро, int)
+        key.equals(current.key)) {     // Потом equals (только при совпадении хеша)
+        return current;
+    }
+    current = current.next;
+}</code></pre>
+<h4>4. Влияние коллизий на производительность</h4>
+<table>
+<tr><th>Количество коллизий</th><th>Производительность</th><th>Структура</th></tr>
+<tr><td>0</td><td>O(1)</td><td>Один узел</td></tr>
+<tr><td>1-8</td><td>Близко к O(1)</td><td>Связный список</td></tr>
+<tr><td>> 8</td><td>O(log n)</td><td>Красно-чёрное дерево</td></tr>
+</table>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('collision')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="collision-handling"><summary>Как HashMap обрабатывает коллизии?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> HashMap обрабатывает коллизии методом цепочек (separate chaining). До Java 8 — только связный список. С Java 8 — список до 8 элементов, затем красно-чёрное дерево для защиты от деградации до O(n).</p>
+<h4>1. Метод цепочек (Separate Chaining)</h4>
+<pre><code>static class Node<K,V> {
+    final int hash; final K key; V value;
+    Node<K,V> next; // следующий узел в цепочке
+}</code></pre>
+<h4>2. Пошаговый алгоритм put() при коллизии</h4>
+<pre><code>// Шаг 1: Корзина пуста — просто кладём
+if (table[index] == null) { table[index] = new Node(...); return; }
+// Шаг 2: Обходим цепочку
+Node<K,V> current = table[index];
+while (current != null) {
+    if (current.hash == hash && key.equals(current.key)) {
+        current.value = value; return; // замена
+    }
+    if (current.next == null) { current.next = new Node(...); break; }
+    current = current.next;
+}</code></pre>
+<h4>3. Поиск в цепочке при get()</h4>
+<pre><code>while (current != null) {
+    if (current.hash == hash && key.equals(current.key)) return current.value;
+    current = current.next;
+}
+return null;</code></pre>
+<h4>4. Деревофикация (JDK 8+)</h4>
+<pre><code>if (binCount >= TREEIFY_THRESHOLD - 1) {  // ≥ 8 элементов
+    if (table.length < MIN_TREEIFY_CAPACITY) resize(); // < 64
+    else treeifyBin(tab, hash); // ≥ 64 → дерево
+}</code></pre>
+<h4>5. Сравнение ключей в дереве</h4>
+<pre><code>// 1. Comparable.compareTo()
+// 2. System.identityHashCode()
+// 3. tieBreakOrder (сравнение имён классов)</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('collision-handling')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="eight-elements"><summary>Что происходит при достижении 8 элементов в одном bucket?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Если размер таблицы < 64 → resize() (расширение). Если ≥ 64 → treeifyBin() (связный список → красно-чёрное дерево).</p>
+<h4>Пошаговый разбор</h4>
+<pre><code>// Константы
+static final int TREEIFY_THRESHOLD = 8;
+static final int MIN_TREEIFY_CAPACITY = 64;
+
+// Логика
+if (binCount >= TREEIFY_THRESHOLD - 1) {
+    if (table.length < MIN_TREEIFY_CAPACITY) resize();
+    else treeifyBin(tab, hash);
+}</code></pre>
+<h4>Два возможных исхода</h4>
+<pre><code>capacity < 64 → resize()
+    ├── массив увеличивается вдвое
+    ├── все элементы перехешируются по новым корзинам
+    └── цепочка естественно разбивается
+
+capacity ≥ 64 → treeifyBin()
+    ├── Node заменяются на TreeNode
+    ├── связный список → красно-чёрное дерево
+    └── поиск: O(n) → O(log n)</code></pre>
+<h4>Почему порог именно 8?</h4>
+<p>Распределение Пуассона: вероятность 8 элементов в корзине при хорошем hashCode ≈ 0.00000006 — настолько редко, что это сигнал проблемы (атака или плохой hashCode).</p>
+<h4>Обратный процесс — Untreeify</h4>
+<pre><code>// При ≤ 6 элементах дерево → обратно в список
+if (root == null || root.right == null || root.left == null || root.left.left == null) {
+    tab[index] = first.untreeify(map);
+}</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('eight-elements')">⬆️ Свернуть</button></div>
+</div></details>
+
+<h2>🟠 Контракт equals() и hashCode()</h2>
+
+<details id="contract"><summary>Что такое контракт equals() и hashCode()?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Набор правил из Javadoc класса Object. Главное правило: <strong>если два объекта равны по equals(), их hashCode() обязан быть одинаковым</strong>. Обратное не требуется. Нарушение контракта приводит к некорректной работе HashSet, HashMap и других хеш-структур.</p>
+<h4>1. Контракт equals()</h4>
+<table>
+<tr><th>Правило</th><th>Описание</th></tr>
+<tr><td>Рефлексивность</td><td>x.equals(x) всегда true</td></tr>
+<tr><td>Симметричность</td><td>x.equals(y) == y.equals(x)</td></tr>
+<tr><td>Транзитивность</td><td>если x.equals(y) и y.equals(z), то x.equals(z)</td></tr>
+<tr><td>Консистентность</td><td>повторные вызовы возвращают одно и то же, пока объекты не изменились</td></tr>
+<tr><td>null-безопасность</td><td>x.equals(null) всегда false</td></tr>
+</table>
+<h4>2. Контракт hashCode()</h4>
+<table>
+<tr><th>Правило</th><th>Описание</th></tr>
+<tr><td>Консистентность</td><td>Повторные вызовы — одно значение, пока поля не изменились</td></tr>
+<tr><td>Связь с equals</td><td>Если a.equals(b) == true, то a.hashCode() == b.hashCode() <strong>ОБЯЗАТЕЛЬНО</strong></td></tr>
+<tr><td>Неравные объекты</td><td>Если a.equals(b) == false, hashCode МОГУТ совпадать (коллизия) или различаться</td></tr>
+</table>
+<h4>3. Связь между equals и hashCode</h4>
+<pre><code>hashCode разные → equals гарантированно false (разные корзины)
+hashCode одинаковые → equals может быть true или false (коллизия)</code></pre>
+<h4>4. Правильный шаблон реализации</h4>
+<pre><code>public class User {
+    private final Long id; private final String name; private final String email;
+
+    @Override public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id) &&
+               Objects.equals(name, user.name) &&
+               Objects.equals(email, user.email);
+    }
+
+    @Override public int hashCode() {
+        return Objects.hash(id, name, email); // ТЕ ЖЕ ПОЛЯ
+    }
+}</code></pre>
+<h4>5. Почему поля должны быть неизменяемыми</h4>
+<pre><code>// Опасный код: изменяемый ключ в HashMap
+MutableKey key = new MutableKey("Alice");
+map.put(key, "value");
+key.setName("Bob"); // КЛЮЧ ИЗМЕНИЛСЯ!
+map.get(key); // null — "потерялся"!</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('contract')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="equals-true-hashcode"><summary>Если два объекта равны по equals(), что можно сказать об их hashCode()?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Их hashCode() <strong>обязан</strong> быть одинаковым. Это жёсткое требование контракта. Нарушение → объект "теряется" в HashMap.</p>
+<h4>Правило контракта</h4>
+<pre><code>if (a.equals(b) == true) {
+    // ГАРАНТИРОВАНО: a.hashCode() == b.hashCode()
+}</code></pre>
+<h4>Почему это критично для HashMap</h4>
+<pre><code>User u1 = new User(1, "Alice"); // hashCode = 12345
+User u2 = new User(1, "Alice"); // hashCode = 67890 — НАРУШЕНИЕ!
+map.put(u1, "value1");
+map.get(u2); // null! Поиск в другой корзине</code></pre>
+<h4>Визуализация</h4>
+<pre><code>✅ ПРАВИЛЬНО: equals=true, hashCode одинаковый
+u1(Alice) → hashCode=12345 → корзина 9
+u2(Alice) → hashCode=12345 → корзина 9 → equals=true → НАЙДЕН
+
+❌ НАРУШЕНИЕ: equals=true, hashCode разный
+u1(Alice) → hashCode=12345 → корзина 9
+u2(Alice) → hashCode=67890 → корзина 10 → ПУСТО → НЕ НАЙДЕН</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('equals-true-hashcode')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="same-hashcode"><summary>Если два объекта имеют одинаковый hashCode(), обязательно ли они равны по equals()?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Нет, не обязательно. Это коллизия — нормальная и допустимая ситуация, которую HashMap корректно обрабатывает через цепочки.</p>
+<h4>Правило контракта</h4>
+<pre><code>if (a.hashCode() == b.hashCode()) {
+    // a.equals(b) МОЖЕТ быть true (тот же ключ)
+    // a.equals(b) МОЖЕТ быть false (коллизия)
+}</code></pre>
+<h4>Пример неизбежной коллизии</h4>
+<pre><code>"Aa".hashCode();   // 2112
+"BB".hashCode();   // 2112 — коллизия!
+"Aa".equals("BB"); // false — разные строки</code></pre>
+<h4>Как HashMap обрабатывает одинаковый hashCode при разных equals</h4>
+<pre><code>map.put("Aa", "value1"); // hashCode=2112 → корзина X
+map.put("BB", "value2"); // hashCode=2112 → та же корзина
+// table[X] → Node("Aa") → Node("BB")
+map.get("Aa"); // hashCode→корзина X→equals("Aa","Aa")=true→"value1"
+map.get("BB"); // hashCode→корзина X→equals("BB","Aa")=false→equals("BB","BB")=true→"value2"</code></pre>
+<h4>Все четыре комбинации</h4>
+<table>
+<tr><th>hashCode</th><th>equals</th><th>Ситуация</th></tr>
+<tr><td>Одинаковый</td><td>true</td><td>Один и тот же ключ</td></tr>
+<tr><td>Одинаковый</td><td>false</td><td>Коллизия (норма)</td></tr>
+<tr><td>Разный</td><td>true</td><td>Нарушение контракта</td></tr>
+<tr><td>Разный</td><td>false</td><td>Разные объекты (норма)</td></tr>
+</table>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('same-hashcode')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="only-equals"><summary>Что произойдёт, если переопределить equals() но не переопределить hashCode()?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Нарушится контракт hashCode(). Объекты, равные по equals(), будут иметь разные хеш-коды (унаследованные от Object). HashMap/HashSet сломаются: get() → null, contains() → false.</p>
+<h4>Демонстрация проблемы</h4>
+<pre><code>class User {
+    private String name;
+    @Override public boolean equals(Object o) {
+        if (!(o instanceof User)) return false;
+        return Objects.equals(name, ((User) o).name);
+    }
+    // hashCode НЕ переопределён → Object.hashCode()
+}
+User u1 = new User("Alice"); User u2 = new User("Alice");
+System.out.println(u1.equals(u2)); // true
+System.out.println(u1.hashCode() == u2.hashCode()); // false — НАРУШЕНИЕ!
+
+Map<User, String> map = new HashMap<>();
+map.put(u1, "value");
+map.get(u2); // null — РАВНЫЙ объект НЕ НАХОДИТ!</code></pre>
+<h4>Механика отказа</h4>
+<pre><code>put(u1): hashCode(u1)=12345 → index=9 → table[9]=u1
+get(u2): hashCode(u2)=67890 → index=10 → table[10]=null → return null</code></pre>
+<p>HashMap сначала определяет корзину по hashCode, и только внутри корзины сравнивает по equals. Разные hashCode → разные корзины → equals никогда не будет вызван.</p>
+<h4>Последствия для разных коллекций</h4>
+<table>
+<tr><th>Коллекция</th><th>Поведение</th></tr>
+<tr><td>HashMap</td><td>get() → null, containsKey() → false</td></tr>
+<tr><td>HashSet</td><td>contains() → false, можно добавить "дубликат"</td></tr>
+<tr><td>ArrayList</td><td>✅ Работает (indexOf, contains только equals)</td></tr>
+<tr><td>TreeSet/TreeMap</td><td>✅ Работает (compareTo, не hashCode)</td></tr>
+</table>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('only-equals')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="only-hashcode"><summary>Что произойдёт, если переопределить hashCode() но не переопределить equals()?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Объекты будут попадать в одну корзину (hashCode совпадает), но equals() сравнивает ссылки (Object.equals). Логически одинаковые объекты считаются разными ключами.</p>
+<h4>Демонстрация проблемы</h4>
+<pre><code>class User {
+    private String name;
+    @Override public int hashCode() { return Objects.hash(name); }
+    // equals НЕ переопределён → Object.equals() сравнивает ССЫЛКИ
+}
+User u1 = new User("Alice"); User u2 = new User("Alice");
+System.out.println(u1.hashCode() == u2.hashCode()); // true
+System.out.println(u1.equals(u2)); // false — разные ссылки!
+
+Map<User, String> map = new HashMap<>();
+map.put(u1, "value1");
+map.put(u2, "value2"); // ДОБАВЛЕН как ОТДЕЛЬНЫЙ ключ!
+System.out.println(map.size()); // 2 — оба в одной корзине, но разные ключи</code></pre>
+<h4>Механика работы HashMap</h4>
+<pre><code>put(u1): hashCode=12345 → корзина 9 → table[9]=u1
+put(u2): hashCode=12345 → та же корзина 9
+    Обход: u2.equals(u1)=false (ссылки!) → идём дальше
+    Конец цепочки → ДОБАВЛЯЕМ u2 как новый узел
+    table[9] = u1 → "value1" → u2 → "value2"</code></pre>
+<h4>Сравнение двух ошибок</h4>
+<table>
+<tr><th>Ситуация</th><th>equals</th><th>hashCode</th><th>HashMap.get(равный)</th><th>Коллизия</th></tr>
+<tr><td>Оба переопределены ✅</td><td>true</td><td>одинаковый</td><td>✅ Найден</td><td>Может быть</td></tr>
+<tr><td>Только equals ❌</td><td>true</td><td>разный</td><td>null (разные корзины)</td><td>Нет</td></tr>
+<tr><td>Только hashCode ❌</td><td>false (ссылки)</td><td>одинаковый</td><td>null (не равен)</td><td>Всегда</td></tr>
+</table>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('only-hashcode')">⬆️ Свернуть</button></div>
+</div></details>
+
+<div style="text-align: center; margin-top: 20px; padding: 10px;">
+<a href="index.html" style="display: inline-block; background-color: var(--button-bg); color: var(--button-text); border: 1px solid var(--border); padding: 10px 24px; border-radius: 4px; text-decoration: none; font-size: 0.9em; transition: 0.2s;" onmouseover="this.style.backgroundColor='var(--button-hover)'" onmouseout="this.style.backgroundColor='var(--button-bg)'">⬅️ Назад к содержанию</a>
+</div>
+
+</div>
+<script>
+function setTheme(t) { document.body.className = t; }
+let fs = 16;
+function changeFontSize(d) { fs = Math.min(24, Math.max(12, fs + d)); document.body.style.fontSize = fs + 'px'; document.getElementById('fontSizeLabel').textContent = fs + 'px'; }
+function closeDetails(id) { const d = document.getElementById(id); if (d) d.removeAttribute('open'); }
+setTheme('dark');
+</script>
+</body>
+</html>

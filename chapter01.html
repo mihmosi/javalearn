@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Паттерны проектирования: полный справочник (Часть 1)</title>
+<style>
+:root {
+--bg: #1e1e1e; --text: #d4d4d4; --header-bg: #2d2d2d; --summary-bg: #333;
+--summary-hover: #3c3c3c; --border: #555; --code-bg: #252526; --code-border: #404040;
+--button-bg: #444; --button-text: #ddd; --button-hover: #555; --link: #569cd6;
+--scrollbar-thumb: #666; --scrollbar-track: #2d2d2d; --details-content-bg: var(--bg);
+--table-bg: #2a2a2a; --table-header: #3a3a3a;
+}
+body.light {
+--bg: #ffffff; --text: #1e1e1e; --header-bg: #f3f3f3; --summary-bg: #e8e8e8;
+--summary-hover: #ddd; --border: #ccc; --code-bg: #f9f9f9; --code-border: #ddd;
+--button-bg: #e0e0e0; --button-text: #000; --button-hover: #ccc; --link: #0451a5;
+--scrollbar-thumb: #aaa; --scrollbar-track: #f0f0f0; --details-content-bg: #fff;
+--table-bg: #fff; --table-header: #e0e0e0;
+}
+body.sepia {
+--bg: #f4ecd8; --text: #5b4636; --header-bg: #e8dcc8; --summary-bg: #ddd0b8;
+--summary-hover: #cfc1a8; --border: #b8a88a; --code-bg: #eee3d0; --code-border: #c0b090;
+--button-bg: #d6c9ae; --button-text: #3e2f22; --button-hover: #c2b498; --link: #8b5e3c;
+--scrollbar-thumb: #b8a080; --scrollbar-track: #e8dcc8; --details-content-bg: #f4ecd8;
+--table-bg: #f4ecd8; --table-header: #ddd0b8;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+background-color: var(--bg); color: var(--text);
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6;
+padding: 10px; transition: background-color 0.3s, color 0.3s; font-size: 16px;
+}
+header {
+background-color: var(--header-bg); padding: 15px; border-radius: 6px;
+margin-bottom: 20px; display: flex; flex-wrap: wrap; align-items: center;
+justify-content: space-between; gap: 10px;
+}
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+button {
+background-color: var(--button-bg); color: var(--button-text);
+border: 1px solid var(--border); padding: 6px 12px; border-radius: 4px;
+cursor: pointer; font-size: 0.9em; transition: 0.2s;
+}
+button:hover { background-color: var(--button-hover); }
+.font-controls { display: flex; gap: 4px; }
+.font-size-label { align-self: center; margin: 0 4px; font-weight: bold; }
+.container { max-width: 1000px; margin: 0 auto; }
+h2 { border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-top: 30px; margin-bottom: 15px; }
+h3 { margin-top: 25px; margin-bottom: 10px; color: #e8c170; }
+h4 { margin-top: 15px; margin-bottom: 8px; color: var(--link); }
+details {
+background-color: var(--summary-bg); border: 1px solid var(--border);
+border-radius: 6px; margin-bottom: 10px; overflow: hidden; transition: 0.2s;
+}
+details[open] { background-color: var(--details-content-bg); }
+summary {
+padding: 12px 16px; font-weight: 600; cursor: pointer;
+background-color: var(--summary-bg); transition: background-color 0.2s;
+list-style-position: inside; font-size: 1.05em;
+}
+summary:hover { background-color: var(--summary-hover); }
+summary::-webkit-details-marker { color: var(--link); }
+.details-content {
+padding: 0 16px 16px 16px; max-height: 65vh; overflow-y: auto;
+scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+.details-content::-webkit-scrollbar { width: 8px; }
+.details-content::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+.details-content::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 4px; }
+.close-btn-container {
+text-align: right; position: sticky; bottom: 0;
+background: linear-gradient(transparent, var(--details-content-bg) 70%);
+padding: 15px 0 5px; margin-top: 10px;
+}
+.close-btn { font-size: 0.85em; padding: 5px 14px; }
+pre {
+background-color: var(--code-bg); border: 1px solid var(--code-border);
+border-radius: 4px; padding: 12px; overflow-x: auto;
+font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+font-size: 0.9em; margin: 10px 0; line-height: 1.5; white-space: pre-wrap; word-break: break-word;
+}
+code { font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace; }
+.section-intro { margin-bottom: 20px; padding: 10px; background-color: var(--header-bg); border-radius: 5px; }
+p { margin: 10px 0; }
+ul, ol { margin: 10px 0 10px 20px; }
+li { margin: 5px 0; }
+table { width: 100%; border-collapse: collapse; margin: 10px 0; background-color: var(--table-bg); }
+th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+th { background-color: var(--table-header); font-weight: 600; }
+strong { color: var(--link); }
+.note {
+background-color: var(--code-bg); border-left: 3px solid #e8c170;
+padding: 10px; margin: 10px 0; border-radius: 0 4px 4px 0;
+}
+@media (max-width: 600px) {
+body { font-size: 14px; }
+header { flex-direction: column; align-items: flex-start; }
+.controls { width: 100%; }
+}
+</style>
+</head>
+<body class="dark">
+<header>
+<h1>📘 Паттерны проектирования: Часть 1</h1>
+<div class="controls">
+<div class="theme-controls">
+<button onclick="setTheme('dark')">🌙 Тёмная</button>
+<button onclick="setTheme('light')">☀️ Светлая</button>
+<button onclick="setTheme('sepia')">📜 Сепия</button>
+</div>
+<div class="font-controls">
+<button onclick="changeFontSize(-1)">A-</button>
+<span class="font-size-label" id="fontSizeLabel">16px</span>
+<button onclick="changeFontSize(1)">A+</button>
+</div>
+</div>
+</header>
+<div class="container">
+<div class="section-intro">
+<p><strong>Часть 1:</strong> Основы паттернов проектирования, категории, порождающие паттерны (Singleton, Factory Method, Abstract Factory, Builder, Prototype). Основано на материалах <a href="https://refactoring.guru/ru/design-patterns/java" target="_blank" style="color: var(--link);">Refactoring.Guru</a>.</p>
+</div>
+
+<h2>🔷 Что такое паттерны проектирования?</h2>
+<details id="what-are-patterns"><summary>Что такое паттерны проектирования?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Паттерны проектирования (Design Patterns) — это типовые, проверенные временем способы решения часто встречающихся задач при проектировании программ. Это не готовый код и не библиотека, а идея организации классов и объектов, которую можно реализовать на любом языке, включая Java.</p>
+<h4>Развёрнутое объяснение</h4>
+<p>Представьте, что вы строите дом. Если вам нужна лестница, никто не изобретает ее заново — используют известную конструкцию, адаптируя ее под конкретный дом. С паттернами происходит то же самое.</p>
+<p><strong>Зачем нужны паттерны:</strong></p>
+<ul>
+<li>писать код, который легче поддерживать;</li>
+<li>уменьшить связанность между классами;</li>
+<li>сделать код более гибким для изменений;</li>
+<li>использовать общий язык с другими разработчиками.</li>
+</ul>
+<p>Например, вместо длинного объяснения можно сказать: «Здесь лучше использовать Factory». И опытный Java-разработчик сразу поймет общую идею решения.</p>
+<p>Самая известная книга по этой теме — <strong>"Design Patterns: Elements of Reusable Object-Oriented Software"</strong> (1994). Ее написали четыре автора, которых называют Gang of Four (GoF). Именно они описали 23 классических паттерна.</p>
+<h4>Примеры в стандартной библиотеке Java</h4>
+<table>
+<tr><th>Паттерн</th><th>Примеры в Java</th></tr>
+<tr><td>Singleton</td><td>java.lang.Runtime, Spring @Service (singleton scope)</td></tr>
+<tr><td>Factory Method</td><td>Calendar.getInstance(), Executors.newFixedThreadPool()</td></tr>
+<tr><td>Builder</td><td>StringBuilder, Stream.Builder, HttpRequest.newBuilder()</td></tr>
+<tr><td>Iterator</td><td>Все коллекции (ArrayList, HashSet), цикл for-each</td></tr>
+<tr><td>Decorator</td><td>BufferedInputStream, BufferedReader, Collections.synchronizedList()</td></tr>
+<tr><td>Proxy</td><td>Spring AOP, @Transactional, Hibernate lazy loading</td></tr>
+<tr><td>Observer</td><td>GUI-события (ActionListener), Spring Events</td></tr>
+<tr><td>Strategy</td><td>Comparator, HttpClient.Redirect</td></tr>
+<tr><td>Adapter</td><td>InputStreamReader (byte → char), Arrays.asList()</td></tr>
+<tr><td>Command</td><td>Runnable, Callable, Swing Action</td></tr>
+<tr><td>Template Method</td><td>AbstractList, JdbcTemplate, HttpServlet</td></tr>
+</table>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('what-are-patterns')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="pattern-categories"><summary>Какие категории паттернов существуют?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Три категории: <strong>порождающие</strong> (Creational) — как создавать объекты, <strong>структурные</strong> (Structural) — как соединять объекты, и <strong>поведенческие</strong> (Behavioral) — как объекты взаимодействуют.</p>
+<h3>1. Порождающие (Creational)</h3>
+<p>Отвечают на вопрос: <strong>Как создавать объекты?</strong></p>
+<p>Singleton, Factory Method, Abstract Factory, Builder, Prototype.</p>
+<pre><code>// Singleton — создает только один объект класса
+public class Database {
+    private static final Database INSTANCE = new Database();
+    private Database() {}
+    public static Database getInstance() { return INSTANCE; }
+}
+
+// Builder — когда объект содержит много параметров
+User user = User.builder()
+    .name("Иван").age(25).city("Москва").email("ivan@mail.ru").build();
+
+// Factory Method — создание объекта передается фабрике
+Animal animal = AnimalFactory.create("dog"); // фабрика решает, какой объект создать</code></pre>
+<h3>2. Структурные (Structural)</h3>
+<p>Отвечают на вопрос: <strong>Как соединять объекты между собой?</strong></p>
+<p>Adapter, Decorator, Proxy, Composite, Facade, Bridge.</p>
+<pre><code>// Adapter — старый класс работает с новым интерфейсом
+class PrinterAdapter implements Printer {
+    private OldPrinter printer;
+    public void print() { printer.printOld(); }
+}
+
+// Decorator — добавляет функциональность без изменения класса
+Coffee coffee = new SimpleCoffee();
+coffee = new MilkDecorator(coffee);
+coffee = new SugarDecorator(coffee);
+
+// Facade — один простой класс для сложной системы
+CarFacade.start(); // внутри вызывает Engine, FuelSystem, Battery...</code></pre>
+<h3>3. Поведенческие (Behavioral)</h3>
+<p>Отвечают на вопрос: <strong>Как объекты взаимодействуют друг с другом?</strong></p>
+<p>Strategy, Observer, Command, State, Iterator, Template Method, Chain of Responsibility, Mediator.</p>
+<pre><code>// Strategy — несколько алгоритмов, легкая замена
+interface PaymentStrategy { void pay(); }
+class CardPayment implements PaymentStrategy {}
+class PaypalPayment implements PaymentStrategy {}
+
+// Observer — один объект сообщает изменения многим другим
+observer.update(); // подписчики получают уведомление
+
+// Command — каждое действие оформляется отдельным объектом
+Command command = new SaveCommand();
+command.execute(); // можно хранить, отменять, ставить в очередь</code></pre>
+<h4>Сводная таблица</h4>
+<table>
+<tr><th>Паттерн</th><th>Категория</th><th>Для чего нужен</th></tr>
+<tr><td>Builder</td><td>Порождающий</td><td>Создание сложных объектов</td></tr>
+<tr><td>Factory Method</td><td>Порождающий</td><td>Создание объектов через фабрику</td></tr>
+<tr><td>Singleton</td><td>Порождающий</td><td>Единственный экземпляр объекта</td></tr>
+<tr><td>Strategy</td><td>Поведенческий</td><td>Замена алгоритмов во время выполнения</td></tr>
+<tr><td>Observer</td><td>Поведенческий</td><td>Уведомление подписчиков о событиях</td></tr>
+<tr><td>Decorator</td><td>Структурный</td><td>Динамическое добавление функциональности</td></tr>
+<tr><td>Adapter</td><td>Структурный</td><td>Совместимость несовместимых интерфейсов</td></tr>
+<tr><td>Facade</td><td>Структурный</td><td>Упрощение работы со сложной системой</td></tr>
+<tr><td>Command</td><td>Поведенческий</td><td>Представление действия как объекта</td></tr>
+<tr><td>Template Method</td><td>Поведенческий</td><td>Общий алгоритм с изменяемыми шагами</td></tr>
+</table>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('pattern-categories')">⬆️ Свернуть</button></div>
+</div></details>
+
+<h2>🔶 Порождающие паттерны (Creational)</h2>
+
+<details id="singleton"><summary>💎 Singleton (Одиночка)</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Singleton гарантирует, что у класса будет только один экземпляр, и предоставляет глобальную точку доступа к нему. Сколько бы раз вы ни пытались создать объект, всегда будет использоваться один и тот же экземпляр.</p>
+<h4>Зачем нужен Singleton</h4>
+<p>Представьте класс настроек приложения. Если каждый раз создавать новый объект <code>Settings s1 = new Settings(); Settings s2 = new Settings();</code>, получится два независимых экземпляра. Изменения в одном не попадут в другой. Это неправильно для: конфигурации, логирования, кэша, менеджера подключений, счетчика статистики.</p>
+<h4>Базовая реализация</h4>
+<pre><code>public class Singleton {
+    // Единственный экземпляр
+    private static final Singleton INSTANCE = new Singleton();
+    // Запрещаем создавать объект извне
+    private Singleton() {}
+    // Получить экземпляр
+    public static Singleton getInstance() { return INSTANCE; }
+}</code></pre>
+<p><strong>Разбор по частям:</strong></p>
+<ul>
+<li><code>private static final Singleton INSTANCE = new Singleton();</code> — private (никто не обратится напрямую), static (принадлежит классу), final (ссылку нельзя изменить), new (создается один раз при загрузке класса).</li>
+<li><code>private Singleton() {}</code> — конструктор закрыт, <code>new Singleton()</code> не скомпилируется: <code>Singleton() has private access</code>.</li>
+<li><code>public static Singleton getInstance()</code> — единственный способ получить объект.</li>
+</ul>
+<h4>Как это выглядит в памяти</h4>
+<pre><code>Singleton.class
+    | INSTANCE
+    v
++----------------+
+| Singleton      |
++----------------+
+// Singleton a, b, c — все ссылаются на один объект</code></pre>
+<h4>Ленивая инициализация (Lazy Initialization)</h4>
+<pre><code>public class Singleton {
+    private static Singleton instance;
+    private Singleton() {}
+    public static Singleton getInstance() {
+        if (instance == null) {
+            instance = new Singleton();
+        }
+        return instance;
+    }
+}</code></pre>
+<p>Объект создается только при первом вызове getInstance(). <strong>Проблема:</strong> не потокобезопасен — два потока могут увидеть instance == null и создать два объекта.</p>
+<div class="note">
+<p><strong>Где применяется:</strong> настройки приложения, логгер, кэш, менеджер конфигурации. В Spring бины по умолчанию singleton scope.</p>
+</div>
+<h4>Как реализовать потокобезопасный Singleton</h4>
+<p><strong>Способ 1: Double-Checked Locking</strong></p>
+<pre><code>public class Singleton {
+    private static volatile Singleton instance;
+    private Singleton() {}
+    public static Singleton getInstance() {
+        if (instance == null) {
+            synchronized (Singleton.class) {
+                if (instance == null) {
+                    instance = new Singleton();
+                }
+            }
+        }
+        return instance;
+    }
+}</code></pre>
+<p><strong>Способ 2: Bill Pugh Holder (рекомендованный)</strong></p>
+<pre><code>public class Singleton {
+    private Singleton() {}
+    private static class Holder {
+        private static final Singleton INSTANCE = new Singleton();
+    }
+    public static Singleton getInstance() { return Holder.INSTANCE; }
+}</code></pre>
+<p>Потокобезопасен благодаря JLS: класс Holder загружается только при первом обращении, JVM гарантирует атомарность инициализации статических полей, final обеспечивает безопасную публикацию объекта.</p>
+<p><strong>Способ 3: Enum Singleton (лучший по Джошуа Блоху)</strong></p>
+<pre><code>public enum Singleton {
+    INSTANCE;
+    public void doWork() { /* Полезная логика */ }
+}</code></pre>
+<p>Автоматически защищен от многопоточности, рефлексии и сериализации.</p>
+<h4>Double-checked locking — подробно</h4>
+<pre><code>public static Singleton getInstance() {
+    if (instance == null) { // Первая проверка (без блокировки) — быстрый путь
+        synchronized (Singleton.class) {
+            if (instance == null) { // Вторая проверка (с блокировкой) — гарантия
+                instance = new Singleton();
+            }
+        }
+    }
+    return instance;
+}</code></pre>
+<p><strong>Зачем volatile:</strong> предотвращает проблему reordering. Без volatile поток мог бы получить ссылку на еще не полностью сконструированный объект (операция new не атомарна: выделение памяти → инициализация полей → присвоение ссылки; JVM может переупорядочить).</p>
+<h4>Проблемы Singleton</h4>
+<table>
+<tr><th>Проблема</th><th>Описание</th></tr>
+<tr><td><strong>Глобальное состояние</strong></td><td>Любой класс может изменить данные, сложно отследить кто и когда</td></tr>
+<tr><td><strong>Скрытые зависимости</strong></td><td><code>Database.getInstance().save(user)</code> — зависимость скрыта внутри метода</td></tr>
+<tr><td><strong>Сложность тестирования</strong></td><td>Трудно подменить реальный объект моком</td></tr>
+<tr><td><strong>Нарушение SRP</strong></td><td>Класс отвечает и за свою работу, и за управление жизненным циклом</td></tr>
+<tr><td><strong>Жесткая связанность</strong></td><td>Замена Logger.getInstance() требует изменений во всех местах использования</td></tr>
+<tr><td><strong>Нарушение DIP</strong></td><td>Код зависит от конкретного класса, а не от абстракции</td></tr>
+<tr><td><strong>Общие данные между тестами</strong></td><td><code>Config.getInstance().setMode("TEST")</code> влияет на следующие тесты</td></tr>
+</table>
+<p><strong>Решение:</strong> в современной Java-разработке используют Dependency Injection (Spring). Зависимости передаются явно через конструктор, код легко тестировать, жизненным циклом управляет контейнер.</p>
+<pre><code>// Вместо Singleton — внедрение зависимости
+@Service
+public class UserService {
+    private final Database database;
+    public UserService(Database database) { this.database = database; }
+}</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('singleton')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="factory-method-vs-abstract-factory"><summary>🏭 Factory Method vs Abstract Factory</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Factory Method создаёт <strong>один продукт</strong>, Abstract Factory — <strong>семейство связанных продуктов</strong>. Оба относятся к порождающим паттернам и решают задачу создания объектов, но на разных уровнях.</p>
+<h3>Factory Method</h3>
+<p><strong>Идея:</strong> предоставить метод, который создает объект, а выбор конкретного класса оставить наследникам. Отвечает на вопрос: <strong>Какой объект создать?</strong></p>
+<h4>Структура</h4>
+<pre><code>Product               Creator
+   ▲                  + factoryMethod()
+   │                      ▲
+ConcreteProductA           │
+ConcreteProductB    ConcreteCreatorA
+                    ConcreteCreatorB</code></pre>
+<h4>Пример: уведомления</h4>
+<pre><code>interface Notification { void send(); }
+
+class EmailNotification implements Notification {
+    public void send() { System.out.println("Email"); }
+}
+class SmsNotification implements Notification {
+    public void send() { System.out.println("SMS"); }
+}
+
+abstract class NotificationFactory {
+    public abstract Notification createNotification();
+}
+class EmailFactory extends NotificationFactory {
+    public Notification createNotification() { return new EmailNotification(); }
+}
+class SmsFactory extends NotificationFactory {
+    public Notification createNotification() { return new SmsNotification(); }
+}
+
+// Использование
+NotificationFactory factory = new EmailFactory();
+Notification notification = factory.createNotification();
+notification.send(); // Email</code></pre>
+<p><strong>Когда использовать:</strong> один тип продукта с разными реализациями (Document, Animal, Payment).</p>
+<h3>Abstract Factory</h3>
+<p><strong>Идея:</strong> создавать целое семейство связанных объектов. Отвечает на вопрос: <strong>Как создать совместимый набор объектов?</strong></p>
+<h4>Пример: GUI для Windows и Mac</h4>
+<pre><code>interface Button { void paint(); }
+interface Checkbox { void paint(); }
+
+class WindowsButton implements Button {
+    public void paint() { System.out.println("Windows Button"); }
+}
+class WindowsCheckbox implements Checkbox {
+    public void paint() { System.out.println("Windows Checkbox"); }
+}
+class MacButton implements Button {
+    public void paint() { System.out.println("Mac Button"); }
+}
+class MacCheckbox implements Checkbox {
+    public void paint() { System.out.println("Mac Checkbox"); }
+}
+
+interface GUIFactory {
+    Button createButton();
+    Checkbox createCheckbox();
+}
+class WindowsFactory implements GUIFactory {
+    public Button createButton() { return new WindowsButton(); }
+    public Checkbox createCheckbox() { return new WindowsCheckbox(); }
+}
+class MacFactory implements GUIFactory {
+    public Button createButton() { return new MacButton(); }
+    public Checkbox createCheckbox() { return new MacCheckbox(); }
+}
+
+// Использование
+GUIFactory factory = new WindowsFactory();
+factory.createButton().paint();    // Windows Button
+factory.createCheckbox().paint();  // Windows Checkbox</code></pre>
+<h4>Главное отличие</h4>
+<table>
+<tr><th>Factory Method</th><th>Abstract Factory</th></tr>
+<tr><td>Создает один продукт</td><td>Создает семейство продуктов</td></tr>
+<tr><td>Обычно один метод создания</td><td>Несколько методов создания</td></tr>
+<tr><td>Использует наследование</td><td>Использует композицию</td></tr>
+<tr><td>Выбирает конкретную реализацию</td><td>Выбирает набор совместимых объектов</td></tr>
+</table>
+<h4>Связь между ними</h4>
+<p>Abstract Factory часто реализуется через несколько Factory Method. Каждый метод (<code>createButton</code>, <code>createCheckbox</code>) — это Factory Method, а их объединение в одном интерфейсе образует Abstract Factory.</p>
+<h4>Аналогия</h4>
+<p><strong>Factory Method:</strong> «Сделайте мне автомобиль» — завод решает какой, получаете одну машину.</p>
+<p><strong>Abstract Factory:</strong> «Мне нужен полный комплект BMW» — фабрика выдает двигатель, коробку передач, салон, электронику. Все детали совместимы. Если выбрать Mercedes — весь комплект будет Mercedes.</p>
+<h4>Когда использовать</h4>
+<p><strong>Factory Method:</strong> один тип объектов, заранее неизвестен конкретный класс, убрать new из клиентского кода.</p>
+<p><strong>Abstract Factory:</strong> объекты создаются группами и должны быть совместимы, легкое переключение между семействами (Windows/Mac, PostgreSQL/MySQL, Light/Dark Theme), гарантия что клиент не смешает несовместимые реализации.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('factory-method-vs-abstract-factory')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="builder"><summary>👷 Builder (Строитель)</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Builder используют, когда объект сложно создать одним конструктором. Он позволяет создавать объект поэтапно и делает код более читаемым.</p>
+<h4>Проблема длинных конструкторов</h4>
+<pre><code>// Без Builder: что означает каждый параметр?
+new User("Misha", "misha@mail.com", 30, null, null, true);
+// Что такое true? Что означает null? При десяти параметрах легко ошибиться.</code></pre>
+<pre><code>// С Builder: код читается как обычный текст
+User user = User.builder()
+    .name("Misha")
+    .email("misha@mail.com")
+    .age(30)
+    .active(true)
+    .build();</code></pre>
+<h4>Пример реализации</h4>
+<pre><code>public class User {
+    private final String name;
+    private final String email;
+    private final int age;
+
+    private User(Builder builder) {
+        this.name = builder.name;
+        this.email = builder.email;
+        this.age = builder.age;
+    }
+
+    public static class Builder {
+        private String name;
+        private String email;
+        private int age;
+
+        public Builder name(String name) { this.name = name; return this; }
+        public Builder email(String email) { this.email = email; return this; }
+        public Builder age(int age) { this.age = age; return this; }
+
+        public User build() {
+            if (name == null) {
+                throw new IllegalStateException("Name required");
+            }
+            return new User(this);
+        }
+    }
+}
+
+// Использование
+User user = new User.Builder()
+    .name("Alex")
+    .email("alex@mail.com")
+    .age(25)
+    .build();</code></pre>
+<h4>Когда Builder действительно нужен</h4>
+<ol>
+<li><strong>Много параметров конструктора</strong> — <code>Car.builder().engine(e).color("Black").sunroof(true).build();</code></li>
+<li><strong>Большинство параметров необязательные</strong> — <code>User.builder().name("Alex").build();</code> или <code>User.builder().name("Alex").phone("123").address("London").build();</code></li>
+<li><strong>Объект должен быть неизменяемым (Immutable)</strong> — все поля final, безопасно для многопоточности.</li>
+<li><strong>Нужна проверка перед созданием</strong> — в методе <code>build()</code> проверяем обязательные поля.</li>
+<li><strong>Создание состоит из нескольких этапов</strong> — <code>HttpClient.newBuilder().connectTimeout(...).followRedirects(...).build();</code></li>
+</ol>
+<h4>Когда Builder не нужен</h4>
+<p>Если класс простой (<code>new Point(x, y)</code>) или параметров 2-3 (<code>new Employee(id, name)</code>) — Builder только усложнит код.</p>
+<h4>Builder vs Factory</h4>
+<table>
+<tr><th>Builder</th><th>Factory</th></tr>
+<tr><td>Пошагово собирает объект</td><td>Выбирает, какой объект создать</td></tr>
+<tr><td>Полезен при большом количестве параметров</td><td>Полезен, когда есть несколько реализаций</td></tr>
+<tr><td>Один и тот же класс, разные конфигурации</td><td>Разные классы, но общий интерфейс</td></tr>
+<tr><td><code>Pizza.builder().size("Large").cheese(true).build()</code></td><td><code>NotificationFactory.create("EMAIL")</code></td></tr>
+</table>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('builder')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="prototype"><summary>🧬 Prototype (Прототип)</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Prototype — порождающий паттерн, который создает новые объекты путем копирования (клонирования) существующего экземпляра, а не через new. Используется, когда создание объекта дорогое или сложное, либо когда заранее неизвестен точный тип объекта.</p>
+<h4>Когда использовать</h4>
+<ul>
+<li>создание объекта занимает много времени или ресурсов;</li>
+<li>объект имеет большое количество полей и сложную инициализацию;</li>
+<li>нужно создавать множество похожих объектов с небольшими изменениями;</li>
+<li>конкретный класс объекта может определяться только во время выполнения.</li>
+</ul>
+<h4>Реализация в Java</h4>
+<pre><code>// Конструктор копирования — наиболее рекомендуемый вариант
+class User {
+    private String name;
+    private Address address; // вложенный объект
+
+    public User(String name, Address address) {
+        this.name = name;
+        this.address = address;
+    }
+
+    // Конструктор копирования
+    public User(User other) {
+        this.name = other.name;
+        this.address = new Address(other.address); // глубокое копирование
+    }
+}
+
+User user1 = new User("Misha", new Address("Moscow"));
+User user2 = new User(user1); // независимая копия</code></pre>
+<h4>Поверхностное и глубокое копирование</h4>
+<ul>
+<li><strong>Shallow copy (поверхностная):</strong> копируются примитивы, ссылки копируются как есть, вложенные объекты остаются общими. Изменение вложенного объекта в копии затронет оригинал.</li>
+<li><strong>Deep copy (глубокая):</strong> копируются все вложенные объекты, новая копия полностью независима от оригинала. Именно необходимость глубокого копирования — одна из сложностей Prototype.</li>
+</ul>
+<h4>Плюсы и минусы</h4>
+<p><strong>Плюсы:</strong> ускоряет создание сложных объектов, уменьшает дублирование кода, позволяет создавать объекты без привязки к конкретным классам.</p>
+<p><strong>Минусы:</strong> сложно реализовать глубокое копирование, Cloneable и Object.clone() считаются неудачным API в Java, необходимо внимательно копировать изменяемые объекты.</p>
+<h4>Prototype vs Builder</h4>
+<p><strong>Prototype</strong> копирует уже существующий объект. <strong>Builder</strong> пошагово собирает новый объект с нуля.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('prototype')">⬆️ Свернуть</button></div>
+</div></details>
+
+</div>
+
+<div style="text-align: center; margin-top: 20px; padding: 10px;">
+<a href="index.html" style="
+display: inline-block;
+background-color: var(--button-bg);
+color: var(--button-text);
+border: 1px solid var(--border);
+padding: 10px 24px;
+border-radius: 4px;
+text-decoration: none;
+font-size: 0.9em;
+transition: 0.2s;
+" onmouseover="this.style.backgroundColor='var(--button-hover)'" 
+   onmouseout="this.style.backgroundColor='var(--button-bg)'">
+⬅️ Назад к содержанию
+</a>
+</div>
+
+<script>
+function setTheme(t) { document.body.className = t; }
+let fs = 16;
+function changeFontSize(d) { fs = Math.min(24, Math.max(12, fs + d)); document.body.style.fontSize = fs + 'px'; document.getElementById('fontSizeLabel').textContent = fs + 'px'; }
+function closeDetails(id) { const d = document.getElementById(id); if (d) d.removeAttribute('open'); }
+setTheme('dark');
+</script>
+</body>
+</html>

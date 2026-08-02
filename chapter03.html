@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Паттерны проектирования: полный справочник (Часть 3)</title>
+<style>
+:root {
+--bg: #1e1e1e; --text: #d4d4d4; --header-bg: #2d2d2d; --summary-bg: #333;
+--summary-hover: #3c3c3c; --border: #555; --code-bg: #252526; --code-border: #404040;
+--button-bg: #444; --button-text: #ddd; --button-hover: #555; --link: #569cd6;
+--scrollbar-thumb: #666; --scrollbar-track: #2d2d2d; --details-content-bg: var(--bg);
+--table-bg: #2a2a2a; --table-header: #3a3a3a;
+}
+body.light {
+--bg: #ffffff; --text: #1e1e1e; --header-bg: #f3f3f3; --summary-bg: #e8e8e8;
+--summary-hover: #ddd; --border: #ccc; --code-bg: #f9f9f9; --code-border: #ddd;
+--button-bg: #e0e0e0; --button-text: #000; --button-hover: #ccc; --link: #0451a5;
+--scrollbar-thumb: #aaa; --scrollbar-track: #f0f0f0; --details-content-bg: #fff;
+--table-bg: #fff; --table-header: #e0e0e0;
+}
+body.sepia {
+--bg: #f4ecd8; --text: #5b4636; --header-bg: #e8dcc8; --summary-bg: #ddd0b8;
+--summary-hover: #cfc1a8; --border: #b8a88a; --code-bg: #eee3d0; --code-border: #c0b090;
+--button-bg: #d6c9ae; --button-text: #3e2f22; --button-hover: #c2b498; --link: #8b5e3c;
+--scrollbar-thumb: #b8a080; --scrollbar-track: #e8dcc8; --details-content-bg: #f4ecd8;
+--table-bg: #f4ecd8; --table-header: #ddd0b8;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+background-color: var(--bg); color: var(--text);
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6;
+padding: 10px; transition: background-color 0.3s, color 0.3s; font-size: 16px;
+}
+header {
+background-color: var(--header-bg); padding: 15px; border-radius: 6px;
+margin-bottom: 20px; display: flex; flex-wrap: wrap; align-items: center;
+justify-content: space-between; gap: 10px;
+}
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+button {
+background-color: var(--button-bg); color: var(--button-text);
+border: 1px solid var(--border); padding: 6px 12px; border-radius: 4px;
+cursor: pointer; font-size: 0.9em; transition: 0.2s;
+}
+button:hover { background-color: var(--button-hover); }
+.font-controls { display: flex; gap: 4px; }
+.font-size-label { align-self: center; margin: 0 4px; font-weight: bold; }
+.container { max-width: 1000px; margin: 0 auto; }
+h2 { border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-top: 30px; margin-bottom: 15px; }
+h3 { margin-top: 25px; margin-bottom: 10px; color: #e8c170; }
+h4 { margin-top: 15px; margin-bottom: 8px; color: var(--link); }
+details {
+background-color: var(--summary-bg); border: 1px solid var(--border);
+border-radius: 6px; margin-bottom: 10px; overflow: hidden; transition: 0.2s;
+}
+details[open] { background-color: var(--details-content-bg); }
+summary {
+padding: 12px 16px; font-weight: 600; cursor: pointer;
+background-color: var(--summary-bg); transition: background-color 0.2s;
+list-style-position: inside; font-size: 1.05em;
+}
+summary:hover { background-color: var(--summary-hover); }
+summary::-webkit-details-marker { color: var(--link); }
+.details-content {
+padding: 0 16px 16px 16px; max-height: 65vh; overflow-y: auto;
+scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+.details-content::-webkit-scrollbar { width: 8px; }
+.details-content::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+.details-content::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 4px; }
+.close-btn-container {
+text-align: right; position: sticky; bottom: 0;
+background: linear-gradient(transparent, var(--details-content-bg) 70%);
+padding: 15px 0 5px; margin-top: 10px;
+}
+.close-btn { font-size: 0.85em; padding: 5px 14px; }
+pre {
+background-color: var(--code-bg); border: 1px solid var(--code-border);
+border-radius: 4px; padding: 12px; overflow-x: auto;
+font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+font-size: 0.9em; margin: 10px 0; line-height: 1.5; white-space: pre-wrap; word-break: break-word;
+}
+code { font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace; }
+.section-intro { margin-bottom: 20px; padding: 10px; background-color: var(--header-bg); border-radius: 5px; }
+p { margin: 10px 0; }
+ul, ol { margin: 10px 0 10px 20px; }
+li { margin: 5px 0; }
+table { width: 100%; border-collapse: collapse; margin: 10px 0; background-color: var(--table-bg); }
+th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+th { background-color: var(--table-header); font-weight: 600; }
+strong { color: var(--link); }
+.note {
+background-color: var(--code-bg); border-left: 3px solid #e8c170;
+padding: 10px; margin: 10px 0; border-radius: 0 4px 4px 0;
+}
+@media (max-width: 600px) {
+body { font-size: 14px; }
+header { flex-direction: column; align-items: flex-start; }
+.controls { width: 100%; }
+}
+</style>
+</head>
+<body class="dark">
+<header>
+<h1>📘 Паттерны проектирования: Часть 3</h1>
+<div class="controls">
+<div class="theme-controls">
+<button onclick="setTheme('dark')">🌙 Тёмная</button>
+<button onclick="setTheme('light')">☀️ Светлая</button>
+<button onclick="setTheme('sepia')">📜 Сепия</button>
+</div>
+<div class="font-controls">
+<button onclick="changeFontSize(-1)">A-</button>
+<span class="font-size-label" id="fontSizeLabel">16px</span>
+<button onclick="changeFontSize(1)">A+</button>
+</div>
+</div>
+</header>
+<div class="container">
+<div class="section-intro">
+<p><strong>Часть 3:</strong> Поведенческие паттерны — Strategy, Observer, Command, State, Iterator, Template Method, Chain of Responsibility, Mediator. Как объекты взаимодействуют друг с другом.</p>
+</div>
+
+<h2>🟢 Поведенческие паттерны (Behavioral)</h2>
+
+<details id="strategy"><summary>🎯 Strategy (Стратегия)</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Strategy — поведенческий паттерн, который инкапсулирует разные алгоритмы в отдельные классы и позволяет выбирать нужный во время выполнения без изменения кода клиента.</p>
+<h4>Когда применять</h4>
+<ul>
+<li>существует несколько алгоритмов, решающих одну задачу;</li>
+<li>алгоритмы должны быть взаимозаменяемыми;</li>
+<li>необходимо избежать большого количества if-else или switch;</li>
+<li>требуется соблюдать принцип Open/Closed (OCP);</li>
+<li>поведение объекта должно изменяться во время выполнения.</li>
+</ul>
+<h4>Структура</h4>
+<pre><code>Context ──→ Strategy (интерфейс)
+               ▲
+               │
+          ConcreteStrategyA
+          ConcreteStrategyB</code></pre>
+<h4>Пример: способы оплаты</h4>
+<pre><code>interface PaymentStrategy {
+    void pay(double amount);
+}
+
+class CardPayment implements PaymentStrategy {
+    public void pay(double amount) {
+        System.out.println("Оплата картой: " + amount);
+    }
+}
+
+class PayPalPayment implements PaymentStrategy {
+    public void pay(double amount) {
+        System.out.println("Оплата через PayPal: " + amount);
+    }
+}
+
+class CryptoPayment implements PaymentStrategy {
+    public void pay(double amount) {
+        System.out.println("Оплата криптовалютой: " + amount);
+    }
+}
+
+class PaymentService {
+    private PaymentStrategy strategy;
+
+    public PaymentService(PaymentStrategy strategy) { this.strategy = strategy; }
+    public void setStrategy(PaymentStrategy strategy) { this.strategy = strategy; }
+
+    public void checkout(double amount) { strategy.pay(amount); }
+}
+
+// Использование
+PaymentService service = new PaymentService(new CardPayment());
+service.checkout(1000);
+service.setStrategy(new PayPalPayment()); // меняем стратегию
+service.checkout(500);</code></pre>
+<h4>Где используется в Java</h4>
+<ul>
+<li><strong>Comparator</strong> — разные стратегии сравнения объектов</li>
+<li><strong>Executor / ExecutorService</strong> — разные стратегии выполнения задач</li>
+<li><strong>Collections.sort(list, comparator)</strong> — стратегия сортировки</li>
+<li><strong>HttpClient.Redirect</strong> — стратегии обработки редиректов</li>
+</ul>
+<h4>Преимущества и недостатки</h4>
+<p><strong>Плюсы:</strong> избавляет от if-else, соответствует OCP и SRP, алгоритмы легко тестировать, можно менять поведение во время выполнения.</p>
+<p><strong>Минусы:</strong> увеличивается количество классов, клиент должен знать какую стратегию выбрать.</p>
+<h4>Отличие от State</h4>
+<p><strong>Strategy</strong> — клиент осознанно выбирает алгоритм. <strong>State</strong> — объект сам меняет поведение при изменении состояния. В Strategy меняется способ выполнения задачи, в State — поведение объекта.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('strategy')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="observer"><summary>👀 Observer (Наблюдатель)</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Observer — поведенческий паттерн, реализующий связь «один ко многим»: объект-издатель хранит список подписчиков и уведомляет их при изменении своего состояния.</p>
+<h4>Типичная реализация</h4>
+<pre><code>interface Observer {
+    void update(String event);
+}
+
+class EventBus {
+    private final List&lt;Observer&gt; observers = new ArrayList&lt;&gt;();
+
+    public void subscribe(Observer observer) { observers.add(observer); }
+    public void unsubscribe(Observer observer) { observers.remove(observer); }
+
+    public void publish(String event) {
+        for (Observer observer : observers) {
+            observer.update(event);
+        }
+    }
+}
+
+// Использование
+EventBus bus = new EventBus();
+bus.subscribe(event -> System.out.println("Email: " + event));
+bus.subscribe(event -> System.out.println("SMS: " + event));
+bus.publish("Order created");
+// Email: Order created
+// SMS: Order created</code></pre>
+<h4>Где используется в Java</h4>
+<ul>
+<li><strong>PropertyChangeListener / PropertyChangeSupport</strong> — отслеживание изменений свойств</li>
+<li><strong>Swing</strong> — button.addActionListener(...), вся модель обработки событий</li>
+<li><strong>JavaFX</strong> — ObservableValue, ChangeListener</li>
+<li><strong>Flow API (Java 9)</strong> — Flow.Publisher, Flow.Subscriber с поддержкой backpressure</li>
+<li><strong>Spring Events</strong> — @EventListener, ApplicationEventPublisher</li>
+</ul>
+<h4>Почему Observable устарел?</h4>
+<p><code>java.util.Observable</code> и <code>java.util.Observer</code> признаны неудачными: Observable — класс, а не интерфейс (нельзя наследоваться от другого класса), плохая расширяемость, неудобная работа с потоками, отсутствие backpressure. Начиная с Java 9 они deprecated.</p>
+<h4>Потокобезопасность</h4>
+<p>В многопоточном приложении использовать CopyOnWriteArrayList или ConcurrentHashMap вместо обычного ArrayList. Если подписчики подписываются/отписываются одновременно с рассылкой — нужны потокобезопасные коллекции.</p>
+<h4>Observer vs Publisher-Subscriber</h4>
+<p><strong>Observer</strong> — издатель знает своих подписчиков и хранит их список. <strong>Publisher-Subscriber</strong> — между ними брокер сообщений (Kafka, RabbitMQ), издатель и подписчики не знают друг о друге.</p>
+<h4>Применение на реальных проектах</h4>
+<ul>
+<li>публикация доменных событий (OrderCreatedEvent)</li>
+<li>уведомления по email, SMS, push</li>
+<li>обработка заказов, логирование, аудит</li>
+<li>обновление кэша, реактивные системы (Reactor, RxJava)</li>
+</ul>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('observer')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="command"><summary>🎮 Command (Команда)</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Command — поведенческий паттерн, представляющий действие как объект. Позволяет хранить команды, ставить их в очередь, логировать и поддерживать отмену операций.</p>
+<h4>Структура</h4>
+<pre><code>interface Command {
+    void execute();
+    void undo(); // опционально
+}
+
+// Конкретная команда
+class SaveCommand implements Command {
+    private Document document;
+
+    public SaveCommand(Document document) { this.document = document; }
+
+    public void execute() {
+        document.save();
+        System.out.println("Документ сохранён");
+    }
+
+    public void undo() {
+        document.revert();
+        System.out.println("Сохранение отменено");
+    }
+}
+
+// Invoker — вызывает команду
+class Button {
+    private Command command;
+
+    public void setCommand(Command command) { this.command = command; }
+    public void click() { command.execute(); }
+}
+
+// Использование
+Document doc = new Document();
+Command save = new SaveCommand(doc);
+Button saveButton = new Button();
+saveButton.setCommand(save);
+saveButton.click(); // Документ сохранён</code></pre>
+<h4>Где используется в Java</h4>
+<ul>
+<li><strong>Runnable</strong> — команда для выполнения в потоке</li>
+<li><strong>Callable</strong> — команда, возвращающая результат</li>
+<li><strong>Swing Action</strong> — команда для GUI-действий</li>
+<li><strong>ThreadPoolExecutor.execute(Runnable)</strong> — очередь команд</li>
+</ul>
+<h4>Дополнительные возможности</h4>
+<ul>
+<li><strong>Очередь команд:</strong> накопление и пакетное выполнение</li>
+<li><strong>История (undo/redo):</strong> хранение выполненных команд для отмены</li>
+<li><strong>Логирование:</strong> запись всех выполненных операций</li>
+<li><strong>Транзакции:</strong> выполнение группы команд атомарно</li>
+</ul>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('command')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="state"><summary>🚦 State (Состояние)</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> State — поведенческий паттерн, позволяющий объекту изменять своё поведение при изменении внутреннего состояния. Каждое состояние знает, что делать и в какое состояние перейти дальше.</p>
+<h4>Когда использовать</h4>
+<ul>
+<li>есть жизненный цикл объекта;</li>
+<li>поведение зависит от текущего состояния;</li>
+<li>много условий вида <code>if (state == NEW) ... else if (state == PAID) ...</code></li>
+</ul>
+<h4>Пример: жизненный цикл заказа</h4>
+<pre><code>interface OrderState {
+    void next(Order order);
+    void cancel(Order order);
+    String getStatus();
+}
+
+class NewState implements OrderState {
+    public void next(Order order) { order.setState(new PaidState()); }
+    public void cancel(Order order) { order.setState(new CancelledState()); }
+    public String getStatus() { return "NEW"; }
+}
+
+class PaidState implements OrderState {
+    public void next(Order order) { order.setState(new ShippedState()); }
+    public void cancel(Order order) {
+        System.out.println("Возврат средств...");
+        order.setState(new CancelledState());
+    }
+    public String getStatus() { return "PAID"; }
+}
+
+class ShippedState implements OrderState {
+    public void next(Order order) { order.setState(new DeliveredState()); }
+    public void cancel(Order order) {
+        System.out.println("Заказ уже отправлен, отмена невозможна");
+    }
+    public String getStatus() { return "SHIPPED"; }
+}
+
+class DeliveredState implements OrderState {
+    public void next(Order order) {
+        System.out.println("Заказ уже доставлен");
+    }
+    public void cancel(Order order) {
+        System.out.println("Заказ доставлен, отмена невозможна");
+    }
+    public String getStatus() { return "DELIVERED"; }
+}
+
+class CancelledState implements OrderState {
+    public void next(Order order) { System.out.println("Отменённый заказ"); }
+    public void cancel(Order order) { System.out.println("Уже отменён"); }
+    public String getStatus() { return "CANCELLED"; }
+}
+
+class Order {
+    private OrderState state = new NewState();
+
+    void setState(OrderState state) { this.state = state; }
+    void next() { state.next(this); }
+    void cancel() { state.cancel(this); }
+    String getStatus() { return state.getStatus(); }
+}</code></pre>
+<h4>Где используется</h4>
+<ul>
+<li><strong>Workflow / State Machine</strong> — бизнес-процессы</li>
+<li><strong>Spring State Machine</strong> — управление состояниями в Spring</li>
+<li><strong>Игровые персонажи</strong> — стояние, бег, прыжок, атака</li>
+<li><strong>TCP-соединения</strong> — CLOSED, LISTEN, ESTABLISHED</li>
+<li><strong>Банкомат</strong> — ожидание карты, ввод PIN, выбор операции</li>
+</ul>
+<h4>State vs Strategy</h4>
+<table>
+<tr><th>Strategy</th><th>State</th></tr>
+<tr><td>Решает задачу выбора алгоритма</td><td>Изменяет поведение по состоянию</td></tr>
+<tr><td>Стратегии независимы</td><td>Состояния связаны переходами</td></tr>
+<tr><td>Выбирается клиентом</td><td>Меняется самим объектом</td></tr>
+<tr><td>Нет жизненного цикла</td><td>Есть жизненный цикл объекта</td></tr>
+</table>
+<p><strong>Мнемоника:</strong> Strategy = "Как выполнить?", State = "В каком я состоянии?"</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('state')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="iterator"><summary>📚 Iterator (Итератор)</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Iterator — поведенческий паттерн, предоставляющий единый способ последовательного обхода элементов коллекции без раскрытия её внутренней реализации. В Java реализован интерфейсом Iterator.</p>
+<h4>Основные методы</h4>
+<pre><code>public interface Iterator&lt;E&gt; {
+    boolean hasNext();  // есть ли следующий элемент
+    E next();           // следующий элемент + сдвиг курсора
+    default void remove(); // удаление (необязательно)
+}</code></pre>
+<h4>Почему Iterator лучше обхода по индексам</h4>
+<p>Для ArrayList <code>get(i)</code> — O(1). Для LinkedList <code>get(i)</code> — O(n), цикл превращается в O(n²). Iterator скрывает особенности реализации и обеспечивает эффективный обход для любой коллекции.</p>
+<h4>Iterable и цикл for-each</h4>
+<pre><code>// for-each — синтаксический сахар над Iterator
+for (String s : list) { System.out.println(s); }
+// Компилятор преобразует в:
+Iterator&lt;String&gt; it = list.iterator();
+while (it.hasNext()) { String s = it.next(); ... }</code></pre>
+<h4>Fail-Fast vs Fail-Safe</h4>
+<ul>
+<li><strong>Fail-Fast:</strong> ArrayList, HashSet. При изменении коллекции извне — ConcurrentModificationException.</li>
+<li><strong>Fail-Safe:</strong> CopyOnWriteArrayList, ConcurrentHashMap. Работают по снимку данных, не бросают исключение.</li>
+</ul>
+<h4>Другие виды итераторов</h4>
+<ul>
+<li><strong>ListIterator:</strong> только для List, умеет идти назад (previous), изменять (set), добавлять (add).</li>
+<li><strong>Spliterator (Java 8):</strong> для Stream API и параллельной обработки, эффективно разбивает коллекцию на части.</li>
+</ul>
+<h4>Iterator vs Iterable</h4>
+<p><strong>Iterable</strong> — объект умеет создавать итератор (метод iterator()). <strong>Iterator</strong> — выполняет обход (hasNext(), next()). Коллекция реализует Iterable, а сам обход выполняет Iterator.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('iterator')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="template-method"><summary>📋 Template Method (Шаблонный метод)</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Template Method определяет скелет алгоритма в базовом классе, оставляя реализацию некоторых шагов подклассам. Подклассы могут переопределять шаги, не меняя общей структуры алгоритма.</p>
+<h4>Пример: экспорт данных</h4>
+<pre><code>abstract class DataExporter {
+    // Шаблонный метод — final, чтобы подклассы не могли изменить порядок
+    public final void export() {
+        connect();
+        fetchData();
+        writeFile();
+        close();
+        System.out.println("Экспорт завершён");
+    }
+
+    void connect() { System.out.println("Подключение к источнику"); }
+    abstract void fetchData(); // различается в подклассах
+    void writeFile() { System.out.println("Запись файла"); }
+    void close() { System.out.println("Закрытие соединения"); }
+}
+
+class CsvExporter extends DataExporter {
+    void fetchData() { System.out.println("Получение данных в CSV"); }
+}
+
+class JsonExporter extends DataExporter {
+    void fetchData() { System.out.println("Получение данных в JSON"); }
+}</code></pre>
+<h4>Где используется в Java</h4>
+<ul>
+<li><strong>AbstractList</strong> — get(), size() абстрактные, add() и remove() определены через них</li>
+<li><strong>JdbcTemplate</strong> — шаблон для работы с БД</li>
+<li><strong>HttpServlet</strong> — doGet(), doPost() переопределяются, сервлет управляет жизненным циклом</li>
+<li><strong>InputStream</strong> — read() определен через read(byte[], int, int)</li>
+</ul>
+<h4>Принцип Голливуда</h4>
+<p>"Не звоните нам — мы вам позвоним". Базовый класс вызывает методы подклассов, а не наоборот. Инверсия управления на уровне классов.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('template-method')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="chain-of-responsibility"><summary>⛓️ Chain of Responsibility (Цепочка обязанностей)</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Chain of Responsibility передаёт запрос по цепочке обработчиков. Каждый обработчик решает, может ли он обработать запрос, и либо обрабатывает, либо передаёт дальше.</p>
+<h4>Пример: цепочка валидации</h4>
+<pre><code>abstract class Validator {
+    protected Validator next;
+
+    public Validator setNext(Validator next) {
+        this.next = next;
+        return next; // fluent API
+    }
+
+    public abstract boolean validate(Request request);
+}
+
+class AuthValidator extends Validator {
+    public boolean validate(Request request) {
+        if (!request.isAuthenticated()) {
+            System.out.println("Ошибка аутентификации");
+            return false;
+        }
+        System.out.println("Аутентификация пройдена");
+        return next == null || next.validate(request);
+    }
+}
+
+class RoleValidator extends Validator {
+    public boolean validate(Request request) {
+        if (!request.hasRole("ADMIN")) {
+            System.out.println("Недостаточно прав");
+            return false;
+        }
+        System.out.println("Права подтверждены");
+        return next == null || next.validate(request);
+    }
+}
+
+class ThrottleValidator extends Validator {
+    private int requestCount = 0;
+    public boolean validate(Request request) {
+        if (++requestCount > 100) {
+            System.out.println("Превышен лимит запросов");
+            return false;
+        }
+        System.out.println("Лимит запросов OK");
+        return next == null || next.validate(request);
+    }
+}
+
+// Использование: строим цепочку
+Validator chain = new AuthValidator();
+chain.setNext(new RoleValidator()).setNext(new ThrottleValidator());
+chain.validate(request);</code></pre>
+<h4>Где используется в Java</h4>
+<ul>
+<li><strong>Servlet Filters</strong> — цепочка фильтров HTTP-запросов</li>
+<li><strong>Spring Security Filter Chain</strong> — цепочка фильтров безопасности</li>
+<li><strong>Logback / Log4j</strong> — цепочка логгеров (логгер → родитель → родитель)</li>
+<li><strong>try-catch</strong> — исключения передаются по цепочке catch блоков</li>
+</ul>
+<h4>Преимущества</h4>
+<ul>
+<li>Ослабляет связанность — отправитель не знает, кто обработает запрос</li>
+<li>Гибкость — можно динамически менять цепочку</li>
+<li>Каждый обработчик выполняет только свою задачу (SRP)</li>
+</ul>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('chain-of-responsibility')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="mediator"><summary>🕊️ Mediator (Посредник)</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Mediator централизует взаимодействие между компонентами, уменьшая их связанность. Вместо того чтобы компоненты общались напрямую, они общаются через посредника.</p>
+<h4>Проблема без Mediator</h4>
+<pre><code>// Все компоненты знают друг о друге — спагетти зависимостей
+class Button {
+    private TextField textField;
+    private ListBox listBox;
+    public void click() {
+        textField.clear();
+        listBox.refresh();
+    }
+}</code></pre>
+<h4>Решение с Mediator</h4>
+<pre><code>interface Mediator {
+    void notify(Component sender, String event);
+}
+
+// Конкретный посредник — диалоговое окно
+class Dialog implements Mediator {
+    private Button okButton;
+    private TextField textField;
+    private ListBox listBox;
+
+    public void notify(Component sender, String event) {
+        if (sender == okButton && event.equals("click")) {
+            textField.clear();
+            listBox.refresh();
+        }
+        if (sender == textField && event.equals("change")) {
+            listBox.filter(textField.getText());
+        }
+    }
+}
+
+abstract class Component {
+    protected Mediator mediator;
+    public Component(Mediator mediator) { this.mediator = mediator; }
+}
+
+class Button extends Component {
+    public void click() { mediator.notify(this, "click"); }
+}
+
+class TextField extends Component {
+    private String text;
+    public void onChange() { mediator.notify(this, "change"); }
+}</code></pre>
+<h4>Где используется в Java</h4>
+<ul>
+<li><strong>java.util.Timer</strong> — посредник между задачами и временем выполнения</li>
+<li><strong>Spring MVC DispatcherServlet</strong> — посредник между контроллерами, видами и моделями</li>
+<li><strong>Event Bus / Message Broker</strong> — централизованный обмен сообщениями</li>
+<li><strong>Swing Dialog</strong> — диалоговое окно как посредник для своих компонентов</li>
+</ul>
+<h4>Преимущества и недостатки</h4>
+<p><strong>Плюсы:</strong> устраняет связанность между компонентами, централизует управление, упрощает добавление новых компонентов.</p>
+<p><strong>Минусы:</strong> посредник может стать God Object — слишком много логики в одном классе.</p>
+<h4>Mediator vs Observer</h4>
+<p><strong>Mediator</strong> — централизованное управление взаимодействием. <strong>Observer</strong> — децентрализованное уведомление о событиях.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('mediator')">⬆️ Свернуть</button></div>
+</div></details>
+
+</div>
+
+<div style="text-align: center; margin-top: 20px; padding: 10px;">
+<a href="index.html" style="
+display: inline-block;
+background-color: var(--button-bg);
+color: var(--button-text);
+border: 1px solid var(--border);
+padding: 10px 24px;
+border-radius: 4px;
+text-decoration: none;
+font-size: 0.9em;
+transition: 0.2s;
+" onmouseover="this.style.backgroundColor='var(--button-hover)'" 
+   onmouseout="this.style.backgroundColor='var(--button-bg)'">
+⬅️ Назад к содержанию
+</a>
+</div>
+
+<script>
+function setTheme(t) { document.body.className = t; }
+let fs = 16;
+function changeFontSize(d) { fs = Math.min(24, Math.max(12, fs + d)); document.body.style.fontSize = fs + 'px'; document.getElementById('fontSizeLabel').textContent = fs + 'px'; }
+function closeDetails(id) { const d = document.getElementById(id); if (d) d.removeAttribute('open'); }
+setTheme('dark');
+</script>
+</body>
+</html>
