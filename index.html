@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>📘 Паттерны проектирования: справочник Java-разработчика</title>
+<title>📘 Справочник Java-разработчика</title>
 <style>
 :root {
 --bg: #1e1e1e; --text: #d4d4d4; --header-bg: #2d2d2d; --card-bg: #2a2a2a;
@@ -89,7 +89,7 @@ header h1 { font-size: 1.5em; }
 <body class="dark">
 <header>
 <h1>📘 Справочник Java-разработчика</h1>
-<p>Паттерны проектирования, Stream API, String, исключения, HashMap — всё в одном месте</p>
+<p>Паттерны проектирования, Collections, Stream API, String, исключения, HashMap — всё в одном месте</p>
 <div class="controls">
 <button onclick="setTheme('dark')">🌙 Тёмная</button>
 <button onclick="setTheme('light')">☀️ Светлая</button>
@@ -100,6 +100,7 @@ header h1 { font-size: 1.5em; }
 </p>
 </header>
 
+<!-- ===== ПАТТЕРНЫ ПРОЕКТИРОВАНИЯ ===== -->
 <h2 class="section-title">🏗️ Паттерны проектирования</h2>
 
 <div class="main-grid">
@@ -167,6 +168,7 @@ header h1 { font-size: 1.5em; }
 
 </div>
 
+<!-- ===== JAVA CORE ===== -->
 <h2 class="section-title">☕ Java Core</h2>
 
 <div class="main-grid">
@@ -186,22 +188,75 @@ header h1 { font-size: 1.5em; }
 </div>
 </a>
 
-<a href="chapter06.html" class="chapter-card" style="opacity: 0.5; cursor: default; pointer-events: none;">
+<a href="chapter06.html" class="chapter-card">
 <div class="chapter-number">06</div>
 <div class="chapter-icon">📚</div>
-<h2>Collection Framework</h2>
-<p>Скоро...</p>
+<h2>Java Collections Framework</h2>
+<p>List, Set, Queue, Map, ArrayList vs LinkedList, TreeMap, ConcurrentHashMap, итераторы, Comparable и многое другое.</p>
 <div class="topics">
-<span class="topic-tag">List</span>
-<span class="topic-tag">Set</span>
-<span class="topic-tag">Queue</span>
-<span class="topic-tag">Map</span>
-<span class="topic-tag">Deque</span>
+<span class="topic-tag">ArrayList</span>
+<span class="topic-tag">LinkedList</span>
+<span class="topic-tag">HashSet</span>
+<span class="topic-tag">TreeMap</span>
+<span class="topic-tag">ConcurrentHashMap</span>
+<span class="topic-tag">Iterator</span>
+<span class="topic-tag">Comparable</span>
 </div>
 </a>
 
-<a href="chapter07.html" class="chapter-card" style="opacity: 0.5; cursor: default; pointer-events: none;">
+<a href="chapter07.html" class="chapter-card">
 <div class="chapter-number">07</div>
+<div class="chapter-icon">❌</div>
+<h2>Исключения в Java</h2>
+<p>Checked и unchecked, try-catch-finally, try-with-resources, suppressed exceptions, создание и оборачивание исключений, логирование.</p>
+<div class="topics">
+<span class="topic-tag">Checked/Unchecked</span>
+<span class="topic-tag">Try-with-resources</span>
+<span class="topic-tag">Suppressed</span>
+<span class="topic-tag">Exception Chaining</span>
+<span class="topic-tag">Stack Trace</span>
+</div>
+</a>
+
+<a href="chapter08.html" class="chapter-card">
+<div class="chapter-number">08</div>
+<div class="chapter-icon">🌊</div>
+<h2>Stream API в Java</h2>
+<p>Intermediate и terminal операции, ленивые вычисления, параллельные стримы, коллекторы и многое другое.</p>
+<div class="topics">
+<span class="topic-tag">filter/map</span>
+<span class="topic-tag">flatMap</span>
+<span class="topic-tag">reduce/collect</span>
+<span class="topic-tag">Parallel Streams</span>
+<span class="topic-tag">Collectors</span>
+<span class="topic-tag">Lazy Evaluation</span>
+</div>
+</a>
+
+<a href="chapter09.html" class="chapter-card">
+<div class="chapter-number">09</div>
+<div class="chapter-icon">📝</div>
+<h2>String в Java</h2>
+<p>String Pool, иммутабельность, конкатенация, кодировки, Compact Strings, рефлексия и многое другое.</p>
+<div class="topics">
+<span class="topic-tag">String Pool</span>
+<span class="topic-tag">intern()</span>
+<span class="topic-tag">Compact Strings</span>
+<span class="topic-tag">StringBuilder</span>
+<span class="topic-tag">Кодировки</span>
+<span class="topic-tag">Concat</span>
+</div>
+</a>
+
+</div>
+
+<!-- ===== ПРОДВИНУТЫЕ ТЕМЫ ===== -->
+<h2 class="section-title">🚀 Продвинутые темы</h2>
+
+<div class="main-grid">
+
+<a href="chapter10.html" class="chapter-card" style="opacity: 0.5; cursor: default; pointer-events: none;">
+<div class="chapter-number">10</div>
 <div class="chapter-icon">🧵</div>
 <h2>Многопоточность</h2>
 <p>Скоро...</p>
@@ -214,8 +269,8 @@ header h1 { font-size: 1.5em; }
 </div>
 </a>
 
-<a href="chapter08.html" class="chapter-card" style="opacity: 0.5; cursor: default; pointer-events: none;">
-<div class="chapter-number">08</div>
+<a href="chapter11.html" class="chapter-card" style="opacity: 0.5; cursor: default; pointer-events: none;">
+<div class="chapter-number">11</div>
 <div class="chapter-icon">🌱</div>
 <h2>Spring Framework</h2>
 <p>Скоро...</p>

@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Java Collections: полный справочник</title>
+<style>
+:root {
+--bg: #1e1e1e; --text: #d4d4d4; --header-bg: #2d2d2d; --summary-bg: #333;
+--summary-hover: #3c3c3c; --border: #555; --code-bg: #252526; --code-border: #404040;
+--button-bg: #444; --button-text: #ddd; --button-hover: #555; --link: #569cd6;
+--scrollbar-thumb: #666; --scrollbar-track: #2d2d2d; --details-content-bg: var(--bg);
+--table-bg: #2a2a2a; --table-header: #3a3a3a; --accent: #e8c170;
+--resume-bg: #1e3a2e; --resume-border: #2ecc71; --interview-bg: #2e1e3a; --interview-border: #9b59b6;
+}
+body.light {
+--bg: #ffffff; --text: #1e1e1e; --header-bg: #f3f3f3; --summary-bg: #e8e8e8;
+--summary-hover: #ddd; --border: #ccc; --code-bg: #f9f9f9; --code-border: #ddd;
+--button-bg: #e0e0e0; --button-text: #000; --button-hover: #ccc; --link: #0451a5;
+--scrollbar-thumb: #aaa; --scrollbar-track: #f0f0f0; --details-content-bg: #fff;
+--table-bg: #fff; --table-header: #e0e0e0; --accent: #b8860b;
+--resume-bg: #e8f5e9; --resume-border: #27ae60; --interview-bg: #f3e5f5; --interview-border: #8e44ad;
+}
+body.sepia {
+--bg: #f4ecd8; --text: #5b4636; --header-bg: #e8dcc8; --summary-bg: #ddd0b8;
+--summary-hover: #cfc1a8; --border: #b8a88a; --code-bg: #eee3d0; --code-border: #c0b090;
+--button-bg: #d6c9ae; --button-text: #3e2f22; --button-hover: #c2b498; --link: #8b5e3c;
+--scrollbar-thumb: #b8a080; --scrollbar-track: #e8dcc8; --details-content-bg: #f4ecd8;
+--table-bg: #f4ecd8; --table-header: #ddd0b8; --accent: #6b4e16;
+--resume-bg: #e2ecd0; --resume-border: #5a8a3c; --interview-bg: #e8dae8; --interview-border: #7b4f8a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+background-color: var(--bg); color: var(--text);
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6;
+padding: 10px; transition: background-color 0.3s, color 0.3s; font-size: 16px;
+}
+header {
+background-color: var(--header-bg); padding: 15px; border-radius: 6px;
+margin-bottom: 20px; display: flex; flex-wrap: wrap; align-items: center;
+justify-content: space-between; gap: 10px;
+}
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+button {
+background-color: var(--button-bg); color: var(--button-text);
+border: 1px solid var(--border); padding: 6px 12px; border-radius: 4px;
+cursor: pointer; font-size: 0.9em; transition: 0.2s;
+}
+button:hover { background-color: var(--button-hover); }
+.font-controls { display: flex; gap: 4px; }
+.font-size-label { align-self: center; margin: 0 4px; font-weight: bold; }
+.container { max-width: 1000px; margin: 0 auto; }
+h2 { border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-top: 30px; margin-bottom: 15px; }
+h4 { margin-top: 15px; margin-bottom: 8px; color: var(--link); }
+details {
+background-color: var(--summary-bg); border: 1px solid var(--border);
+border-radius: 6px; margin-bottom: 10px; overflow: hidden; transition: 0.2s;
+}
+details[open] { background-color: var(--details-content-bg); }
+summary {
+padding: 12px 16px; font-weight: 600; cursor: pointer;
+background-color: var(--summary-bg); transition: background-color 0.2s;
+list-style-position: inside; font-size: 1.05em;
+}
+summary:hover { background-color: var(--summary-hover); }
+summary::-webkit-details-marker { color: var(--link); }
+.details-content {
+padding: 0 16px 16px 16px; max-height: 65vh; overflow-y: auto;
+scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+.details-content::-webkit-scrollbar { width: 8px; }
+.details-content::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+.details-content::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 4px; }
+.close-btn-container {
+text-align: right; position: sticky; bottom: 0;
+background: linear-gradient(transparent, var(--details-content-bg) 70%);
+padding: 15px 0 5px; margin-top: 10px;
+}
+.close-btn { font-size: 0.85em; padding: 5px 14px; }
+pre {
+background-color: var(--code-bg); border: 1px solid var(--code-border);
+border-radius: 4px; padding: 12px; overflow-x: auto;
+font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+font-size: 0.9em; margin: 10px 0; line-height: 1.5; white-space: pre-wrap; word-break: break-word;
+}
+code { font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace; }
+.section-intro { margin-bottom: 20px; padding: 10px; background-color: var(--header-bg); border-radius: 5px; }
+p { margin: 10px 0; }
+ul, ol { margin: 10px 0 10px 20px; }
+li { margin: 5px 0; }
+table { width: 100%; border-collapse: collapse; margin: 10px 0; background-color: var(--table-bg); }
+th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+th { background-color: var(--table-header); font-weight: 600; }
+strong { color: var(--link); }
+
+/* Стили для блоков Резюме и Собеседование */
+.resume-box {
+background-color: var(--resume-bg); border-left: 4px solid var(--resume-border);
+padding: 12px 16px; margin: 15px 0; border-radius: 0 6px 6px 0;
+}
+.resume-box strong { color: var(--resume-border); }
+.resume-box p, .resume-box ul { margin: 5px 0; }
+.resume-box ul { padding-left: 20px; }
+
+.interview-box {
+background-color: var(--interview-bg); border-left: 4px solid var(--interview-border);
+padding: 12px 16px; margin: 15px 0; border-radius: 0 6px 6px 0;
+}
+.interview-box strong { color: var(--interview-border); }
+.interview-box p, .interview-box ul { margin: 5px 0; }
+.interview-box ul { padding-left: 20px; }
+
+@media (max-width: 600px) {
+body { font-size: 14px; }
+header { flex-direction: column; align-items: flex-start; }
+.controls { width: 100%; }
+}
+</style>
+</head>
+<body class="dark">
+<header>
+<h1>📘 Java Collections</h1>
+<div class="controls">
+<div class="theme-controls">
+<button onclick="setTheme('dark')">🌙 Тёмная</button>
+<button onclick="setTheme('light')">☀️ Светлая</button>
+<button onclick="setTheme('sepia')">📜 Сепия</button>
+</div>
+<div class="font-controls">
+<button onclick="changeFontSize(-1)">A-</button>
+<span class="font-size-label" id="fontSizeLabel">16px</span>
+<button onclick="changeFontSize(1)">A+</button>
+</div>
+</div>
+</header>
+<div class="container">
+<div class="section-intro">
+<p><strong>Часть 1:</strong> Интерфейсы Collection Framework, List, Set, Queue, ArrayList vs LinkedList, временная сложность, Vector, Stack, Queue, Deque. Каждый раздел содержит развёрнутое объяснение, примеры кода, резюме для Middle+ и советы для собеседования.</p>
+</div>
+
+<h2>🔷 Интерфейсы Collection Framework</h2>
+
+<details id="collection-interfaces"><summary>Какие основные интерфейсы Collection Framework?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Collection Framework построен на трёх корневых интерфейсах: <code>Collection&lt;E&gt;</code>, <code>Map&lt;K,V&gt;</code> и <code>Iterator&lt;E&gt;</code>. От <code>Collection</code> наследуются <code>List</code>, <code>Set</code> и <code>Queue</code>.</p>
+<h4>Полная иерархия интерфейсов</h4>
+<pre><code>Iterable&lt;E&gt;
+    │
+    └── Collection&lt;E&gt;
+            │
+            ├── List&lt;E&gt;          — упорядоченная, доступ по индексу, дубликаты
+            ├── Set&lt;E&gt;           — уникальность, нет дубликатов
+            │   └── SortedSet&lt;E&gt; — отсортированные
+            │       └── NavigableSet&lt;E&gt; — навигация
+            └── Queue&lt;E&gt;         — FIFO
+                ├── Deque&lt;E&gt;     — двусторонняя (FIFO + LIFO)
+                └── BlockingQueue&lt;E&gt; — потокобезопасная с блокировкой
+
+Map&lt;K,V&gt;                          — отображение (НЕ наследует Collection)
+    ├── SortedMap&lt;K,V&gt;
+    │   └── NavigableMap&lt;K,V&gt;
+    └── ConcurrentMap&lt;K,V&gt;</code></pre>
+<h4>Сводная таблица интерфейсов</h4>
+<table>
+<tr><th>Интерфейс</th><th>Контракт</th><th>Дубликаты</th><th>Порядок</th><th>Индексы</th></tr>
+<tr><td><code>List</code></td><td>Упорядоченная коллекция</td><td>✅ Да</td><td>✅ Гарантирован</td><td>✅ <code>get(i)</code></td></tr>
+<tr><td><code>Set</code></td><td>Уникальные элементы</td><td>❌ Нет</td><td>Зависит от реализации</td><td>❌ Нет</td></tr>
+<tr><td><code>SortedSet</code></td><td>Уникальные + отсортированные</td><td>❌ Нет</td><td>✅ Отсортирован</td><td>❌ Нет</td></tr>
+<tr><td><code>Queue</code></td><td>FIFO</td><td>✅ Да</td><td>✅ FIFO</td><td>❌ Нет</td></tr>
+<tr><td><code>Deque</code></td><td>FIFO + LIFO</td><td>✅ Да</td><td>✅ Двусторонний</td><td>❌ Нет</td></tr>
+<tr><td><code>Map</code></td><td>Ключ→значение</td><td>Ключи — нет</td><td>Зависит</td><td>По ключу</td></tr>
+</table>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Collection Framework — это фундамент Java-разработки. Три корневых интерфейса (<code>Collection</code>, <code>Map</code>, <code>Iterator</code>) определяют контракты для всех структур данных. <code>Map</code> стоит особняком — не наследует <code>Collection</code>, потому что работает с парами ключ-значение, а не с отдельными элементами. Каждый интерфейс имеет свои контракты по поводу порядка, дубликатов, null-значений и потокобезопасности, что позволяет выбрать правильную структуру под задачу. Понимание этой иерархии — база для выбора между ArrayList, HashSet, TreeMap и другими реализациями.</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Нарисовать иерархию интерфейсов по памяти (Iterable → Collection → List/Set/Queue, отдельно Map)</li>
+<li>Объяснить, почему Map не наследует Collection (работа с парами, а не с элементами)</li>
+<li>Назвать ключевые контракты каждого интерфейса (List — порядок+индексы, Set — уникальность, Queue — FIFO)</li>
+<li>Привести примеры реализаций для каждого интерфейса</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('collection-interfaces')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="list-set-queue"><summary>В чём разница между List, Set и Queue?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> <code>List</code> — упорядоченная коллекция с доступом по индексу и дубликатами. <code>Set</code> — уникальные элементы без индексов. <code>Queue</code> — FIFO-коллекция для временного хранения перед обработкой.</p>
+<table>
+<tr><th>Характеристика</th><th>List</th><th>Set</th><th>Queue</th></tr>
+<tr><td>Дубликаты</td><td>✅ Разрешены</td><td>❌ Запрещены</td><td>✅ Разрешены</td></tr>
+<tr><td>Порядок</td><td>Порядок вставки</td><td>Зависит от реализации</td><td>FIFO</td></tr>
+<tr><td>Доступ по индексу</td><td>✅ get(int)</td><td>❌ Нет</td><td>❌ Нет</td></tr>
+<tr><td>Доступ к элементу</td><td>По индексу/итерацией</td><td>contains()/итерацией</td><td>peek/poll (голова)</td></tr>
+<tr><td>null</td><td>✅ Да</td><td>Зависит</td><td>Зависит</td></tr>
+</table>
+<h4>Когда что использовать</h4>
+<pre><code>// List — порядок и доступ по индексу
+List&lt;String&gt; history = new ArrayList&lt;&gt;();
+
+// Set — уникальность и быстрая проверка наличия
+Set&lt;String&gt; blacklist = new HashSet&lt;&gt;();
+
+// Queue — обработка в порядке поступления
+Queue&lt;Task&gt; queue = new LinkedList&lt;&gt;();</code></pre>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p><code>List</code>, <code>Set</code> и <code>Queue</code> — три базовых контракта интерфейса <code>Collection</code>, каждый для своего сценария. <code>List</code> даёт полный контроль над позицией элемента (индексы) и сохраняет порядок вставки с дубликатами. <code>Set</code> гарантирует уникальность и оптимизирован для быстрой проверки наличия элемента, жертвуя индексацией. <code>Queue</code> моделирует поведение очереди (FIFO) и оптимизирован для сценариев "производитель-потребитель", добавляя специальные методы с разной реакцией на пустоту/переполнение. Выбор интерфейса определяет не только доступные методы, но и контракт, которому должны следовать все реализации.</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Объяснить разницу в контрактах на примерах кода (дубликаты в List vs исключение в Set.of)</li>
+<li>Показать понимание, что Queue.add() бросает исключение, а offer() возвращает false</li>
+<li>Привести пример: "если нужен доступ по индексу — только List, если уникальность — Set, если обработка в порядке поступления — Queue"</li>
+<li>Упомянуть, что Queue — часть Java 5+, оптимизирована для producer-consumer</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('list-set-queue')">⬆️ Свернуть</button></div>
+</div></details>
+
+<h2>🟠 List и реализации</h2>
+
+<details id="arraylist-vs-linkedlist"><summary>В чём разница между ArrayList и LinkedList?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> <code>ArrayList</code> — динамический массив (O(1) доступ, O(n) вставка в середину). <code>LinkedList</code> — двусвязный список (O(n) доступ, O(1) вставка/удаление на концах).</p>
+<h4>Внутреннее устройство</h4>
+<pre><code>// ArrayList — динамический массив
+transient Object[] elementData; // непрерывный блок памяти
+// LinkedList — двусвязный список
+private static class Node&lt;E&gt; { E item; Node&lt;E&gt; next; Node&lt;E&gt; prev; }</code></pre>
+<h4>Сравнение производительности</h4>
+<table>
+<tr><th>Операция</th><th>ArrayList</th><th>LinkedList</th></tr>
+<tr><td>get(i)</td><td>O(1)</td><td>O(n)</td></tr>
+<tr><td>add(E) в конец</td><td>O(1) аморт.</td><td>O(1)</td></tr>
+<tr><td>add(0, E) в начало</td><td>O(n)</td><td>O(1)</td></tr>
+<tr><td>add(i, E) в середину</td><td>O(n)</td><td>O(n)</td></tr>
+<tr><td>remove(0)</td><td>O(n)</td><td>O(1)</td></tr>
+<tr><td>remove(i)</td><td>O(n)</td><td>O(n)</td></tr>
+<tr><td>Итерация</td><td>Быстрая (кеш)</td><td>Медленнее (кеш-промахи)</td></tr>
+<tr><td>Память</td><td>Только данные</td><td>Данные + 2 ссылки на узел</td></tr>
+</table>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p><code>ArrayList</code> — динамический массив с O(1) доступом по индексу, плотным хранением и эффективной итерацией (кеш-локальность). Платное — вставка/удаление не в конец: O(n) на сдвиг элементов через <code>System.arraycopy()</code>. <code>LinkedList</code> — двусвязный список с O(1) вставкой/удалением в начале и конце, но O(n) доступом по индексу и значительным оверхедом по памяти (объекты Node с двумя ссылками). Главный практический вывод для Middle+: в 95% случаев ArrayList — правильный выбор. LinkedList имеет смысл только когда нужна функциональность Deque (очередь/стек) или когда доказано профилировщиком, что вставка/удаление в начале списка — узкое место.</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Развеять миф: "вставка в середину LinkedList быстрее" — оба O(n), но System.arraycopy() в ArrayList часто быстрее обхода указателей в LinkedList из-за кеш-промахов</li>
+<li>Объяснить кеш-локальность: элементы ArrayList лежат в непрерывном блоке памяти (L1/L2/L3 кеш процессора), элементы LinkedList разбросаны по куче (кеш-промах на каждом узле)</li>
+<li>Сравнить память: 1M элементов ArrayList ≈ 4MB (только ссылки), LinkedList ≈ 4MB + 24MB на Node</li>
+<li>Упомянуть RandomAccess: ArrayList помечен этим интерфейсом, LinkedList — нет (сигнал алгоритмам использовать get(i) или Iterator)</li>
+<li>Показать реальный бенчмарк: вставка в середину 100K элементов — ArrayList ~0.3ms, LinkedList ~0.7ms</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('arraylist-vs-linkedlist')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="when-arraylist-linkedlist"><summary>Когда использовать ArrayList, а когда LinkedList?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> <code>ArrayList</code> — в 95% случаев (чтение по индексу, вставка в конец). <code>LinkedList</code> — когда нужны частые вставки/удаления в начале или используется как очередь/стек.</p>
+<pre><code>// ArrayList — много чтения, вставка в конец
+List&lt;User&gt; users = new ArrayList&lt;&gt;();
+// LinkedList — очередь/стек, вставка в начало
+LinkedList&lt;Task&gt; tasks = new LinkedList&lt;&gt;();
+tasks.addFirst(new UrgentTask()); // O(1)</code></pre>
+<p>Главный миф: вставка в середину LinkedList НЕ быстрее ArrayList (оба O(n), но System.arraycopy часто быстрее).</p>
+<h4>Когда LinkedList — правильный выбор</h4>
+<pre><code>// 1. Нужна функциональность Deque (двусторонняя очередь)
+Deque&lt;Task&gt; deque = new LinkedList&lt;&gt;();
+// 2. Много вставок/удалений в начале (ДОКАЗАНО профилировщиком)
+// 3. Не нужен доступ по индексу</code></pre>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p><code>ArrayList</code> — выбор по умолчанию. <code>LinkedList</code> оправдан когда нужна функциональность <code>Deque</code> или когда профилировщик доказывает, что вставка/удаление в начале списка — узкое место. Замена <code>LinkedList</code> на <code>ArrayList</code> — один из самых частых перфоманс-фиксов в Java-приложениях. Для очередей и стеков современной альтернативой <code>LinkedList</code> является <code>ArrayDeque</code> — он быстрее и потребляет меньше памяти.</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Привести критерии выбора в виде таблицы сравнения</li>
+<li>Объяснить, что LinkedList в роли очереди можно заменить на ArrayDeque (быстрее, меньше памяти)</li>
+<li>Показать понимание, что выбор структуры данных зависит от паттерна использования (read-heavy vs write-heavy)</li>
+<li>Упомянуть, что в стандартной библиотеке Java LinkedList используется редко, ArrayList — повсеместно</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('when-arraylist-linkedlist')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="arraylist-complexity"><summary>Какова временная сложность операций в ArrayList?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> get(i) — O(1), add(E) в конец — O(1) амортизированное, add(i, E) — O(n), remove(i) — O(n), contains/indexOf — O(n), set(i, E) — O(1).</p>
+<table>
+<tr><th>Операция</th><th>Сложность</th><th>Примечание</th></tr>
+<tr><td>get(i)</td><td>O(1)</td><td>Прямой доступ к массиву</td></tr>
+<tr><td>set(i, E)</td><td>O(1)</td><td>Замена без сдвига</td></tr>
+<tr><td>add(E) в конец</td><td>O(1) аморт.</td><td>Редкое расширение O(n)</td></tr>
+<tr><td>add(i, E)</td><td>O(n)</td><td>Сдвиг элементов вправо</td></tr>
+<tr><td>remove(i)</td><td>O(n)</td><td>Сдвиг элементов влево</td></tr>
+<tr><td>contains(Object)</td><td>O(n)</td><td>Линейный поиск</td></tr>
+<tr><td>indexOf(Object)</td><td>O(n)</td><td>Линейный поиск</td></tr>
+<tr><td>size()</td><td>O(1)</td><td>Хранится в поле</td></tr>
+</table>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p><code>ArrayList</code> — массив с O(1) доступом по индексу (get/set). Вставка в конец — O(1) амортизированное (редкое расширение в 1.5 раза через Arrays.copyOf). Вставка и удаление не в конец — O(n) из-за сдвига элементов через System.arraycopy(). Поиск (contains/indexOf) — O(n) линейный обход. Ключевое для собеседования: понимание разницы между O(1) (get), O(1) амортизированным (add в конец) и O(n) (add/remove в середину).</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Объяснить, почему add в конец — амортизированное O(1), а не просто O(1): расширение в 1.5x, суммарно O(n) для n вставок</li>
+<li>Сравнить System.arraycopy() (нативная операция) с ручным копированием в цикле</li>
+<li>Упомянуть, что size() — O(1) в отличие от LinkedList.size() в Java 5- (было O(n), сейчас O(1))</li>
+<li>Показать понимание, что O(n) для contains() — это причина, почему для частого поиска используют HashSet</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('arraylist-complexity')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="linkedlist-complexity"><summary>Какова временная сложность операций в LinkedList?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> get(i) — O(n), addFirst/addLast — O(1), add(i, E) в середину — O(n), removeFirst/removeLast — O(1), remove(i) — O(n), contains — O(n).</p>
+<table>
+<tr><th>Операция</th><th>Сложность</th><th>Примечание</th></tr>
+<tr><td>get(i)</td><td>O(n)</td><td>Обход от ближайшего конца</td></tr>
+<tr><td>add(E)/addLast(E)</td><td>O(1)</td><td>Прямая ссылка на last</td></tr>
+<tr><td>addFirst(E)</td><td>O(1)</td><td>Прямая ссылка на first</td></tr>
+<tr><td>add(i, E)</td><td>O(n)</td><td>Обход до позиции + вставка O(1)</td></tr>
+<tr><td>removeFirst()</td><td>O(1)</td><td>Прямая ссылка на first</td></tr>
+<tr><td>removeLast()</td><td>O(1)</td><td>Прямая ссылка на last</td></tr>
+<tr><td>remove(i)</td><td>O(n)</td><td>Обход до позиции + удаление O(1)</td></tr>
+<tr><td>contains(Object)</td><td>O(n)</td><td>Линейный поиск</td></tr>
+</table>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p><code>LinkedList</code> — двусвязный список с O(1) операциями на концах благодаря прямым ссылкам на <code>first</code> и <code>last</code>. Доступ по индексу — O(n) с оптимизацией (обход от ближайшего конца). Главный практический вывод: LinkedList имеет преимущество перед ArrayList только при частых операциях в <strong>начале</strong> списка и при использовании как Deque. Вставка в середину — O(n) в обоих случаях, но ArrayList обычно быстрее из-за кеш-локальности и нативного System.arraycopy().</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Развеять миф: "вставка в середину LinkedList — O(1)" — это O(n), потому что нужно ДОЙТИ до позиции</li>
+<li>Объяснить оптимизацию get(i): обход от ближайшего конца (если i &lt; size/2 — от first, иначе от last)</li>
+<li>Сравнить с ArrayList: System.arraycopy() (нативная) vs обход указателей (кеш-промахи)</li>
+<li>Показать, что современная альтернатива LinkedList для очередей — ArrayDeque</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('linkedlist-complexity')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="vector"><summary>Что такое Vector и чем он отличается от ArrayList?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> <code>Vector</code> — устаревшая (legacy) реализация динамического массива из Java 1.0, все методы <code>synchronized</code>. <code>ArrayList</code> — современная реализация из Java 1.2, не синхронизирована. В современной разработке <code>Vector</code> не используется.</p>
+<table>
+<tr><th>Характеристика</th><th>ArrayList</th><th>Vector</th></tr>
+<tr><td>Появился</td><td>Java 1.2</td><td>Java 1.0</td></tr>
+<tr><td>Синхронизация</td><td>❌ Нет</td><td>✅ Все методы synchronized</td></tr>
+<tr><td>Производительность</td><td>Высокая</td><td>Низкая</td></tr>
+<tr><td>Расширение массива</td><td>В 1.5 раза</td><td>В 2 раза (по умолчанию)</td></tr>
+<tr><td>Современное использование</td><td>Стандарт</td><td>Не рекомендуется</td></tr>
+</table>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p><code>Vector</code> — устаревшая синхронизированная реализация из Java 1.0. В современной разработке не используется: для однопоточного кода — <code>ArrayList</code> (быстрее без синхронизации), для многопоточного — <code>Collections.synchronizedList()</code> или <code>CopyOnWriteArrayList</code>. Даже в многопоточной среде Vector неудобен, потому что составные операции (check-then-act) всё равно требуют внешней синхронизации. Единственное место, где Vector всё ещё встречается — legacy-код и Swing (<code>DefaultListModel</code>).</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Объяснить, почему синхронизация каждого метода — не silver bullet для потокобезопасности</li>
+<li>Показать пример: check-then-act с Vector всё равно требует внешней синхронизации</li>
+<li>Назвать современные альтернативы: Collections.synchronizedList(), CopyOnWriteArrayList</li>
+<li>Упомянуть Stack (наследник Vector) и его замену на ArrayDeque</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('vector')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="stack"><summary>Что такое Stack?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> <code>Stack</code> — устаревшая реализация LIFO-стека из Java 1.0, наследующая <code>Vector</code>. В современной Java заменяется на <code>ArrayDeque</code> с методами <code>push()</code>, <code>pop()</code>, <code>peek()</code>.</p>
+<pre><code>// ✅ Правильный стек в современной Java
+Deque&lt;String&gt; stack = new ArrayDeque&lt;&gt;();
+stack.push("A"); stack.push("B"); stack.push("C");
+stack.peek(); // "C"
+stack.pop();  // "C"</code></pre>
+<p>Почему Stack устарел: наследование от Vector нарушает инкапсуляцию (доступен любой элемент по индексу), все методы synchronized (оверхед), есть современная альтернатива ArrayDeque.</p>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p><code>Stack</code> — устаревшая реализация LIFO из Java 1.0. Из-за наследования от Vector нарушается инкапсуляция (доступен любой элемент через методы Vector), синхронизация всех методов снижает производительность. Правильная замена — <code>ArrayDeque</code> с методами <code>push()</code>, <code>pop()</code>, <code>peek()</code>. <code>ArrayDeque</code> быстрее, соблюдает инкапсуляцию и не содержит устаревшего наследия. Для многопоточного стека — <code>ConcurrentLinkedDeque</code> или внешняя синхронизация <code>ArrayDeque</code>.</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Объяснить, что Stack существует, но почему его не используют (наследование от Vector, synchronized)</li>
+<li>Продемонстрировать правильную замену — ArrayDeque с push/pop/peek</li>
+<li>Показать пример нарушения инкапсуляции: stack.get(1) обращается к середине стека</li>
+<li>Сравнить Stack, ArrayDeque и LinkedList как стека в таблице</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('stack')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="queue"><summary>Что такое Queue и какие реализации существуют?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> <code>Queue</code> — интерфейс FIFO-коллекции. Основные реализации: <code>LinkedList</code>, <code>ArrayDeque</code>, <code>PriorityQueue</code>, <code>ConcurrentLinkedQueue</code>, <code>ArrayBlockingQueue</code>, <code>LinkedBlockingQueue</code>.</p>
+<h4>Два набора методов</h4>
+<table>
+<tr><th>Операция</th><th>Бросает исключение</th><th>Возвращает спец. значение</th></tr>
+<tr><td>Вставка</td><td>add(e)</td><td>offer(e) → false</td></tr>
+<tr><td>Удаление</td><td>remove()</td><td>poll() → null</td></tr>
+<tr><td>Просмотр</td><td>element()</td><td>peek() → null</td></tr>
+</table>
+<h4>Сравнение реализаций</h4>
+<table>
+<tr><th>Реализация</th><th>Порядок</th><th>Потокобезопасность</th><th>Ограничение размера</th></tr>
+<tr><td>LinkedList</td><td>FIFO</td><td>❌</td><td>Нет</td></tr>
+<tr><td>ArrayDeque</td><td>FIFO</td><td>❌</td><td>Нет</td></tr>
+<tr><td>PriorityQueue</td><td>По приоритету</td><td>❌</td><td>Нет</td></tr>
+<tr><td>ConcurrentLinkedQueue</td><td>FIFO</td><td>✅ CAS</td><td>Нет</td></tr>
+<tr><td>ArrayBlockingQueue</td><td>FIFO</td><td>✅ Lock</td><td>Да (fixed)</td></tr>
+</table>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p><code>Queue</code> — интерфейс FIFO-коллекции с двумя наборами методов (бросающие исключения vs возвращающие специальные значения). Ключевые реализации: <code>ArrayDeque</code> — оптимальный выбор для однопоточной очереди (быстрее LinkedList, меньше памяти); <code>LinkedList</code> — когда дополнительно нужен доступ по индексу; <code>PriorityQueue</code> — очередь по приоритету на основе кучи (не FIFO); <code>ConcurrentLinkedQueue</code> — потокобезопасная без блокировок; реализации <code>BlockingQueue</code> — для producer-consumer с блокировкой. На собеседовании важно знать разницу между add/offer, remove/poll, element/peek.</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Объяснить два набора методов и когда какой использовать</li>
+<li>Сравнить ArrayDeque и LinkedList как очереди (ArrayDeque быстрее)</li>
+<li>Объяснить PriorityQueue (не FIFO, а min-heap, O(log n))</li>
+<li>Различить ConcurrentLinkedQueue (lock-free) и BlockingQueue (с блокировкой для producer-consumer)</li>
+<li>Привести пример: ArrayBlockingQueue для ограниченной очереди задач</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('queue')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="deque"><summary>Что такое Deque?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> <code>Deque</code> (Double Ended Queue) — интерфейс двусторонней очереди, позволяющий добавлять/удалять элементы с обоих концов. Может работать как FIFO, LIFO или двусторонняя очередь.</p>
+<h4>Три режима использования</h4>
+<pre><code>// FIFO-очередь
+Deque&lt;String&gt; queue = new ArrayDeque&lt;&gt;();
+queue.offerLast("A"); queue.pollFirst(); // "A"
+// LIFO-стек
+Deque&lt;String&gt; stack = new ArrayDeque&lt;&gt;();
+stack.push("A"); stack.pop(); // "A"
+// Двусторонняя
+deque.addFirst(urgent); deque.addLast(normal);</code></pre>
+<p>Основная реализация — <code>ArrayDeque</code> (циклический массив, быстрее LinkedList, не разрешает null). Является рекомендуемой заменой <code>Stack</code> и <code>LinkedList</code> в роли очереди.</p>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p><code>Deque</code> — интерфейс двусторонней очереди, расширяющий <code>Queue</code>. Позволяет работать в трёх режимах: FIFO-очередь (<code>offerLast</code>/<code>pollFirst</code>), LIFO-стек (<code>push</code>/<code>pop</code>), двусторонняя очередь. Основная реализация — <code>ArrayDeque</code> (циклический массив, быстрее LinkedList, меньше памяти, не разрешает null). Является рекомендуемой заменой для <code>Stack</code> и для <code>LinkedList</code> в роли очереди. На собеседовании важно знать оба набора методов и три режима использования.</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Объяснить три режима использования Deque (FIFO, LIFO, двусторонняя)</li>
+<li>Показать, что ArrayDeque — рекомендуемая замена Stack и LinkedList-как-очереди</li>
+<li>Объяснить внутреннее устройство ArrayDeque (циклический массив, head/tail указатели)</li>
+<li>Сравнить ArrayDeque и LinkedList: память, производительность, null-элементы</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('deque')">⬆️ Свернуть</button></div>
+</div></details>
+
+
+<h2>🟢 Set и реализации</h2>
+
+<details id="hashset-linkedhashset-treeset"><summary>В чём разница между HashSet, LinkedHashSet и TreeSet?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> <code>HashSet</code> — без гарантий порядка (O(1), на HashMap). <code>LinkedHashSet</code> — порядок вставки (O(1), на LinkedHashMap + двусвязный список). <code>TreeSet</code> — отсортированный порядок (O(log n), на красно-чёрном дереве).</p>
+<table>
+<tr><th>Характеристика</th><th>HashSet</th><th>LinkedHashSet</th><th>TreeSet</th></tr>
+<tr><td>Основан на</td><td>HashMap</td><td>LinkedHashMap</td><td>TreeMap</td></tr>
+<tr><td>Порядок</td><td>❌ Не гарантирован</td><td>✅ Порядок вставки</td><td>✅ Отсортированный</td></tr>
+<tr><td>Сложность add/remove/contains</td><td>O(1)</td><td>O(1)</td><td>O(log n)</td></tr>
+<tr><td>null-элементы</td><td>✅ Да (один)</td><td>✅ Да (один)</td><td>❌ Нет (NPE)</td></tr>
+<tr><td>Требования к элементам</td><td>equals/hashCode</td><td>equals/hashCode</td><td>Comparable или Comparator</td></tr>
+</table>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Три реализации <code>Set</code> различаются порядком хранения: <code>HashSet</code> — без гарантий порядка (O(1), на HashMap), <code>LinkedHashSet</code> — порядок вставки (O(1), на LinkedHashMap + двусвязный список), <code>TreeSet</code> — отсортированный порядок (O(log n), на красно-чёрном дереве). Выбор зависит от требований: нужна максимальная скорость без учёта порядка — <code>HashSet</code>; нужно сохранить порядок добавления — <code>LinkedHashSet</code>; нужна сортировка или навигация по диапазонам — <code>TreeSet</code> (единственный реализует <code>NavigableSet</code>).</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Знать не только различия, но и внутреннее устройство (на каких Map основаны)</li>
+<li>Объяснить, почему HashSet допускает null, а TreeSet нет (невозможно сравнить null через compareTo)</li>
+<li>Показать дополнительные методы навигации TreeSet (first, last, lower, higher, headSet, tailSet, subSet)</li>
+<li>Объяснить, что TreeSet определяет уникальность по compareTo, а не по equals — потенциальная ловушка</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('hashset-linkedhashset-treeset')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="hashset-internal"><summary>Как работает HashSet внутри?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> <code>HashSet</code> — обёртка над <code>HashMap</code>. Элементы становятся ключами HashMap, значения — единый объект-заглушка <code>PRESENT</code>.</p>
+<pre><code>// Внутреннее устройство
+private transient HashMap&lt;E, Object&gt; map;
+private static final Object PRESENT = new Object();
+
+public boolean add(E e) { return map.put(e, PRESENT) == null; }
+public boolean contains(Object o) { return map.containsKey(o); }
+public boolean remove(Object o) { return map.remove(o) == PRESENT; }</code></pre>
+<p>Все операции делегируются HashMap. Производительность: O(1) в среднем. Требования к элементам такие же, как к ключам HashMap (equals/hashCode, неизменяемость).</p>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p><code>HashSet</code> — это тонкая обёртка над <code>HashMap</code>. Элементы множества — ключи HashMap, значения — единый объект-заглушка <code>PRESENT</code>. Все операции делегируются соответствующим методам HashMap. Благодаря этому HashSet наследует все свойства HashMap: O(1) в среднем, деревофикация при коллизиях в Java 8+, зависимость от качества hashCode(), "потеря" элемента при изменении после добавления. Ключевое: понимание внутреннего устройства (HashMap с заглушкой), почему при итерации порядок не гарантирован, и почему требования к элементам такие же, как к ключам HashMap.</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Объяснить, что HashSet — это HashMap с заглушкой PRESENT</li>
+<li>Показать цепочку делегирования: add() → map.put(), contains() → map.containsKey()</li>
+<li>Знать, что LinkedHashSet расширяет HashSet и передаёт в конструктор LinkedHashMap — показывает понимание иерархии</li>
+<li>Объяснить, почему итерация по HashSet может быть медленнее, чем по LinkedHashSet (обходит все корзины, включая пустые)</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('hashset-internal')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="treeset"><summary>Что такое TreeSet и как он работает?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> <code>TreeSet</code> — реализация <code>Set</code> на основе красно-чёрного дерева (<code>TreeMap</code>). Хранит элементы в отсортированном порядке, все операции O(log n). Реализует <code>NavigableSet</code> с методами навигации.</p>
+<pre><code>TreeSet&lt;Integer&gt; set = new TreeSet&lt;&gt;();
+set.add(5); set.add(1); set.add(3);
+// [1, 3, 5] — всегда отсортирован
+
+// Методы навигации
+set.first();        // 1 — минимальный
+set.last();         // 5 — максимальный
+set.lower(3);       // 1 — строго меньше 3
+set.higher(3);      // 5 — строго больше 3
+set.headSet(3);     // [1] — все < 3
+set.tailSet(3);     // [3, 5] — все ≥ 3</code></pre>
+<p>Определяет уникальность по <code>compareTo()</code>/<code>compare()</code>, а не по <code>equals()</code>.</p>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p><code>TreeSet</code> — реализация <code>Set</code> на основе красно-чёрного дерева (<code>TreeMap</code>). Гарантирует отсортированный порядок элементов (по <code>Comparable</code> или <code>Comparator</code>), все базовые операции за O(log n). Реализует <code>NavigableSet</code> с методами навигации. В отличие от <code>HashSet</code>/<code>LinkedHashSet</code>, определяет уникальность по <code>compareTo()</code>/<code>compare()</code>, а не по <code>equals()</code>/<code>hashCode()</code>, что может приводить к расхождению с контрактом <code>Set</code>. Не допускает <code>null</code>. Выбор между TreeSet и HashSet — компромисс между O(log n) с сортировкой и O(1) без порядка.</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Знать внутреннее устройство (TreeMap + красно-чёрное дерево)</li>
+<li>Показать методы навигации и объяснить их применение</li>
+<li>Объяснить разницу в определении уникальности (compareTo vs equals) и пример с BigDecimal</li>
+<li>Объяснить, почему TreeSet не допускает null (невозможно сравнить)</li>
+<li>Сравнить производительность с HashSet: O(log n) vs O(1), но с сортировкой</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('treeset')">⬆️ Свернуть</button></div>
+</div></details>
+
+<h2>🔵 Map и реализации</h2>
+
+<details id="map"><summary>Что такое Map и какие реализации существуют?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> <code>Map&lt;K,V&gt;</code> — интерфейс для хранения пар ключ-значение. В отличие от <code>Collection</code>, не наследует <code>Iterable</code>. Основные реализации: <code>HashMap</code>, <code>LinkedHashMap</code>, <code>TreeMap</code>, <code>WeakHashMap</code>, <code>IdentityHashMap</code>, <code>ConcurrentHashMap</code>, <code>Hashtable</code> (legacy), <code>EnumMap</code>.</p>
+<h4>Сводная таблица</h4>
+<table>
+<tr><th>Реализация</th><th>Порядок</th><th>O(1)</th><th>null-ключ</th><th>null-знач</th><th>Потокобезопасность</th></tr>
+<tr><td>HashMap</td><td>Нет</td><td>✅</td><td>✅</td><td>✅</td><td>❌</td></tr>
+<tr><td>LinkedHashMap</td><td>Вставки</td><td>✅</td><td>✅</td><td>✅</td><td>❌</td></tr>
+<tr><td>TreeMap</td><td>Сортировка</td><td>O(log n)</td><td>❌*</td><td>✅</td><td>❌</td></tr>
+<tr><td>WeakHashMap</td><td>Нет</td><td>✅</td><td>✅</td><td>✅</td><td>❌</td></tr>
+<tr><td>ConcurrentHashMap</td><td>Нет</td><td>✅</td><td>❌</td><td>❌</td><td>✅</td></tr>
+<tr><td>Hashtable</td><td>Нет</td><td>✅</td><td>❌</td><td>❌</td><td>✅</td></tr>
+</table>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p><code>Map</code> — интерфейс для хранения пар ключ-значение, не наследующий <code>Collection</code>. Восемь основных реализаций покрывают все сценарии: <code>HashMap</code> — стандарт (O(1), без порядка); <code>LinkedHashMap</code> — с порядком вставки; <code>TreeMap</code> — отсортированный (O(log n), NavigableMap); <code>WeakHashMap</code> — для кешей (слабые ссылки на ключи); <code>IdentityHashMap</code> — сравнение ключей по ==; <code>ConcurrentHashMap</code> — многопоточность; <code>Hashtable</code> — legacy; <code>EnumMap</code> — для enum-ключей. На собеседовании важно знать не только список, но и внутреннее устройство, сложность и сценарии применения.</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Перечислить все 8 реализаций и их ключевые особенности</li>
+<li>Объяснить, почему Map не наследует Collection</li>
+<li>Знать три представления Map: keySet(), values(), entrySet()</li>
+<li>Упомянуть default-методы JDK 8+: getOrDefault, putIfAbsent, compute, merge</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('map')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="hashmap-linkedhashmap-treemap"><summary>В чём разница между HashMap, LinkedHashMap и TreeMap?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> <code>HashMap</code> — без гарантий порядка (O(1)). <code>LinkedHashMap</code> — порядок вставки (O(1), HashMap + двусвязный список). <code>TreeMap</code> — отсортированные ключи (O(log n), красно-чёрное дерево).</p>
+<table>
+<tr><th>Характеристика</th><th>HashMap</th><th>LinkedHashMap</th><th>TreeMap</th></tr>
+<tr><td>Внутреннее устройство</td><td>Хеш-таблица</td><td>Хеш-таблица + двусвязный список</td><td>Красно-чёрное дерево</td></tr>
+<tr><td>Порядок ключей</td><td>❌ Не гарантирован</td><td>✅ Порядок вставки</td><td>✅ Отсортированный</td></tr>
+<tr><td>get/put/remove</td><td>O(1)</td><td>O(1)</td><td>O(log n)</td></tr>
+<tr><td>null-ключ</td><td>✅ Да</td><td>✅ Да</td><td>❌ Нет (NPE)</td></tr>
+<tr><td>Интерфейс</td><td>Map</td><td>Map</td><td>NavigableMap</td></tr>
+</table>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p><code>HashMap</code>, <code>LinkedHashMap</code> и <code>TreeMap</code> — три основные реализации <code>Map</code>, различающиеся порядком хранения ключей. <code>HashMap</code> — хеш-таблица без гарантий порядка (O(1)), стандартный выбор. <code>LinkedHashMap</code> — хеш-таблица с двусвязным списком (O(1)), сохраняет порядок вставки или доступа (access-order для LRU-кешей). <code>TreeMap</code> — красно-чёрное дерево (O(log n)), ключи отсортированы, реализует <code>NavigableMap</code>. Ключевые различия: производительность (O(1) vs O(log n)), допустимость null-ключа, интерфейс (Map vs NavigableMap).</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Показать понимание внутреннего устройства (хеш-таблица vs дерево)</li>
+<li>Объяснить компромисс O(1) против O(log n) с сортировкой</li>
+<li>Рассказать о дополнительных возможностях LinkedHashMap (access-order, removeEldestEntry для LRU-кеша)</li>
+<li>Показать методы навигации TreeMap (firstKey, lastKey, headMap, tailMap, subMap)</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('hashmap-linkedhashmap-treemap')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="when-treemap"><summary>Когда использовать TreeMap?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Когда нужна автоматическая сортировка ключей или операции с диапазонами (subMap, tailMap, headMap, min/max, ближайший больший/меньший). Если сортировка не нужна — HashMap (O(1) вместо O(log n)).</p>
+<pre><code>// Операции с диапазонами
+TreeMap&lt;Integer, String&gt; scores = new TreeMap&lt;&gt;();
+scores.subMap(60, 80); // все баллы между 60 и 80
+scores.tailMap(85);    // все отличники (≥85)
+scores.firstKey();     // минимальный ключ
+scores.lastKey();      // максимальный ключ
+scores.higherKey(70);  // ближайший больший 70</code></pre>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p><code>TreeMap</code> — правильный выбор когда ключевое требование к карте — сортировка ключей или навигация по диапазонам. Плата за это — O(log n) вместо O(1) у HashMap, и отсутствие поддержки null-ключей. Если сортировка не нужна, HashMap даёт лучшую производительность. Если нужен порядок вставки — LinkedHashMap. Если ключи — enum — EnumMap ещё быстрее HashMap. На собеседовании важно аргументировать выбор TreeMap конкретными сценариями, а не просто "для сортировки".</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Аргументировать выбор TreeMap конкретными сценариями (диапазоны, min/max, рейтинги)</li>
+<li>Показать понимание внутреннего устройства (красно-чёрное дерево)</li>
+<li>Продемонстрировать методы NavigableMap (subMap, tailMap, headMap, firstKey, lastKey, lowerKey, higherKey, floorKey, ceilingKey)</li>
+<li>Объяснить, когда TreeMap НЕ подходит (нужна скорость, порядок вставки, enum-ключи, потокобезопасность)</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('when-treemap')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="weakhashmap"><summary>Что такое WeakHashMap?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> <code>WeakHashMap</code> — Map, в которой ключи хранятся как <code>WeakReference</code>. Если на ключ нет сильных ссылок, GC удаляет запись. Полезно для кешей без риска memory leak.</p>
+<pre><code>Map&lt;Object, String&gt; map = new WeakHashMap&lt;&gt;();
+Object key = new Object();
+map.put(key, "value");
+key = null; System.gc(); // запись удалена!
+
+// ⚠️ Строковые литералы НИКОГДА не удалятся (String Pool)</code></pre>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p><code>WeakHashMap</code> — специализированная Map со слабыми ссылками (<code>WeakReference</code>) на ключи. Когда на ключ нет сильных ссылок, GC удаляет запись. Идеально для кешей без риска memory leak: метаданные классов, временные ассоциации, канонические отображения. Важные ограничения: значения — сильные ссылки; строковые литералы не удалятся (String Pool); удаление не мгновенное (зависит от GC); не потокобезопасен. Главное преимущество перед HashMap — предотвращение memory leak при хранении временных ассоциаций.</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Различать слабые ссылки на ключи (WeakHashMap) и на значения (другие структуры)</li>
+<li>Знать о ловушке со строковыми литералами</li>
+<li>Объяснить механизм очистки: ReferenceQueue + expungeStaleEntries()</li>
+<li>Привести примеры использования: кеш метаданных классов, хранение доп. информации об объектах</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('weakhashmap')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="concurrenthashmap"><summary>Что такое ConcurrentHashMap?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Потокобезопасная Map, оптимизированная для конкурентного доступа. Использует CAS для пустых корзин и synchronized на уровне корзины. Чтение (get) без блокировок. Запрещает null-ключи и значения. Предоставляет атомарные операции (putIfAbsent, compute, merge).</p>
+<table>
+<tr><th>Характеристика</th><th>HashMap</th><th>ConcurrentHashMap</th></tr>
+<tr><td>Потокобезопасность</td><td>Нет</td><td>Да</td></tr>
+<tr><td>null-ключи/значения</td><td>Да</td><td>Нет (NPE)</td></tr>
+<tr><td>Атомарные операции</td><td>Нет</td><td>Да (putIfAbsent, compute...)</td></tr>
+<tr><td>Итератор</td><td>Fail-fast</td><td>Weakly-consistent</td></tr>
+</table>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p><code>ConcurrentHashMap</code> — высокопроизводительная потокобезопасная <code>Map</code>. Ключевые отличия от <code>HashMap</code>: потокобезопасность через CAS и synchronized на уровне корзин; запрет null; атомарные составные операции; weakly-consistent итераторы. От <code>Hashtable</code> отличается гранулярными блокировками и отсутствием блокировок при чтении. Эволюция от сегментов (Java 5-7) к CAS + корзинным блокировкам (Java 8+) значительно повысила производительность.</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Объяснить механизм работы: CAS для пустой корзины, synchronized на первом узле для занятой</li>
+<li>Объяснить причину запрета null (невозможно отличить отсутствие ключа от null-значения в многопоточной среде)</li>
+<li>Показать преимущества атомарных операций (compute, merge, putIfAbsent) над внешней синхронизацией</li>
+<li>Сравнить с Hashtable и Collections.synchronizedMap(): гранулярность блокировок</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('concurrenthashmap')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="chm-thread-safety"><summary>Как ConcurrentHashMap обеспечивает thread-safety?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Три механизма: <strong>CAS</strong> для вставки в пустые корзины (lock-free), <strong>synchronized на голове корзины</strong> для занятых корзин, <strong>volatile-чтение</strong> для get() без блокировок.</p>
+<pre><code>// 1. Пустая корзина → CAS (без блокировки)
+if (tabAt(tab, i) == null) {
+    if (casTabAt(tab, i, null, newNode)) { /* успешно */ }
+}
+// 2. Занятая корзина → synchronized на голове
+synchronized (f) { /* обход и вставка */ }
+// 3. Чтение → volatile, без блокировок
+public V get(Object key) { return ...; }</code></pre>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p><code>ConcurrentHashMap</code> обеспечивает потокобезопасность без глобальной блокировки через три механизма. <strong>CAS</strong> для атомарной вставки в пустые корзины без блокировок. <strong>synchronized на головном узле корзины</strong> для модификации занятых корзин — блокируется только одна корзина. <strong>volatile-чтение</strong> для <code>get()</code> — чтение без блокировок с гарантией видимости. При расширении массива потоки помогают друг другу (helping transfer). На собеседовании важно объяснить все три механизма с примерами кода.</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Объяснить все три механизма на псевдокоде</li>
+<li>Показать понимание CAS: атомарное сравнение и замена на уровне процессора (cmpxchg)</li>
+<li>Объяснить, почему get() без блокировок корректен (volatile read видит последнюю запись)</li>
+<li>Рассказать о helping transfer при расширении массива</li>
+<li>Сравнить с Hashtable: почему глобальная блокировка — узкое место</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('chm-thread-safety')">⬆️ Свернуть</button></div>
+</div></details>
+
+<h2>🟣 Потокобезопасные коллекции</h2>
+
+<details id="copyonwritearraylist"><summary>Что такое CopyOnWriteArrayList?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Потокобезопасный список, при каждой модификации создающий новую копию внутреннего массива. Чтение без блокировок. Оптимален когда чтений значительно больше, чем записей.</p>
+<pre><code>// Идеален для: списков слушателей, конфигураций
+private final CopyOnWriteArrayList&lt;EventListener&gt; listeners = 
+    new CopyOnWriteArrayList&lt;&gt;();
+for (EventListener l : listeners) { l.onEvent(event); } // без блокировок
+listeners.add(newListener); // копирование массива (редко)</code></pre>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p><code>CopyOnWriteArrayList</code> — потокобезопасный список, оптимизированный для сценариев "много чтений, редкие записи". При каждой модификации создаёт новую копию внутреннего массива под <code>ReentrantLock</code>, атомарная замена через <code>volatile</code>. Чтение без блокировок. Итераторы — snapshot, не бросают <code>ConcurrentModificationException</code>. Главный недостаток — дороговизна модификаций (O(n) копирование). Идеален для списков слушателей, конфигураций. Непригоден для частых модификаций или больших списков.</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Объяснить компромисс: платим копированием при записи за отсутствие блокировок при чтении</li>
+<li>Показать разницу в производительности: 100K чтений — ~5ms (COWAL) vs ~15ms (syncList); 100K записей — ~5000ms (COWAL) vs ~15ms (syncList)</li>
+<li>Объяснить, почему итератор не поддерживает remove()</li>
+<li>Привести пример использования: список слушателей событий</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('copyonwritearraylist')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="synchronized-collections"><summary>Когда использовать synchronized collections?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Когда нужно быстро добавить потокобезопасность к существующей коллекции, и при этом чтения и записи примерно равны, а потоков немного. Для высоконагруженных сценариев — конкурентные коллекции.</p>
+<pre><code>// Быстрая синхронизация
+List&lt;String&gt; syncList = Collections.synchronizedList(new ArrayList&lt;&gt;());
+
+// ⚠️ Составные операции требуют внешней синхронизации
+synchronized (syncList) {
+    if (!syncList.contains("key")) syncList.add("key");
+}
+// ⚠️ Итерация требует внешней синхронизации
+synchronized (syncList) {
+    for (String s : syncList) { process(s); }
+}</code></pre>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p><code>Collections.synchronized*()</code> — быстрый способ сделать коллекцию потокобезопасной, обернув все методы в <code>synchronized</code>. Подходит для сценариев с умеренной конкуренцией. Ключевые недостатки: необходимость внешней синхронизации для составных операций и итерации; глобальная блокировка снижает производительность при высокой конкуренции. В современной разработке предпочтительнее конкурентные коллекции. На собеседовании важно показать понимание ограничений и умение выбрать правильную коллекцию.</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Объяснить, что synchronized-обёртки — это быстрый путь, но не оптимальный</li>
+<li>Показать пример составной операции, требующей внешней синхронизации</li>
+<li>Сравнить с конкурентными коллекциями в таблице</li>
+<li>Объяснить, почему для нового кода лучше использовать ConcurrentHashMap и CopyOnWriteArrayList</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('synchronized-collections')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="get-synchronized"><summary>Как получить synchronized коллекцию?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Через статические методы <code>Collections.synchronized*()</code>, которые оборачивают обычную коллекцию в синхронизированную обёртку.</p>
+<pre><code>List&lt;String&gt; syncList = Collections.synchronizedList(new ArrayList&lt;&gt;());
+Set&lt;String&gt; syncSet = Collections.synchronizedSet(new HashSet&lt;&gt;());
+Map&lt;String, String&gt; syncMap = Collections.synchronizedMap(new HashMap&lt;&gt;());
+SortedMap&lt;String, String&gt; syncSortedMap = 
+    Collections.synchronizedSortedMap(new TreeMap&lt;&gt;());</code></pre>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Синхронизированную коллекцию получают через статические методы <code>Collections.synchronized*()</code>. Для каждого типа коллекции есть свой метод. Важно: после оборачивания нельзя обращаться к исходной коллекции напрямую; составные операции и итерация требуют внешней синхронизации; при высокой конкуренции лучше использовать конкурентные коллекции.</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Перечислить все методы: synchronizedCollection, synchronizedList, synchronizedSet, synchronizedSortedSet, synchronizedMap, synchronizedSortedMap</li>
+<li>Объяснить механизм: обёртка с synchronized на одном мьютексе</li>
+<li>Показать ограничения подхода</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('get-synchronized')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="unmodifiable"><summary>Что такое Collections.unmodifiableList()?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Создаёт неизменяемую <strong>обёртку</strong> (view) вокруг списка. Методы чтения работают, методы модификации выбрасывают <code>UnsupportedOperationException</code>. Не копирует данные.</p>
+<pre><code>List&lt;String&gt; unmodifiable = Collections.unmodifiableList(original);
+unmodifiable.add("X"); // UnsupportedOperationException!
+// ⚠️ Это обёртка, не копия! Изменения оригинала видны</code></pre>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p><code>Collections.unmodifiableList()</code> создаёт неизменяемую обёртку (view), не копируя данные. Это быстрый способ защитить коллекцию от изменений через возвращаемую ссылку, но он не защищает от изменений через оригинальную ссылку и не делает элементы неизменяемыми. Для полной защиты — <code>List.of()</code> (Java 9+) или <code>List.copyOf()</code> (Java 10+). На собеседовании важно различать обёртку (view) и копию.</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Объяснить разницу между обёрткой и копией</li>
+<li>Показать, что изменения оригинала видны через обёртку</li>
+<li>Сравнить с List.of() и List.copyOf() — когда что использовать</li>
+<li>Упомянуть, что элементы не становятся неизменяемыми (если элемент mutable, его можно изменить)</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('unmodifiable')">⬆️ Свернуть</button></div>
+</div></details>
+
+<h2>🟡 Итераторы</h2>
+
+<details id="iterator-vs-listiterator"><summary>В чём разница между Iterator и ListIterator?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> <code>Iterator</code> — базовый для однонаправленного обхода любых коллекций. <code>ListIterator</code> — расширенный только для List, с обходом в обоих направлениях, добавлением и заменой элементов.</p>
+<table>
+<tr><th>Характеристика</th><th>Iterator</th><th>ListIterator</th></tr>
+<tr><td>Направление обхода</td><td>Только вперёд</td><td>Вперёд и <strong>назад</strong></td></tr>
+<tr><td>Доступен для</td><td>Всех коллекций</td><td>Только List</td></tr>
+<tr><td>Удаление</td><td>✅ remove()</td><td>✅ remove()</td></tr>
+<tr><td>Замена</td><td>❌ Нет</td><td>✅ set(E e)</td></tr>
+<tr><td>Добавление</td><td>❌ Нет</td><td>✅ add(E e)</td></tr>
+<tr><td>Индексы</td><td>❌ Нет</td><td>✅ nextIndex(), previousIndex()</td></tr>
+</table>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p><code>Iterator</code> — базовый интерфейс для однонаправленного обхода (вперёд, <code>remove()</code>), доступен для всех коллекций. <code>ListIterator</code> расширяет <code>Iterator</code> для двунаправленного обхода списков (вперёд/назад, <code>add()</code>, <code>set()</code>, индексы). Ключевые отличия: <code>ListIterator</code> работает только с <code>List</code>; позволяет обход в обратном направлении; поддерживает добавление и замену элементов. Курсор ListIterator находится между элементами, а не на них.</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Показать, что ListIterator — это не просто "Iterator с дополнительными методами", а полноценный инструмент для модификации списка</li>
+<li>Объяснить позицию курсора (между элементами) и как работают индексы</li>
+<li>Показать пример обхода в обратном направлении</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('iterator-vs-listiterator')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="fail-fast-fail-safe"><summary>Что такое fail-fast и fail-safe итераторы?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Fail-fast выбрасывают <code>ConcurrentModificationException</code> при изменении коллекции после создания итератора. Fail-safe не бросают исключений (snapshot или weakly-consistent).</p>
+<table>
+<tr><th>Характеристика</th><th>Fail-Fast</th><th>Fail-Safe</th></tr>
+<tr><td>Исключение при изменении</td><td>✅ ConcurrentModificationException</td><td>❌ Нет</td></tr>
+<tr><td>Как работает</td><td>Проверка modCount</td><td>Снимок (snapshot) или слабая согласованность</td></tr>
+<tr><td>Примеры</td><td>ArrayList, HashSet, HashMap</td><td>CopyOnWriteArrayList, ConcurrentHashMap</td></tr>
+</table>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Fail-fast итераторы — стандартное поведение большинства коллекций Java. Они выбрасывают <code>ConcurrentModificationException</code> при обнаружении структурного изменения, используя счётчик <code>modCount</code>. Это механизм раннего обнаружения багов в однопоточном коде, но <strong>не гарантия потокобезопасности</strong>. Fail-safe итераторы не бросают исключений: snapshot-based (<code>CopyOnWriteArrayList</code>) работают с копией данных, weakly-consistent (<code>ConcurrentHashMap</code>) обходят актуальные данные без гарантии видеть все изменения.</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Объяснить, что fail-fast ≠ потокобезопасность — это важно!</li>
+<li>Показать внутренний механизм: modCount + expectedModCount</li>
+<li>Различать два типа fail-safe: snapshot и weakly-consistent</li>
+<li>Привести примеры коллекций для каждого типа</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('fail-fast-fail-safe')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="cme"><summary>Что такое ConcurrentModificationException?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Исключение, выбрасываемое fail-fast итераторами при обнаружении структурного изменения коллекции во время итерации. <strong>Не связано напрямую с многопоточностью</strong> — чаще возникает в одном потоке при неправильном удалении.</p>
+<pre><code>// Классический пример
+for (String s : list) {
+    if (s.equals("B")) list.remove(s); // ConcurrentModificationException!
+}
+// Правильно — Iterator.remove()
+Iterator&lt;String&gt; it = list.iterator();
+while (it.hasNext()) {
+    if (it.next().equals("B")) it.remove(); // OK
+}</code></pre>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p><code>ConcurrentModificationException</code> — fail-fast исключение при расхождении <code>modCount</code> и <code>expectedModCount</code> в итераторе. Вопреки названию, не связано с многопоточностью — чаще возникает в одном потоке. Правильные способы модификации: <code>Iterator.remove()</code>, <code>removeIf()</code>, обход по индексу в обратном направлении. Fail-safe коллекции не бросают это исключение. На собеседовании важно объяснить внутренний механизм и правильные паттерны удаления.</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Объяснить, что название обманчиво — не связано с многопоточностью напрямую</li>
+<li>Показать внутренний механизм: modCount в коллекции, expectedModCount в итераторе</li>
+<li>Различить структурные и неструктурные изменения (set() не вызывает CME)</li>
+<li>Показать правильные паттерны удаления</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('cme')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="remove-during-iteration"><summary>Как правильно удалять элементы во время итерации?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> (1) <code>Iterator.remove()</code>, (2) <code>removeIf()</code> (Java 8+), (3) обратный обход по индексу для List, (4) <code>removeAll()</code>/<code>retainAll()</code>.</p>
+<pre><code>// Способ 1: Iterator.remove()
+Iterator&lt;String&gt; it = list.iterator();
+while (it.hasNext()) { if (it.next().equals("B")) it.remove(); }
+// Способ 2: removeIf (Java 8+)
+list.removeIf(s -> s.equals("B"));
+// Способ 3: Обратный обход
+for (int i = list.size() - 1; i >= 0; i--) {
+    if (list.get(i).equals("B")) list.remove(i);
+}</code></pre>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Правильное удаление при итерации зависит от сценария. <code>Iterator.remove()</code> — универсальный способ. <code>removeIf()</code> (Java 8+) — лаконичный для удаления по условию. Обратный обход по индексу — только для List. Массовые операции (<code>removeAll</code>, <code>retainAll</code>) — для набора элементов. Ключевое правило: никогда не использовать методы коллекции во время итерации, кроме как через сам итератор.</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Перечислить все 4 способа и их применимость</li>
+<li>Объяснить, почему обратный обход работает, а прямой — нет (сдвиг индексов)</li>
+<li>Показать пример для Map: удаление через entrySet().iterator()</li>
+<li>Упомянуть, что ConcurrentHashMap итераторы weakly-consistent — Iterator.remove() может не поддерживаться</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('remove-during-iteration')">⬆️ Свернуть</button></div>
+</div></details>
+
+<h2>🟠 Comparable и Comparator</h2>
+
+<details id="comparable"><summary>Что такое Comparable и Comparator?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> <code>Comparable</code> — интерфейс для естественного порядка (метод <code>compareTo()</code>), реализуется самим классом. <code>Comparator</code> — интерфейс для внешнего порядка (метод <code>compare()</code>), реализуется отдельно.</p>
+<pre><code>// Comparable — естественный порядок внутри класса
+public class User implements Comparable&lt;User&gt; {
+    @Override public int compareTo(User other) { return name.compareTo(other.name); }
+}
+// Comparator — внешний порядок (лямбда)
+Comparator&lt;User&gt; byAge = Comparator.comparingInt(User::getAge);
+users.sort(byAge);</code></pre>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p><code>Comparable</code> (один метод <code>compareTo()</code>, один естественный порядок) реализуется внутри класса. <code>Comparator</code> (один метод <code>compare()</code>, множество порядков) реализуется отдельно, не требует изменения класса, и позволяет создавать цепочки сортировок. Java 8+ сделала <code>Comparator</code> основным инструментом благодаря функциональному интерфейсу и лаконичным статическим методам. На собеседовании важно объяснить разницу на примерах.</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Объяснить, что Comparable — для естественного порядка, Comparator — для внешнего</li>
+<li>Показать современный подход с Comparator.comparing() и цепочками</li>
+<li>Объяснить контракт compareTo()/compare() и рекомендацию согласованности с equals()</li>
+<li>Привести пример расхождения compareTo и equals (BigDecimal)</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('comparable')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="comparable-vs-comparator"><summary>В чём разница между Comparable и Comparator?</summary><div class="details-content">
+<table>
+<tr><th>Характеристика</th><th>Comparable</th><th>Comparator</th></tr>
+<tr><td>Пакет</td><td>java.lang</td><td>java.util</td></tr>
+<tr><td>Метод</td><td>compareTo(T o)</td><td>compare(T o1, T o2)</td></tr>
+<tr><td>Где реализуется</td><td>В самом классе</td><td>В отдельном классе или лямбде</td></tr>
+<tr><td>Количество порядков</td><td>Один (естественный)</td><td>Сколько угодно</td></tr>
+<tr><td>Изменение класса</td><td>Требуется</td><td>Не требуется</td></tr>
+<tr><td>Функциональный интерфейс</td><td>❌ Нет</td><td>✅ Да</td></tr>
+</table>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p><code>Comparable</code> определяет <strong>один</strong> естественный порядок внутри самого класса. <code>Comparator</code> определяет <strong>внешний</strong> порядок, позволяя создавать множество сортировок без изменения класса. Java 8+ сделала <code>Comparator</code> предпочтительным выбором: лаконичные методы <code>comparing()</code>, <code>thenComparing()</code>, <code>reversed()</code>, <code>nullsFirst()</code>. На собеседовании важно показать понимание разницы и умение создавать цепочки Comparator.</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Объяснить, когда выбирать Comparable, а когда Comparator</li>
+<li>Показать современный подход: users.sort(Comparator.comparing(User::getName).thenComparingInt(User::getAge))</li>
+<li>Упомянуть, что Comparator — функциональный интерфейс (можно лямбдой)</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('comparable-vs-comparator')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="collection-operations"><summary>Какие операции поддерживает интерфейс Collection?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> <code>Collection</code> — корневой интерфейс. Поддерживает: добавление (add, addAll), удаление (remove, removeAll, removeIf, clear), проверку (contains, containsAll), размер (size, isEmpty), массив (toArray), Stream (stream, parallelStream), итерацию (iterator).</p>
+<table>
+<tr><th>Категория</th><th>Методы</th></tr>
+<tr><td>Размер</td><td>size(), isEmpty()</td></tr>
+<tr><td>Проверка</td><td>contains(o), containsAll(c)</td></tr>
+<tr><td>Добавление</td><td>add(e), addAll(c)</td></tr>
+<tr><td>Удаление</td><td>remove(o), removeAll(c), removeIf(filter), retainAll(c), clear()</td></tr>
+<tr><td>Итерация</td><td>iterator()</td></tr>
+<tr><td>Массив</td><td>toArray(), toArray(T[])</td></tr>
+<tr><td>Stream</td><td>stream(), parallelStream()</td></tr>
+</table>
+
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Интерфейс <code>Collection</code> определяет фундаментальный контракт для всех коллекций в Java. Он предоставляет операции добавления, удаления, проверки, размера, преобразования в массив, итерации и создания Stream. Все методы имеют реализации по умолчанию, кроме базовых. Интерфейс расширяет <code>Iterable</code>, что позволяет использовать for-each. На собеседовании важно показать понимание полного API и разницы между <code>remove</code>/<code>removeAll</code>/<code>retainAll</code>/<code>removeIf</code>.</p>
+</div>
+
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Перечислить категории операций и ключевые методы в каждой</li>
+<li>Объяснить разницу между remove, removeAll, retainAll, removeIf</li>
+<li>Показать связь с Iterable (for-each цикл)</li>
+<li>Упомянуть Stream API (stream, parallelStream) как часть Collection с JDK 8</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('collection-operations')">⬆️ Свернуть</button></div>
+</div></details>
+
+
+<div style="text-align: center; margin-top: 20px; padding: 10px;">
+<a href="index.html" style="display: inline-block; background-color: var(--button-bg); color: var(--button-text); border: 1px solid var(--border); padding: 10px 24px; border-radius: 4px; text-decoration: none; font-size: 0.9em; transition: 0.2s;" onmouseover="this.style.backgroundColor='var(--button-hover)'" onmouseout="this.style.backgroundColor='var(--button-bg)'">⬅️ Назад к содержанию</a>
+</div>
+
+</div>
+<script>
+function setTheme(t) { document.body.className = t; }
+let fs = 16;
+function changeFontSize(d) { fs = Math.min(24, Math.max(12, fs + d)); document.body.style.fontSize = fs + 'px'; document.getElementById('fontSizeLabel').textContent = fs + 'px'; }
+function closeDetails(id) { const d = document.getElementById(id); if (d) d.removeAttribute('open'); }
+setTheme('dark');
+</script>
+</body>
+</html>

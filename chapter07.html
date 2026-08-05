@@ -1,0 +1,1611 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Исключения в Java: полный справочник</title>
+<style>
+:root {
+--bg: #1e1e1e;
+--text: #d4d4d4;
+--header-bg: #2d2d2d;
+--summary-bg: #333;
+--summary-hover: #3c3c3c;
+--border: #555;
+--code-bg: #252526;
+--code-border: #404040;
+--button-bg: #444;
+--button-text: #ddd;
+--button-hover: #555;
+--link: #569cd6;
+--scrollbar-thumb: #666;
+--scrollbar-track: #2d2d2d;
+--details-content-bg: var(--bg);
+--table-bg: #2a2a2a;
+--table-header: #3a3a3a;
+}
+
+body.light {
+--bg: #ffffff;
+--text: #1e1e1e;
+--header-bg: #f3f3f3;
+--summary-bg: #e8e8e8;
+--summary-hover: #ddd;
+--border: #ccc;
+--code-bg: #f9f9f9;
+--code-border: #ddd;
+--button-bg: #e0e0e0;
+--button-text: #000;
+--button-hover: #ccc;
+--link: #0451a5;
+--scrollbar-thumb: #aaa;
+--scrollbar-track: #f0f0f0;
+--details-content-bg: #fff;
+--table-bg: #fff;
+--table-header: #e0e0e0;
+}
+
+body.sepia {
+--bg: #f4ecd8;
+--text: #5b4636;
+--header-bg: #e8dcc8;
+--summary-bg: #ddd0b8;
+--summary-hover: #cfc1a8;
+--border: #b8a88a;
+--code-bg: #eee3d0;
+--code-border: #c0b090;
+--button-bg: #d6c9ae;
+--button-text: #3e2f22;
+--button-hover: #c2b498;
+--link: #8b5e3c;
+--scrollbar-thumb: #b8a080;
+--scrollbar-track: #e8dcc8;
+--details-content-bg: #f4ecd8;
+--table-bg: #f4ecd8;
+--table-header: #ddd0b8;
+}
+
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+
+body {
+background-color: var(--bg);
+color: var(--text);
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+line-height: 1.6;
+padding: 10px;
+transition: background-color 0.3s, color 0.3s;
+font-size: 16px;
+}
+
+header {
+background-color: var(--header-bg);
+padding: 15px;
+border-radius: 6px;
+margin-bottom: 20px;
+display: flex;
+flex-wrap: wrap;
+align-items: center;
+justify-content: space-between;
+gap: 10px;
+}
+
+.controls {
+display: flex;
+flex-wrap: wrap;
+gap: 8px;
+align-items: center;
+}
+
+button, select {
+background-color: var(--button-bg);
+color: var(--button-text);
+border: 1px solid var(--border);
+padding: 6px 12px;
+border-radius: 4px;
+cursor: pointer;
+font-size: 0.9em;
+transition: 0.2s;
+}
+
+button:hover {
+background-color: var(--button-hover);
+}
+
+.font-controls {
+display: flex;
+gap: 4px;
+}
+
+.font-size-label {
+align-self: center;
+margin: 0 4px;
+font-weight: bold;
+}
+
+.container {
+max-width: 1000px;
+margin: 0 auto;
+}
+
+h2 {
+border-bottom: 1px solid var(--border);
+padding-bottom: 5px;
+margin-top: 30px;
+margin-bottom: 15px;
+}
+
+h4 {
+margin-top: 15px;
+margin-bottom: 8px;
+color: var(--link);
+}
+
+details {
+background-color: var(--summary-bg);
+border: 1px solid var(--border);
+border-radius: 6px;
+margin-bottom: 10px;
+overflow: hidden;
+transition: 0.2s;
+}
+
+details[open] {
+background-color: var(--details-content-bg);
+}
+
+summary {
+padding: 12px 16px;
+font-weight: 600;
+cursor: pointer;
+background-color: var(--summary-bg);
+transition: background-color 0.2s;
+list-style-position: inside;
+font-size: 1.05em;
+}
+
+summary:hover {
+background-color: var(--summary-hover);
+}
+
+summary::-webkit-details-marker {
+color: var(--link);
+}
+
+.details-content {
+padding: 0 16px 16px 16px;
+max-height: 60vh;
+overflow-y: auto;
+scrollbar-width: thin;
+scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+.details-content::-webkit-scrollbar {
+width: 8px;
+}
+
+.details-content::-webkit-scrollbar-track {
+background: var(--scrollbar-track);
+}
+
+.details-content::-webkit-scrollbar-thumb {
+background-color: var(--scrollbar-thumb);
+border-radius: 4px;
+}
+
+.close-btn-container {
+text-align: right;
+position: sticky;
+bottom: 0;
+background: linear-gradient(transparent, var(--details-content-bg) 70%);
+padding: 15px 0 5px;
+margin-top: 10px;
+}
+
+.close-btn {
+font-size: 0.85em;
+padding: 5px 14px;
+}
+
+pre {
+background-color: var(--code-bg);
+border: 1px solid var(--code-border);
+border-radius: 4px;
+padding: 12px;
+overflow-x: auto;
+font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+font-size: 0.9em;
+margin: 10px 0;
+line-height: 1.5;
+white-space: pre-wrap;
+word-break: break-word;
+}
+
+code {
+font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+}
+
+.section-intro {
+margin-bottom: 20px;
+padding: 10px;
+background-color: var(--header-bg);
+border-radius: 5px;
+}
+
+p {
+margin: 10px 0;
+}
+
+ul, ol {
+margin: 10px 0 10px 20px;
+}
+
+li {
+margin: 5px 0;
+}
+
+table {
+width: 100%;
+border-collapse: collapse;
+margin: 10px 0;
+background-color: var(--table-bg);
+}
+
+th, td {
+border: 1px solid var(--border);
+padding: 8px 12px;
+text-align: left;
+}
+
+th {
+background-color: var(--table-header);
+font-weight: 600;
+}
+
+strong {
+color: var(--link);
+}
+
+@media (max-width: 600px) {
+body {
+font-size: 14px;
+}
+header {
+flex-direction: column;
+align-items: flex-start;
+}
+.controls {
+width: 100%;
+}
+}
+</style>
+</head>
+<body class="dark">
+<header>
+<h1>📘 Исключения в Java</h1>
+<div class="controls">
+<div class="theme-controls">
+<button onclick="setTheme('dark')">🌙 Тёмная</button>
+<button onclick="setTheme('light')">☀️ Светлая</button>
+<button onclick="setTheme('sepia')">📜 Сепия</button>
+</div>
+<div class="font-controls">
+<button onclick="changeFontSize(-1)" title="Уменьшить шрифт">A-</button>
+<span class="font-size-label" id="fontSizeLabel">16px</span>
+<button onclick="changeFontSize(1)" title="Увеличить шрифт">A+</button>
+</div>
+</div>
+</header>
+
+<div class="container">
+<div class="section-intro">
+<p>Полный справочник по исключениям в Java: checked и unchecked исключения, иерархия Throwable, блоки try-catch-finally, try-with-resources, suppressed exceptions, создание и оборачивание исключений, логирование и многое другое. Каждый раздел включает развёрнутое объяснение и рабочие примеры кода.</p>
+</div>
+
+<h2>🔷 Основы исключений</h2>
+<!-- В чём разница между checked и unchecked exceptions -->
+<details id="checked-vs-unchecked">
+<summary>В чём разница между checked и unchecked exceptions?</summary>
+<div class="details-content">
+<p><strong>Короткий ответ:</strong> Checked exceptions проверяются компилятором — их обязательно обрабатывать (try-catch) или декларировать (throws). Unchecked exceptions — не проверяются компилятором, возникают на рантайме из-за ошибок программиста или состояния JVM. Первые наследуются от Exception (но не от RuntimeException), вторые — от RuntimeException и Error.</p>
+<h4>Иерархия (основа ответа)</h4>
+<pre><code>Throwable
+├── Error (unchecked)                     — проблемы JVM: OutOfMemoryError, StackOverflowError
+└── Exception
+    ├── RuntimeException (unchecked)      — ошибки программиста: NPE, IAE, IndexOutOfBounds
+    └── Все остальные (checked)           — внешние условия: IOException, SQLException</code></pre>
+<p>Классы Error и RuntimeException и их потомки — unchecked. Все остальные потомки Exception — checked.</p>
+<h4>Checked exceptions</h4>
+<p><strong>Суть:</strong> Отражают внешние, предсказуемые, но неконтролируемые программистом проблемы (сеть упала, файл удалили, БД недоступна). Компилятор принуждает разработчика осознанно принять решение: обработать исключение здесь и сейчас или пробросить выше.</p>
+<p><strong>Обязательная обработка:</strong></p>
+<pre><code>// Код не скомпилируется без try-catch или throws
+public String readFile(File file) {
+    return Files.readString(file.toPath());  // Ошибка компиляции!
+}
+
+// Исправление -- вариант 1: throws в сигнатуре
+public String readFile(File file) throws IOException {
+    return Files.readString(file.toPath());
+}
+
+// Исправление -- вариант 2: try-catch
+public String readFile(File file) {
+    try {
+        return Files.readString(file.toPath());
+    } catch (IOException e) {
+        throw new UncheckedIOException(e);  // Оборачиваем
+    }
+}</code></pre>
+<p><strong>Примеры:</strong> IOException, SQLException, ClassNotFoundException, InterruptedException, FileNotFoundException.</p>
+<p><strong>Философия:</strong> Это часть публичного API метода. Глядя на throws IOException, вызывающий код понимает: "здесь я должен предусмотреть сценарий отказа".</p>
+<h4>Unchecked exceptions</h4>
+<p><strong>Суть:</strong> Отражают ошибки в логике самой программы, которые можно предотвратить корректным кодом. Компилятор не заставляет их обрабатывать — предполагается, что разработчик напишет код правильно, и эти исключения не возникнут.</p>
+<p><strong>Не требуют обработки:</strong></p>
+<pre><code>// Компилятор не требует try-catch, хотя NPE возможен
+public String toUpper(String s) {
+    return s.toUpperCase();  // Может быть NPE, но компилятор молчит
+}</code></pre>
+<p><strong>Примеры:</strong> NullPointerException, IllegalArgumentException, IndexOutOfBoundsException, ArithmeticException, ClassCastException.</p>
+<p><strong>Философия:</strong> Это баги, а не ожидаемые ситуации. Их не ловят — их исправляют в коде.</p>
+<h4>Error (тоже unchecked, но особый)</h4>
+<p>Проблемы уровня JVM, которые приложение не должно пытаться обработать:</p>
+<pre><code>// Так не делают
+try {
+    recursiveMethod();  // Бесконечная рекурсия
+} catch (StackOverflowError e) {
+    // JVM в нестабильном состоянии, бесполезно
+}</code></pre>
+<p>OutOfMemoryError, StackOverflowError, NoClassDefFoundError — нет смысла ловить, JVM может быть повреждена.</p>
+<h4>Сравнительная таблица</h4>
+<table>
+<tr><th>Критерий</th><th>Checked</th><th>Unchecked</th></tr>
+<tr><td>Базовый класс</td><td>Exception (не RuntimeException)</td><td>RuntimeException, Error</td></tr>
+<tr><td>Проверка компилятором</td><td>Да (try-catch или throws обязательны)</td><td>Нет</td></tr>
+<tr><td>Природа ошибки</td><td>Внешние условия (сеть, файлы, БД)</td><td>Ошибки программиста (null, границы)</td></tr>
+<tr><td>Можно ли предотвратить?</td><td>Не всегда (сеть упала)</td><td>Всегда (проверкой)</td></tr>
+<tr><td>Пример</td><td>IOException, SQLException</td><td>NullPointerException, IllegalArgumentException</td></tr>
+<tr><td>Требование к вызывающему коду</td><td>Предусмотреть восстановление</td><td>Исправить код</td></tr>
+</table>
+<h4>Как выбирать между ними (для создания своих исключений)</h4>
+<p><strong>Делайте checked, если:</strong> ошибка связана с внешним миром, вызывающий код может осмысленно восстановиться, вы хотите принудить разработчика задуматься об этом сценарии.</p>
+<p><strong>Делайте unchecked, если:</strong> ошибка вызвана некорректным использованием API, вызывающий код не может ничего исправить (это баг), это ошибка, которой "не должно случиться" при правильном использовании.</p>
+<h4>Проблема checked exceptions и современные подходы</h4>
+<p>Checked exceptions критикуют за захламление сигнатур методов, неудобство в лямбдах и Stream API, склонность разработчиков "проглатывать" исключения пустым catch.</p>
+<p><strong>Современный тренд (Spring, Lombok):</strong> бизнес-исключения делать unchecked, использовать @SneakyThrows для скрытой проброски checked, Spring транзакции откатываются только на unchecked по умолчанию.</p>
+<h4>Резюме для Middle+</h4>
+<p>Checked exceptions — механизм принуждения к обработке ожидаемых внешних сбоев через try-catch или throws. Unchecked — ошибки программирования и критические сбои JVM. Главное различие не в типах, а в философии: checked говорит "здесь возможен отказ, реши что делать", unchecked говорит "ты ошибся в коде, исправляй".</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('checked-vs-unchecked')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Что такое checked exception и когда его использовать -->
+<details id="checked-exception">
+<summary>Что такое checked exception и когда его использовать?</summary>
+<div class="details-content">
+<p><strong>Checked exception</strong> — это исключение, наследуемое от Exception (но не от RuntimeException), которое компилятор Java обязывает явно обрабатывать: либо через try-catch, либо декларируя в сигнатуре метода через throws. Его философия — отразить предсказуемую внештатную ситуацию, которая не является ошибкой программиста, и принудить вызывающий код осознанно решить, что с ней делать.</p>
+<h4>Механика: как компилятор принуждает</h4>
+<pre><code>// Код не скомпилируется без throws или try-catch
+public String readConfig(Path path) {
+    return Files.readString(path);  // Ошибка компиляции: unreported exception IOException
+}
+
+// Вариант 1: throws -- перекладываю ответственность выше
+public String readConfig(Path path) throws IOException {
+    return Files.readString(path);
+}
+
+// Вариант 2: try-catch -- обрабатываю здесь и сейчас
+public String readConfig(Path path) {
+    try {
+        return Files.readString(path);
+    } catch (IOException e) {
+        return DEFAULT_CONFIG;  // fallback
+    }
+}</code></pre>
+<p>Без одного из этих вариантов код не скомпилируется. Это главное отличие от unchecked исключений.</p>
+<h4>Философия: когда это уместно</h4>
+<p>Checked exception моделирует ситуацию, когда операция в принципе может не выполниться по причинам вне контроля программы, и вызывающий код способен осмысленно отреагировать. Три условия:</p>
+<ol>
+<li><strong>Проблема не от программиста.</strong> Неправильные аргументы — это баг (unchecked). Недоступный файл — это реальность (checked).</li>
+<li><strong>Вызывающий код МОЖЕТ восстановиться.</strong> Есть разумный сценарий кроме "упасть с ошибкой": повторить, использовать значение по умолчанию, уведомить пользователя, залогировать и продолжить.</li>
+<li><strong>Вы ХОТИТЕ принудить к осознанию.</strong> Сигнатура метода — часть контракта. throws IOException громко заявляет: "Эй, здесь всё может пойти не так, подумай об этом сейчас, а не в продакшене".</li>
+</ol>
+<h4>Примеры из стандартной библиотеки</h4>
+<pre><code>Files.readAllLines(path);                    // IOException
+Class.forName("com.mysql.Driver");           // ClassNotFoundException
+url.openConnection().getInputStream();       // IOException
+Thread.sleep(1000);                          // InterruptedException</code></pre>
+<h4>Когда НЕ использовать checked</h4>
+<p>Нарушение любого из трёх условий — сигнал делать unchecked.</p>
+<pre><code>// ПЛОХО: вызывающий код не может восстановиться -- это баг программиста
+public void setAge(int age) throws InvalidAgeException {  // Должен быть unchecked!
+    if (age < 0) throw new InvalidAgeException();
+}
+
+// ХОРОШО: unchecked для ошибок программиста
+public void setAge(int age) {
+    if (age < 0) throw new IllegalArgumentException("Age must be non-negative: " + age);
+}</code></pre>
+<h4>Реализация своего checked exception</h4>
+<pre><code>public class PaymentGatewayException extends Exception {
+    private final int errorCode;
+    public PaymentGatewayException(String message, int errorCode, Throwable cause) {
+        super(message, cause);
+        this.errorCode = errorCode;
+    }
+    public int getErrorCode() { return errorCode; }
+}</code></pre>
+<h4>Проблема с лямбдами и Stream API</h4>
+<pre><code>// Не компилируется: Files.readString бросает IOException
+List&lt;String&gt; contents = fileList.stream()
+    .map(Files::readString)
+    .collect(Collectors.toList());
+
+// Решение: обернуть в unchecked
+List&lt;String&gt; contents = fileList.stream()
+    .map(file -> {
+        try { return Files.readString(file); }
+        catch (IOException e) { throw new UncheckedIOException(e); }
+    })
+    .collect(Collectors.toList());</code></pre>
+<h4>Резюме для Middle+</h4>
+<p>Checked exception — это инструмент принуждения разработчика к осознанной обработке внештатных ситуаций. Он уместен, когда отказ вызван внешними причинами (не баг), вызывающий код способен восстановиться, и вы хотите сделать эту возможность явной частью контракта метода. Главное — не злоупотреблять: если вызывающий код не может ничего умного сделать с исключением, не надо заставлять его ловить — делайте unchecked.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('checked-exception')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Что такое unchecked exception -->
+<details id="unchecked-exception">
+<summary>Что такое unchecked exception (Runtime Exception)?</summary>
+<div class="details-content">
+<p><strong>Unchecked exception</strong> — это исключение, наследующееся от RuntimeException (или Error), которое компилятор Java не заставляет обрабатывать. Его философия: отразить ошибку программиста или фатальный сбой JVM, которые нельзя предотвратить внешней обработкой — нужно исправлять код.</p>
+<h4>Иерархия</h4>
+<pre><code>Throwable
+├── Error (unchecked)                     — критические ошибки JVM
+│   ├── OutOfMemoryError
+│   ├── StackOverflowError
+│   └── ...
+└── Exception
+    ├── RuntimeException (unchecked)      — ошибки программиста
+    │   ├── NullPointerException
+    │   ├── IllegalArgumentException
+    │   ├── IndexOutOfBoundsException
+    │   ├── ClassCastException
+    │   └── ...
+    └── Все остальные (checked)           — внешние условия</code></pre>
+<h4>Почему компилятор молчит</h4>
+<pre><code>// Компилируется без проблем — никаких try-catch или throws
+public int sumLengths(String a, String b) {
+    return a.length() + b.length();  // Может быть NPE, но компилятор не требует обработки
+}</code></pre>
+<p>Компилятор предполагает: разработчик достаточно компетентен, чтобы не допускать таких ошибок. Null-проверка, валидация аргументов, проверка границ — это часть нормального кода, а не исключительные ситуации.</p>
+<h4>Три категории unchecked</h4>
+<p><strong>1. Ошибки программиста (RuntimeException)</strong></p>
+<p>Возникают из-за багов в коде. Их не ловят — их предотвращают.</p>
+<pre><code>// NullPointerException — не проверили на null
+public String greet(String name) {
+    return "Hello, " + name.toUpperCase();  // NPE при name == null
+}
+
+// Исправление: проверка или Objects.requireNonNull
+public String greet(String name) {
+    Objects.requireNonNull(name, "name must not be null");
+    return "Hello, " + name.toUpperCase();
+}
+
+// IllegalArgumentException — передали невалидный аргумент
+public void setAge(int age) {
+    if (age < 0) throw new IllegalArgumentException("Age must be non-negative: " + age);
+}
+
+// IndexOutOfBoundsException — вышли за границы
+List&lt;String&gt; list = List.of("a", "b");
+String third = list.get(2);  // IndexOutOfBoundsException — нужно было проверить size()</code></pre>
+<p><strong>2. Критические ошибки JVM (Error)</strong></p>
+<p>Приложение не должно их обрабатывать — JVM в нестабильном состоянии.</p>
+<pre><code>// Бесконечная рекурсия
+public void recurse() {
+    recurse();  // StackOverflowError — не ловить!
+}
+
+// Утечка памяти
+List&lt;Object&gt; list = new ArrayList&lt;&gt;();
+while (true) list.add(new byte[1024 * 1024]);  // OutOfMemoryError</code></pre>
+<p><strong>3. Пользовательские unchecked исключения</strong></p>
+<p>Когда хотите сообщить о нарушении контракта API:</p>
+<pre><code>public class InsufficientFundsException extends RuntimeException {
+    private final BigDecimal balance;
+    private final BigDecimal requested;
+    public InsufficientFundsException(BigDecimal balance, BigDecimal requested) {
+        super(String.format("Insufficient funds: balance=%s, requested=%s", balance, requested));
+        this.balance = balance;
+        this.requested = requested;
+    }
+}</code></pre>
+<h4>Когда ловить unchecked (редкие случаи)</h4>
+<p>В общем случае unchecked не ловят. Но есть осмысленные исключения: защита потока от падения, очистка ресурсов, оборачивание checked в unchecked для совместимости, глобальный обработчик (последний рубеж).</p>
+<h4>Стандартные unchecked исключения</h4>
+<table>
+<tr><th>Исключение</th><th>Когда бросать</th></tr>
+<tr><td>NullPointerException</td><td>null там, где его быть не должно</td></tr>
+<tr><td>IllegalArgumentException</td><td>Невалидный аргумент метода</td></tr>
+<tr><td>IllegalStateException</td><td>Объект в неподходящем состоянии для вызова</td></tr>
+<tr><td>IndexOutOfBoundsException</td><td>Индекс за пределами диапазона</td></tr>
+<tr><td>UnsupportedOperationException</td><td>Операция не поддерживается реализацией</td></tr>
+<tr><td>ConcurrentModificationException</td><td>Модификация коллекции во время итерации</td></tr>
+</table>
+<h4>Резюме для Middle+</h4>
+<p>Unchecked exceptions (RuntimeException и Error) — это исключения, не требующие принудительной обработки компилятором. Они сигнализируют об ошибках программиста или фатальных сбоях JVM. Их философия: "это не должно происходить, а если происходит — код нужно чинить, а не ловить". Практическое правило: если вызывающий код может предотвратить исключение проверкой предусловий — делайте unchecked.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('unchecked-exception')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Какие исключения нужно обрабатывать обязательно -->
+<details id="mandatory-exceptions">
+<summary>Какие исключения нужно обрабатывать обязательно?</summary>
+<div class="details-content">
+<p>Обязательно нужно обрабатывать только <strong>checked exceptions</strong> — те, которые наследуются от Exception, но не от RuntimeException. Компилятор Java физически не даст запустить код, пока вы либо не обернёте такой вызов в try-catch, либо не добавите throws в сигнатуру метода. Unchecked exceptions (RuntimeException и Error) обрабатывать не обязательно.</p>
+<h4>Три варианта обязательной обработки</h4>
+<pre><code>// Метод, бросающий checked exception
+public String readFile(Path path) throws IOException {
+    return Files.readString(path);
+}
+
+// Вариант 1: try-catch — ловим здесь и сейчас
+public String loadConfig() {
+    try {
+        return readFile(Path.of("config.json"));
+    } catch (IOException e) {
+        System.err.println("Config not found, using defaults");
+        return DEFAULT_CONFIG;
+    }
+}
+
+// Вариант 2: throws — пробрасываем выше
+public String loadConfig() throws IOException {
+    return readFile(Path.of("config.json"));
+}
+
+// Вариант 3: Оборачиваем в unchecked
+public String loadConfig() {
+    try {
+        return readFile(Path.of("config.json"));
+    } catch (IOException e) {
+        throw new UncheckedIOException("Failed to load config", e);
+    }
+}</code></pre>
+<h4>Какие исключения относятся к checked (обязательным)</h4>
+<table>
+<tr><th>Исключение</th><th>Типичный источник</th></tr>
+<tr><td>IOException</td><td>Файловый ввод-вывод, сеть</td></tr>
+<tr><td>FileNotFoundException</td><td>Файл не существует</td></tr>
+<tr><td>SQLException</td><td>Работа с базами данных</td></tr>
+<tr><td>ClassNotFoundException</td><td>Class.forName(), динамическая загрузка</td></tr>
+<tr><td>InterruptedException</td><td>Thread.sleep(), wait(), блокирующие операции</td></tr>
+<tr><td>InstantiationException</td><td>Рефлексивное создание объектов</td></tr>
+<tr><td>NoSuchMethodException</td><td>Рефлексия</td></tr>
+<tr><td>MalformedURLException</td><td>Парсинг URL</td></tr>
+</table>
+<h4>Unchecked exceptions — обрабатывать не обязательно</h4>
+<pre><code>// Компилируется без проблем
+public int divide(int a, int b) {
+    return a / b;  // ArithmeticException при b=0 — компилятор молчит
+}
+
+public String getFirst(List&lt;String&gt; list) {
+    return list.get(0);  // IndexOutOfBoundsException при пустом списке
+}</code></pre>
+<h4>Практическое правило: что ДЕЙСТВИТЕЛЬНО нужно обрабатывать</h4>
+<p>Формально обязательны — checked. Но на практике хороший код обрабатывает и некоторые unchecked в определённых точках: глобальный обработчик (ControllerAdvice), защита цикла, в транзакции (откат на любое исключение).</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('mandatory-exceptions')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Что находится в вершине иерархии исключений -->
+<details id="hierarchy-top">
+<summary>Что находится в вершине иерархии исключений?</summary>
+<div class="details-content">
+<p>В вершине иерархии находится <strong>Throwable</strong>. Все классы исключений и ошибок в Java происходят от этого единого корня. Ключевой момент для собеседования — умение правильно нарисовать и объяснить раздвоение этой иерархии на Exception и Error.</p>
+<h4>Полная иерархия</h4>
+<pre><code>Object
+└── Throwable                     ← ВЕРШИНА (корень)
+    ├── Error                     ← Ошибки JVM (unchecked)
+    │   ├── OutOfMemoryError
+    │   ├── StackOverflowError
+    │   └── ...
+    └── Exception                 ← Исключения приложения
+        ├── RuntimeException     ← Ошибки программиста (unchecked)
+        │   ├── NullPointerException
+        │   ├── IllegalArgumentException
+        │   └── ...
+        └── (все остальные)       ← Внешние условия (checked)
+            ├── IOException
+            ├── SQLException
+            └── ...</code></pre>
+<h4>Что важно сказать о Throwable</h4>
+<p><strong>1. Основные члены класса:</strong> детальное сообщение (detailMessage), причина (cause), трассировка стека (stack trace).</p>
+<p><strong>2. Конструкторы и подавленные исключения:</strong> в Java 7 появились подавленные исключения (suppressed). Они добавляются через метод addSuppressed(Throwable). Основной кейс — try-with-resources: если мы сломались при закрытии ресурса, это исключение не должно затирать основную ошибку.</p>
+<p><strong>3. Главный антипаттерн:</strong> никогда нельзя писать catch (Throwable t). Это перехватит не только программные ошибки, но и Error'ы, после которых JVM может находиться в нестабильном состоянии.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('hierarchy-top')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Что такое Throwable -->
+<details id="throwable">
+<summary>Что такое Throwable?</summary>
+<div class="details-content">
+<p><strong>Throwable</strong> — это корневой класс всей иерархии ошибок и исключений в Java. Он является единственным типом, который можно "бросить" через throw и "поймать" через catch. Это не интерфейс и не просто удобная абстракция, а полноценный класс, наследующий Object.</p>
+<h4>1. Роль в JVM: контракт throw/catch</h4>
+<pre><code>// ЗАКОН JVM: после throw может стоять ТОЛЬКО объект Throwable или его наследник.
+throw new Throwable();       // ОК
+throw new Exception();       // ОК (наследник)
+throw new RuntimeException(); // ОК (наследник)
+throw new String("error");   // Ошибка компиляции! String не наследник Throwable</code></pre>
+<h4>2. Внутреннее устройство</h4>
+<pre><code>public class Throwable implements Serializable {
+    private String detailMessage;         // Сообщение
+    private Throwable cause;              // Первопричина
+    private StackTraceElement[] stackTrace; // Стек вызовов
+    private List&lt;Throwable&gt; suppressedExceptions; // Подавленные исключения
+}</code></pre>
+<p><strong>Четыре столпа Throwable:</strong></p>
+<ol>
+<li><strong>Stack Trace</strong> — заполняется в момент создания вызовом fillInStackTrace(). Именно поэтому создание исключений — относительно дорогая операция.</li>
+<li><strong>Cause</strong> — реализует паттерн "цепочка исключений". Позволяет сохранить первопричину, обернув её в исключение более высокого уровня.</li>
+<li><strong>Suppressed</strong> — главное новшество Java 7 (try-with-resources). Если основная логика упала, а при закрытии ресурса тоже возникла ошибка — она не замещает основную, а добавляется в suppressed.</li>
+<li><strong>Геттеры и иммутабельность</strong> — getMessage(), getCause(), getStackTrace() без сеттеров.</li>
+</ol>
+<h4>3. Как работает throw</h4>
+<p>throw new Throwable() создает объект и заполняет стек. JVM начинает раскручивать стек вызовов в поисках подходящего catch. Если catch не найден — поток умирает. Если finally встречается по пути — он обязательно выполняется.</p>
+<h4>4. Антипаттерны</h4>
+<p>Никогда не ловите Throwable без крайней нужды. Не создавайте исключения без надобности (new Exception() ради стектрейса — дорого).</p>
+<h4>Резюме для Middle+</h4>
+<p>Throwable — это не просто "родитель", а единственный легальный тип для системы throw/catch в JVM. Он реализует три критических механизма: снимок стека, цепочку причин и подавление исключений. Понимание того, что стек сохраняется в момент new, а не в момент throw, и чем грозит catch (Throwable t) — граница между Junior'ом и Middle'ом в теме исключений.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('throwable')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- В чём разница между Error и Exception -->
+<details id="error-vs-exception">
+<summary>В чём разница между Error и Exception?</summary>
+<div class="details-content">
+<p><strong>Короткий ответ:</strong> Error — это критические проблемы уровня JVM или железа, которые приложение не должно пытаться обрабатывать (нет смысла, JVM нестабильна). Exception — это проблемы уровня приложения, которые можно и нужно обрабатывать, они делятся на checked и unchecked.</p>
+<h4>1. Разница по уровням ответственности</h4>
+<pre><code>Throwable
+├── Error                     ← Зона ответственности JVM (железо, память, байт-код)
+│   ├── OutOfMemoryError      — закончилась куча, GC не помог
+│   ├── StackOverflowError    — бесконечная рекурсия
+│   ├── NoClassDefFoundError  — класс был при компиляции, но отсутствует в runtime
+│   ├── AssertionError        — сработал assert
+│   └── ...
+└── Exception                 ← Зона ответственности приложения
+    ├── RuntimeException      — баги в коде (unchecked)
+    └── IOException           — внешние условия (checked)</code></pre>
+<p><strong>Мнемоника:</strong> Error — "всё пропало, JVM умирает". Exception — "что-то пошло не так, но можно исправить".</p>
+<h4>2. Ключевые различия</h4>
+<table>
+<tr><th>Критерий</th><th>Error</th><th>Exception</th></tr>
+<tr><td>Источник</td><td>JVM, среда выполнения, железо</td><td>Бизнес-логика, внешние сервисы</td></tr>
+<tr><td>Можно ли восстановиться</td><td>Почти никогда</td><td>Почти всегда</td></tr>
+<tr><td>Стоит ли ловить</td><td>Нет (опасно)</td><td>Да (выборочно или глобально)</td></tr>
+<tr><td>Пример</td><td>OutOfMemoryError</td><td>IOException, SQLException</td></tr>
+<tr><td>Кто виноват</td><td>Среда выполнения</td><td>Данные или разработчик</td></tr>
+</table>
+<h4>3. Почему Error нельзя ловить</h4>
+<pre><code>// КАТАСТРОФИЧЕСКИ ПЛОХОЙ КОД — никогда так не делайте!
+public void dangerous() {
+    try {
+        recursiveOverflow();
+    } catch (StackOverflowError e) {
+        System.out.println("Recovered!");
+        saveImportantData();  // Может записать мусор или упасть снова
+    }
+}
+
+// Единственный относительно безопасный случай — аварийное логирование
+catch (OutOfMemoryError e) {
+    emergencyLog.fatal("OOM occurred, shutting down");
+    System.exit(1);
+}</code></pre>
+<h4>4. Как объяснить на собеседовании за 30 секунд</h4>
+<p>"Error — это проблемы JVM: кончилась память, стек переполнен, сломанный байт-код. Их бессмысленно ловить, потому что среда выполнения нестабильна. Exception — это проблемы приложения: сеть упала, файл не найден, передан null. Их нужно обрабатывать, потому что приложение может восстановиться."</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('error-vs-exception')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<h2>🔶 Try-Catch-Finally и Try-With-Resources</h2>
+<!-- Гарантируется ли выполнение блока finally -->
+<details id="finally-guarantee">
+<summary>Гарантируется ли выполнение блока finally?</summary>
+<div class="details-content">
+<p><strong>Короткий ответ: Нет, не гарантируется.</strong> Блок finally выполняется почти всегда, но существуют конкретные сценарии, когда JVM до него просто "не доживает".</p>
+<h4>1. Когда finally выполняется (обычные сценарии)</h4>
+<pre><code>try {
+    System.out.println("try");
+    return; // Даже тут finally отработает
+} finally {
+    System.out.println("finally"); // Выполнится перед return!
+}</code></pre>
+<h4>2. Ситуации, когда finally НЕ выполняется</h4>
+<p><strong>Ситуация 1: System.exit()</strong></p>
+<pre><code>try {
+    System.out.println("try");
+    System.exit(0); // Принудительное завершение JVM
+} finally {
+    System.out.println("finally"); // ЭТО НЕ ВЫПОЛНИТСЯ
+}</code></pre>
+<p><strong>Ситуация 2:</strong> Аварийное падение JVM (Error уровня краша) — может не выполниться.</p>
+<p><strong>Ситуация 3:</strong> kill -9 (SIGKILL) из ОС — мгновенное уничтожение процесса.</p>
+<p><strong>Ситуация 4:</strong> Бесконечный цикл или дедлок в try/catch — никогда не выйдем из try.</p>
+<p><strong>Ситуация 5:</strong> Отключение питания / крах ОС — аппаратный сбой.</p>
+<h4>3. Как отвечать на собеседовании</h4>
+<p>"Блок finally выполняется почти всегда, если поток выполнения доходит до try. Он сработает даже при return или исключении. Однако есть исключения: System.exit(), аварийное завершение JVM, kill -9 из ОС, бесконечный цикл в try. Поэтому 100% гарантии нет — полагаться на finally для критически важных действий, которые должны пережить крах JVM, нельзя."</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('finally-guarantee')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Что такое try-with-resources -->
+<details id="try-with-resources">
+<summary>Что такое try-with-resources?</summary>
+<div class="details-content">
+<p><strong>try-with-resources</strong> — это конструкция Java (появилась в JDK 7), которая автоматически закрывает ресурсы, объявленные в заголовке try, сразу после выхода из блока — будь то нормальное завершение, return или исключение. Ключевой интерфейс — AutoCloseable.</p>
+<h4>1. Как это выглядит</h4>
+<pre><code>// Старый подход (Java 6-): finally и ручное закрытие
+BufferedReader br = null;
+try {
+    br = new BufferedReader(new FileReader("file.txt"));
+    String line = br.readLine();
+} catch (IOException e) { ... }
+finally {
+    if (br != null) {
+        try { br.close(); } catch (IOException e) { }
+    }
+}
+
+// try-with-resources (Java 7+): компактно и безопасно
+try (BufferedReader br = new BufferedReader(new FileReader("file.txt"))) {
+    String line = br.readLine();
+} catch (IOException e) { ... }
+// br.close() вызван автоматически</code></pre>
+<h4>2. Механика работы</h4>
+<p><strong>Шаг 1.</strong> Ресурсы должны реализовывать AutoCloseable. Closeable наследует AutoCloseable, уточняя сигнатуру до throws IOException.</p>
+<p><strong>Шаг 2.</strong> Порядок закрытия: ресурсы закрываются в порядке, обратном их объявлению (LIFO — последний открытый закрывается первым).</p>
+<p><strong>Шаг 3.</strong> Подавленные исключения (suppressed): если основной код выбросил исключение, а при закрытии ресурса тоже произошло исключение — второе не заменяет основное, а добавляется как подавленное.</p>
+<h4>3. Эволюция: JDK 7 → JDK 9</h4>
+<pre><code>// JDK 7-8: обязательно объявление в try()
+try (BufferedReader br = new BufferedReader(...)) { ... }
+
+// JDK 9+: можно использовать effectively final переменные
+BufferedReader br = new BufferedReader(...);
+try (br) { ... }  // br должен быть effectively final</code></pre>
+<h4>4. Когда использовать</h4>
+<p>Всегда, когда ресурс реализует AutoCloseable: IO-потоки, JDBC-соединения, сетевые сокеты, любые свои классы, инкапсулирующие нативные ресурсы.</p>
+<h4>5. Как написать свой AutoCloseable</h4>
+<pre><code>public class DatabaseConnection implements AutoCloseable {
+    private boolean closed = false;
+    public void executeQuery(String sql) {
+        if (closed) throw new IllegalStateException("Connection is closed");
+    }
+    @Override
+    public void close() {
+        if (!closed) { closed = true; /* освобождение ресурсов */ }
+    }
+}</code></pre>
+<h4>Резюме для Middle+</h4>
+<p>try-with-resources — это синтаксический сахар над finally для автоматического управления ресурсами. Ресурсы должны реализовывать AutoCloseable, закрываются в обратном порядке объявления (LIFO), а исключения при закрытии не маскируют основную ошибку, а добавляются как suppressed. С JDK 9 можно использовать внешние effectively final переменные.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('try-with-resources')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Чем лучше ручного finally и порядок закрытия LIFO -->
+<details id="vs-finally">
+<summary>Чем try-with-resources лучше ручного finally и почему LIFO?</summary>
+<div class="details-content">
+<h4>Почему try-with-resources лучше ручного finally</h4>
+<p><strong>1. Проблема потерянного исключения (главная причина)</strong></p>
+<p>Ручной finally маскирует основную ошибку. Если в try возникло исключение, а в finally при закрытии ресурса тоже — исключение из finally перезаписывает основное:</p>
+<pre><code>// Ручной finally — основная ошибка теряется
+BufferedReader br = null;
+try {
+    br = new BufferedReader(new FileReader("file.txt"));
+    throw new IOException("Ошибка чтения"); // ОСНОВНАЯ ошибка
+} finally {
+    if (br != null) {
+        br.close(); // Здесь тоже IOException ("Ошибка закрытия")
+    }
+}
+// До разработчика долетит только "Ошибка закрытия"
+// Истинная причина "Ошибка чтения" потеряна навсегда</code></pre>
+<p>try-with-resources решает эту проблему через механизм подавленных исключений: основная ошибка из try остаётся главной, ошибка закрытия добавляется в getSuppressed().</p>
+<p><strong>2. Пропуск закрытия ресурса.</strong> В ручном finally легко забыть проверить на null или перепутать порядок.</p>
+<p><strong>3. Многословность.</strong> 3 ресурса = ~25 строк шаблонного кода против 1 строки объявления.</p>
+<h4>Почему закрытие в обратном порядке (LIFO)</h4>
+<p><strong>Аналогия:</strong> вы надеваете пальто поверх пиджака. Снимаете сначала пальто, потом пиджак.</p>
+<p><strong>Техническая причина — зависимость ресурсов:</strong></p>
+<pre><code>Connection conn = DriverManager.getConnection(url);       // 1. Открыто первым
+PreparedStatement stmt = conn.prepareStatement(sql);      // 2. Зависит от conn
+ResultSet rs = stmt.executeQuery();                       // 3. Зависит от stmt
+
+// Прямой порядок (НЕПРАВИЛЬНО):
+conn.close();  // Закрыли соединение
+stmt.close();  // Поздно! Statement ссылается на мёртвое соединение
+rs.close();    // Поздно!
+
+// Обратный порядок LIFO (ПРАВИЛЬНО):
+rs.close();    // 3. Закрыли первым
+stmt.close();  // 2. Statement больше не нужен
+conn.close();  // 1. Соединение закрыто последним</code></pre>
+<p><strong>LIFO гарантирует:</strong> ресурс жив, пока живы все, кто на него ссылается. Когда close() вызывается на родительском ресурсе, все дочерние уже корректно освобождены.</p>
+<h4>Резюме для собеседования</h4>
+<p>Чем лучше: сохраняет основное исключение (suppressed), гарантирует закрытие всех ресурсов, убирает шаблонный код. Почему LIFO: ресурсы часто зависят друг от друга, закрытие родительского при живых дочерних вызывает ошибки, обратный порядок гарантирует корректное освобождение.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('vs-finally')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Какие требования к ресурсам в try-with-resources -->
+<details id="resource-requirements">
+<summary>Какие требования к ресурсам в try-with-resources?</summary>
+<div class="details-content">
+<p><strong>Короткий ответ:</strong> Ресурс, объявленный в try-with-resources, должен реализовывать интерфейс java.lang.AutoCloseable (или его подтип java.io.Closeable). Это единственное жёсткое требование компилятора.</p>
+<h4>1. Интерфейс AutoCloseable</h4>
+<pre><code>public interface AutoCloseable {
+    void close() throws Exception;  // Может бросать любое исключение
+}
+// Closeable наследует AutoCloseable с уточнённой сигнатурой:
+public interface Closeable extends AutoCloseable {
+    void close() throws IOException;  // Только IOException
+}</code></pre>
+<h4>2. Что считается ресурсом (эволюция JDK)</h4>
+<pre><code>// JDK 7-8: ресурс должен быть объявлен внутри try
+try (BufferedReader br = new BufferedReader(...)) { }
+
+// JDK 9+: допускаются effectively final переменные
+BufferedReader br = new BufferedReader(...);
+try (br) { }  // Компилируется с JDK 9+</code></pre>
+<h4>3. Свой AutoCloseable: минимальная реализация</h4>
+<pre><code>public class ManagedResource implements AutoCloseable {
+    private boolean closed = false;
+    public void doWork() {
+        if (closed) throw new IllegalStateException("Resource closed");
+        System.out.println("Working...");
+    }
+    @Override
+    public void close() {
+        if (!closed) {
+            closed = true;
+            System.out.println("Resource released");
+        }
+        // Важно: close() должен быть идемпотентным!
+    }
+}</code></pre>
+<h4>4. Требования к реализации close()</h4>
+<table>
+<tr><th>Рекомендация</th><th>Почему</th></tr>
+<tr><td>Идемпотентность</td><td>close() может вызываться повторно</td></tr>
+<tr><td>Не бросать InterruptedException</td><td>Подавленные исключения могут сбить флаг прерывания</td></tr>
+<tr><td>Избегать бросков вообще</td><td>Если close() бросает, это не должно мешать освобождению ресурсов</td></tr>
+<tr><td>Потокобезопасность</td><td>Если ресурс используется из нескольких потоков</td></tr>
+</table>
+<h4>5. Распространённые ошибки</h4>
+<p>Ресурс без AutoCloseable — ошибка компиляции. Изменение effectively final переменной в JDK 9+ — ошибка компиляции. close() не идемпотентен — баг.</p>
+<h4>6. Несколько ресурсов</h4>
+<p>Можно объявлять несколько ресурсов через ; (не ,!). Закрываются в обратном порядке (LIFO: rs → stmt → conn).</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('resource-requirements')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- AutoCloseable интерфейс -->
+<details id="autocloseable">
+<summary>Что такое AutoCloseable интерфейс?</summary>
+<div class="details-content">
+<p><strong>AutoCloseable</strong> — это интерфейс из java.lang, появившийся в JDK 7. Содержит единственный метод void close() throws Exception и является фундаментом для конструкции try-with-resources. Любой класс, реализующий этот интерфейс, может быть использован как ресурс, автоматически закрываемый JVM.</p>
+<h4>1. Определение и контракт</h4>
+<pre><code>package java.lang;
+public interface AutoCloseable {
+    void close() throws Exception;
+}</code></pre>
+<p>Метод вызывается автоматически при выходе из try-with-resources, может бросать Exception, рекомендуется делать идемпотентным.</p>
+<h4>2. Место в иерархии</h4>
+<pre><code>AutoCloseable (java.lang, JDK 7)
+    ↑
+Closeable (java.io, JDK 1.5 — но с JDK 7 наследует AutoCloseable)
+    void close() throws IOException;</code></pre>
+<h4>3. Кто его реализует</h4>
+<p>IO-потоки (InputStream, OutputStream, Reader, Writer), JDBC (Connection, Statement, ResultSet), сеть (Socket, ServerSocket), Concurrency (ExecutorService), файловые системы (FileSystem, FileChannel).</p>
+<h4>4. Свой класс: пример</h4>
+<pre><code>public class ManagedResource implements AutoCloseable {
+    private boolean closed = false;
+    public void doWork() {
+        if (closed) throw new IllegalStateException("Already closed");
+        System.out.println("Working...");
+    }
+    @Override
+    public void close() {
+        if (!closed) {
+            closed = true;
+            System.out.println("Cleaned up");
+        }
+    }
+}</code></pre>
+<h4>5. Разница AutoCloseable vs Closeable</h4>
+<table>
+<tr><th>Критерий</th><th>AutoCloseable</th><th>Closeable</th></tr>
+<tr><td>Пакет</td><td>java.lang</td><td>java.io</td></tr>
+<tr><td>Появился</td><td>JDK 7</td><td>JDK 1.5</td></tr>
+<tr><td>close() бросает</td><td>Exception</td><td>IOException</td></tr>
+<tr><td>Назначение</td><td>Универсальный</td><td>IO-специфичный</td></tr>
+<tr><td>Идемпотентность</td><td>Рекомендована</td><td>Требуется</td></tr>
+</table>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('autocloseable')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Разница между AutoCloseable и Closeable -->
+<details id="autocloseable-vs-closeable">
+<summary>В чём разница между AutoCloseable и Closeable?</summary>
+<div class="details-content">
+<p><strong>Короткий ответ:</strong> AutoCloseable — это общий интерфейс из java.lang (JDK 7) для любых ресурсов с методом void close() throws Exception. Closeable — это его подтип из java.io (JDK 5, обновлён в JDK 7) для IO-ресурсов с уточнённой сигнатурой void close() throws IOException. Closeable наследует AutoCloseable, сужая тип исключения.</p>
+<h4>1. Иерархия и сигнатуры</h4>
+<pre><code>// java.lang — JDK 7
+public interface AutoCloseable {
+    void close() throws Exception;
+}
+
+// java.io — JDK 5, обновлён в JDK 7
+public interface Closeable extends AutoCloseable {
+    @Override
+    void close() throws IOException;  // Суженная сигнатура
+}</code></pre>
+<h4>2. Ключевые различия</h4>
+<table>
+<tr><th>Критерий</th><th>AutoCloseable</th><th>Closeable</th></tr>
+<tr><td>Пакет</td><td>java.lang</td><td>java.io</td></tr>
+<tr><td>Появился</td><td>JDK 7</td><td>JDK 1.5</td></tr>
+<tr><td>close() бросает</td><td>Exception</td><td>IOException</td></tr>
+<tr><td>Назначение</td><td>Универсальный родитель</td><td>IO-специализация</td></tr>
+<tr><td>Идемпотентность</td><td>Рекомендована</td><td>Требуется</td></tr>
+<tr><td>Примеры</td><td>ExecutorService, Connection</td><td>InputStream, OutputStream</td></tr>
+</table>
+<h4>3. Почему Closeable сужает throws до IOException</h4>
+<p>IO-операции бросают IOException и его подклассы. Closeable гарантирует: если вы закрываете IO-поток, вы будете иметь дело только с IOException, а не с абстрактным Exception.</p>
+<h4>4. Когда что использовать</h4>
+<p><strong>Реализуйте Closeable, если:</strong> ресурс связан с вводом-выводом, естественное исключение при закрытии — IOException, хотите вписаться в экосистему IO.</p>
+<p><strong>Реализуйте AutoCloseable, если:</strong> ресурс не связан с IO (пул соединений, distributed lock), при закрытии могут возникнуть исключения не IOException, создаёте универсальный API.</p>
+<h4>5. Исторический контекст</h4>
+<p>До JDK 7 существовал только Closeable в java.io. Когда ввели try-with-resources, потребовался универсальный интерфейс. Создали AutoCloseable в java.lang, а Closeable ретрофитнули — сделали его подтипом. Это сохранило обратную совместимость.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('autocloseable-vs-closeable')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<h2>🟢 Обработка исключений</h2>
+<!-- Можно ли несколько catch блоков для одного try -->
+<details id="multiple-catch">
+<summary>Можно ли несколько catch блоков для одного try?</summary>
+<div class="details-content">
+<p><strong>Короткий ответ: Да.</strong> Один try может иметь несколько catch блоков. Это фундаментальная возможность Java для дифференцированной обработки разных типов исключений. С JDK 7 также доступен multi-catch — перехват нескольких типов исключений в одном catch блоке через синтаксис с вертикальной чертой.</p>
+<h4>1. Несколько catch блоков — базовая механика</h4>
+<pre><code>try {
+    Files.readAllLines(Path.of("config.txt"));
+    int port = Integer.parseInt(System.getProperty("port"));
+    ServerSocket socket = new ServerSocket(port);
+} catch (FileNotFoundException e) {
+    System.err.println("Config file not found: " + e.getMessage());
+    loadDefaultConfig();
+} catch (NumberFormatException e) {
+    System.err.println("Invalid port number");
+    System.exit(1);
+} catch (IOException e) {
+    System.err.println("IO error: " + e.getMessage());
+    logger.error("Server startup failed", e);
+    throw new ServiceException("Cannot start server", e);
+}</code></pre>
+<h4>Ключевые правила:</h4>
+<ul>
+<li>Catch блоки проверяются сверху вниз</li>
+<li>Первый подходящий по типу — выполняется</li>
+<li>Остальные игнорируются</li>
+<li>Порядок критичен: от частного к общему</li>
+</ul>
+<h4>2. Порядок catch блоков: от частного к общему</h4>
+<pre><code>// ПРАВИЛЬНО: FileNotFoundException → IOException
+try {
+    Files.readAllLines(Path.of("file.txt"));
+} catch (FileNotFoundException e) { ... }
+catch (IOException e) { ... }
+
+// ОШИБКА КОМПИЛЯЦИИ: общее перед частным
+try {
+    Files.readAllLines(Path.of("file.txt"));
+} catch (IOException e) { ... }
+catch (FileNotFoundException e) { ... }  // Ошибка: unreachable catch block</code></pre>
+<h4>3. Multi-catch (JDK 7+)</h4>
+<pre><code>try {
+    process();
+} catch (IOException | SQLException e) {
+    logger.error("Operation failed", e);
+    throw new ServiceException(e);
+}</code></pre>
+<p>Ограничения: типы не должны быть в иерархии, переменная e неявно final.</p>
+<h4>4. Исключения, которые не стоит ловить вместе</h4>
+<p>Слишком широкий catch (Exception e) маскирует ошибки программирования. Error ловить опасно. Try + finally без catch — легально.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('multiple-catch')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Multi-catch -->
+<details id="multi-catch">
+<summary>Что такое multi-catch (catching multiple exceptions)?</summary>
+<div class="details-content">
+<p><strong>Multi-catch</strong> — это синтаксическая конструкция JDK 7, позволяющая перехватывать несколько типов исключений в одном блоке catch через разделитель |. Устраняет дублирование кода, когда разные исключения обрабатываются одинаково. Переменная исключения в таком блоке неявно final.</p>
+<h4>1. Синтаксис и базовая механика</h4>
+<pre><code>// До JDK 7: дублирование обработчиков
+try {
+    process();
+} catch (IOException e) {
+    logger.error("Operation failed", e);
+    throw new ServiceException(e);
+} catch (SQLException e) {
+    logger.error("Operation failed", e);
+    throw new ServiceException(e);
+}
+
+// JDK 7+: multi-catch — один блок
+try {
+    process();
+} catch (IOException | SQLException e) {
+    logger.error("Operation failed", e);
+    throw new ServiceException(e);
+}</code></pre>
+<h4>2. Технические ограничения</h4>
+<p><strong>Типы не должны состоять в иерархии наследования:</strong></p>
+<pre><code>// Ошибка компиляции: FileNotFoundException — подкласс IOException
+catch (FileNotFoundException | IOException e) { }  // Ошибка!</code></pre>
+<p><strong>Переменная исключения неявно final:</strong></p>
+<pre><code>catch (IOException | SQLException e) {
+    e = new IOException();  // Ошибка компиляции!
+}</code></pre>
+<p><strong>Нельзя выбрасывать объединённый тип</strong> без соответствующего throws в сигнатуре.</p>
+<h4>3. Как это выглядит в байт-коде</h4>
+<p>Создаётся общий catch для Throwable с проверкой instanceof внутри. HotSpot JVM оптимизирует это лучше, чем ручные проверки instanceof.</p>
+<h4>4. Практические применения</h4>
+<p>Единая точка логирования и оборачивания, fallback-логика при недоступности внешних сервисов, очистка ресурсов при разных ошибках.</p>
+<h4>5. Когда НЕ использовать</h4>
+<p>Если обработка различается — разные catch. Если нужно знать конкретный тип внутри блока — лучше разделить.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('multi-catch')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- В каком порядке располагать catch блоки -->
+<details id="catch-order">
+<summary>В каком порядке располагать catch блоки?</summary>
+<div class="details-content">
+<p><strong>Короткий ответ:</strong> От наиболее частного (специфичного) к наиболее общему. Сначала подклассы, потом суперклассы. Нарушение этого порядка вызывает ошибку компиляции "unreachable catch block".</p>
+<h4>1. Железное правило: от частного к общему</h4>
+<pre><code>// ПРАВИЛЬНО
+try { readFile(); }
+catch (FileNotFoundException e) { ... }       // Самый конкретный
+catch (EOFException e) { ... }                 // Тоже конкретный
+catch (IOException e) { ... }                  // Общий
+catch (RuntimeException e) { ... }             // Ещё более общий
+
+// НЕПРАВИЛЬНО — ошибка компиляции
+try { readFile(); }
+catch (IOException e) { ... }                  // Перехватит всё
+catch (FileNotFoundException e) { ... }        // Ошибка: unreachable!</code></pre>
+<h4>2. Почему это ошибка компиляции</h4>
+<p>Java гарантирует, что каждый reachable catch блок может быть выполнен. Если общий тип стоит перед частным, компилятор статически доказывает, что до частного блока управление никогда не дойдёт.</p>
+<h4>3. Полная иерархия для запоминания</h4>
+<pre><code>Throwable
+├── Error                          ← Не ловить без крайней необходимости
+└── Exception
+    ├── IOException                ← Checked
+    │   ├── FileNotFoundException
+    │   ├── EOFException
+    │   └── SocketException
+    ├── SQLException               ← Checked
+    └── RuntimeException           ← Unchecked
+        ├── NullPointerException
+        ├── IllegalArgumentException
+        └── IndexOutOfBoundsException</code></pre>
+<h4>4. Multi-catch и порядок</h4>
+<p>Multi-catch блок можно размещать наравне с обычными catch блоками, соблюдая то же правило.</p>
+<h4>5. Стратегия: когда ловить частное, а когда общее</h4>
+<p>Разная реакция на разные типы — отдельные catch. Одинаковая реакция — общий catch или multi-catch. Выбор определяется бизнес-логикой восстановления, а не типом исключения.</p>
+<h4>6. Мнемоническое правило</h4>
+<p>"Дети перед родителями". Подклассы всегда перед суперклассами. Или: "От специального к общему".</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('catch-order')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Можно ли повторно бросить исключение -->
+<details id="rethrow">
+<summary>Можно ли повторно бросить исключение?</summary>
+<div class="details-content">
+<p><strong>Короткий ответ: Да.</strong> Повторно бросить исключение можно тремя способами: пробросить исходное как есть (throw e), обернуть в новое с сохранением причины (throw new WrapperException(e)), или использовать fillInStackTrace() для сброса стек-трейса.</p>
+<h4>1. Простой проброс: throw e без изменений</h4>
+<pre><code>public void processFile(String path) throws IOException {
+    try {
+        Files.readAllLines(Path.of(path));
+    } catch (IOException e) {
+        logger.error("Failed to read file: {}", path, e);
+        throw e;  // Пробрасываем то же исключение
+    }
+}</code></pre>
+<p>Исходный стек-трейс полностью сохраняется. Используется для логирования без изменения семантики ошибки.</p>
+<h4>2. Обёртывание в новое исключение с сохранением причины</h4>
+<pre><code>public User loadUser(Long id) throws ServiceException {
+    try {
+        return database.query("SELECT * FROM users WHERE id = ?", id);
+    } catch (SQLException e) {
+        throw new ServiceException("Failed to load user " + id, e);
+    }
+}</code></pre>
+<p>Создаётся новое исключение более высокого уровня абстракции. Исходное SQLException сохраняется как cause.</p>
+<h4>3. Сброс стек-трейса: fillInStackTrace()</h4>
+<pre><code>throw (RuntimeException) e.fillInStackTrace();</code></pre>
+<p>Применяется для сокрытия внутренней структуры системы. Теряется информация о реальной причине ошибки.</p>
+<h4>4. Проброс без объявления throws (sneaky throw)</h4>
+<p>Checked-исключение пробрасывается без объявления в сигнатуре. Технически возможно, но нарушает контракт метода.</p>
+<h4>5. Частая ошибка: потеря причины</h4>
+<pre><code>// ПЛОХО: причина потеряна
+throw new ServiceException("Query failed");  // SQLException потерян!
+
+// ХОРОШО: причина сохранена
+throw new ServiceException("Query failed", e);  // e — cause</code></pre>
+<h4>Резюме для Middle+</h4>
+<p>Ключевые правила: простой throw e для прозрачного проброса; throw new WrapperException(msg, e) для перехода между уровнями абстракции с обязательным сохранением cause; fillInStackTrace() только для сокрытия внутренней структуры. Никогда не терять исходное исключение при обёртывании.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('rethrow')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Exception chaining -->
+<details id="chaining">
+<summary>Что такое exception chaining?</summary>
+<div class="details-content">
+<p><strong>Exception chaining</strong> — это механизм связывания исключений в причинно-следственную цепь, где одно исключение является причиной другого. Реализуется через конструкторы с параметром cause и метод getCause().</p>
+<h4>1. Как это работает</h4>
+<pre><code>// Низкоуровневая операция
+public User findUser(Long id) throws SQLException {
+    return database.query("SELECT * FROM users WHERE id = ?", id);
+}
+
+// Высокоуровневая операция — оборачиваем с сохранением причины
+public UserProfile getUserProfile(Long userId) throws ProfileException {
+    try {
+        User user = findUser(userId);
+        return buildProfile(user);
+    } catch (SQLException e) {
+        throw new ProfileException("Failed to load profile for user " + userId, e);
+    }
+}</code></pre>
+<h4>2. API для создания цепочки</h4>
+<pre><code>// Конструкторы с причиной
+public Throwable(String message, Throwable cause);
+public Throwable(Throwable cause);
+
+// Методы
+public Throwable getCause();
+public Throwable initCause(Throwable);   // Только один раз</code></pre>
+<h4>3. Как выглядит стек-трейс с цепочкой</h4>
+<pre><code>ProfileException: Failed to load profile for user 42
+    at UserService.getUserProfile(UserService.java:25)
+Caused by: java.sql.SQLException: Connection refused
+    at Database.query(Database.java:42)
+    ... 10 more</code></pre>
+<h4>4. Многоуровневая цепочка</h4>
+<pre><code>ApiException: User endpoint error
+Caused by: ServiceException: Cannot load user 42
+Caused by: RepositoryException: Query failed
+Caused by: DataAccessException: Connection pool exhausted
+Caused by: SQLException: Too many connections</code></pre>
+<h4>5. Типичные ошибки</h4>
+<p>Потеря причины при обёртывании, обёртывание без добавления контекста, разрыв цепочки при логировании.</p>
+<h4>6. Exception chaining vs Suppressed exceptions</h4>
+<table>
+<tr><th></th><th>Exception Chaining (cause)</th><th>Suppressed Exceptions</th></tr>
+<tr><td>Связь</td><td>Причинно-следственная</td><td>Параллельная</td></tr>
+<tr><td>Метод</td><td>getCause()</td><td>getSuppressed()</td></tr>
+<tr><td>Когда</td><td>Оборачивание исключений</td><td>Try-with-resources</td></tr>
+<tr><td>Стек-трейс</td><td>Caused by:</td><td>Suppressed:</td></tr>
+</table>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('chaining')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<h2>🔵 Проброс и логирование</h2>
+<!-- Что делает ключевое слово throws -->
+<details id="throws">
+<summary>Что делает ключевое слово throws?</summary>
+<div class="details-content">
+<p><strong>throws</strong> в сигнатуре метода декларирует проверяемые исключения (checked exceptions), которые метод может выбросить, но не обрабатывает сам. Это часть контракта метода: вызывающий код обязан либо перехватить эти исключения через try-catch, либо пробросить дальше по цепочке.</p>
+<h4>1. Синтаксис и базовое поведение</h4>
+<pre><code>public void readFile(String path) throws IOException, FileNotFoundException {
+    Files.readAllLines(Path.of(path));
+    // Вызывающий код должен их обработать
+}</code></pre>
+<h4>На вызывающей стороне — обязательная реакция:</h4>
+<pre><code>// Вариант 1: try-catch
+try { readFile("config.txt"); }
+catch (IOException e) { ... }
+
+// Вариант 2: пробросить дальше
+public void init() throws IOException {
+    readFile("config.txt");
+}</code></pre>
+<h4>2. Полиморфизм и ограничения</h4>
+<p>При переопределении метода НЕЛЬЗЯ расширять список проверяемых исключений. Можно сужать или убирать.</p>
+<h4>3. Главная критика checked exceptions</h4>
+<p>Современная Java-экосистема отходит от checked exceptions: конфликт с лямбдами и Stream API, захламление сигнатур, Spring транзакции по умолчанию откатывают только на unchecked.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('throws')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Проброс checked без throws -->
+<details id="sneaky-throw">
+<summary>Можно ли пробросить checked exception из метода без throws?</summary>
+<div class="details-content">
+<p><strong>Да, технически можно</strong> — через трюк с дженериками (sneaky throw), который обманывает компилятор. JVM не различает checked и unchecked исключения. Проверка происходит только в javac.</p>
+<h4>1. Классический sneaky throw</h4>
+<pre><code>public class SneakyThrow {
+    @SuppressWarnings("unchecked")
+    private static &lt;E extends Throwable&gt; void sneakyThrow(Throwable e) throws E {
+        throw (E) e;
+    }
+    
+    public static void main(String[] args) {
+        sneakyThrow(new IOException("Checked exception sneaked out!"));
+    }
+}</code></pre>
+<h4>2. Как это работает</h4>
+<ol>
+<li>sneakyThrow параметризован &lt;E extends Throwable&gt; и объявляет throws E</li>
+<li>При вызове компилятор выводит E как RuntimeException</li>
+<li>throws RuntimeException не требует обработки — компилятор доволен</li>
+<li>В рантайме дженерики стираются и выбрасывается настоящий IOException</li>
+</ol>
+<h4>3. Lombok @SneakyThrows</h4>
+<pre><code>@SneakyThrows
+public String readFile(String path) {
+    return Files.readString(Path.of(path)); // IOException без throws!
+}</code></pre>
+<h4>4. Риски</h4>
+<p>Нарушение контракта метода, сломанная обработка исключений, несовместимость с полиморфизмом, усложнение отладки.</p>
+<h4>5. Когда допустимо</h4>
+<p>Утилиты функционального программирования (jOOL, Vavr), локальные хелперы внутри одного класса. Никогда в публичном API.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('sneaky-throw')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Исключение в finally -->
+<details id="exception-in-finally">
+<summary>Что произойдёт, если в блоке finally тоже возникнет исключение?</summary>
+<div class="details-content">
+<p><strong>Исходное исключение теряется.</strong> Если исключение возникает в finally, оно заменяет исходное исключение из try или catch. Это одна из самых коварных ловушек в Java.</p>
+<h4>1. Классический сценарий</h4>
+<pre><code>public void readAndClose() throws IOException {
+    InputStream is = null;
+    try {
+        is = new FileInputStream("data.bin");
+        int data = is.read();  // IOException A
+    } finally {
+        if (is != null) {
+            is.close(); // IOException B — перезаписывает A!
+        }
+    }
+}</code></pre>
+<h4>2. Детальная механика</h4>
+<pre><code>try {
+    throw new SQLException("Connection lost"); // Исключение 1
+} finally {
+    throw new RuntimeException("Finally failed"); // Исключение 2
+}
+// Стек-трейс покажет RuntimeException, SQLException исчезло</code></pre>
+<h4>3. Try-with-resources — решение проблемы</h4>
+<pre><code>try (InputStream is = new FileInputStream("data.bin")) {
+    is.read();  // IOException A — основное
+} // close() бросает IOException B — SUPPRESSED
+// A.getSuppressed() содержит B</code></pre>
+<h4>4. Возврат значения из finally — ещё одна ловушка</h4>
+<pre><code>public int test() {
+    try {
+        return 10 / 0; // ArithmeticException
+    } finally {
+        return 42; // Перезаписывает исключение!
+    }
+}
+// Вернёт 42 без исключений!</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('exception-in-finally')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Suppressed exceptions -->
+<details id="suppressed">
+<summary>Что такое suppressed exceptions?</summary>
+<div class="details-content">
+<p><strong>Suppressed exceptions</strong> — это механизм JDK 7, позволяющий сохранить информацию о вторичных исключениях, возникших при закрытии ресурсов. Вторичные исключения присоединяются к основному через addSuppressed() и доступны через getSuppressed().</p>
+<h4>1. Проблема, которую решают</h4>
+<p>До JDK 7 закрытие ресурсов в finally приводило к катастрофической потере информации — исключение закрытия перезаписывало основную ошибку.</p>
+<h4>2. Как это работает: try-with-resources</h4>
+<pre><code>try (InputStream is = new FileInputStream("data.bin")) {
+    is.read();  // IOException A — основное
+} // close() бросает IOException B — подавленное
+// IOException A.getSuppressed() содержит IOException B</code></pre>
+<h4>3. API</h4>
+<pre><code>public class Throwable {
+    public final void addSuppressed(Throwable exception);
+    public final Throwable[] getSuppressed();
+}</code></pre>
+<h4>4. Несколько ресурсов — несколько suppressed</h4>
+<p>Ресурсы закрываются в обратном порядке (LIFO). getSuppressed()[0] — исключение из последнего открытого ресурса.</p>
+<h4>5. Отличие от cause</h4>
+<table>
+<tr><th>Suppressed</th><th>Cause</th></tr>
+<tr><td>Параллельные ошибки</td><td>Причинно-следственная связь</td></tr>
+<tr><td>Suppressed: ...</td><td>Caused by: ...</td></tr>
+</table>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('suppressed')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<h2>🟣 Проектирование исключений</h2>
+<!-- Можно ли создавать кастомные исключения -->
+<details id="custom-exceptions">
+<summary>Можно ли создавать кастомные исключения?</summary>
+<div class="details-content">
+<p><strong>Да, и это стандартная практика.</strong> Механизм прост: наследуетесь от одного из классов иерархии Throwable. Ключевой момент — правильный выбор родителя (checked или unchecked) и реализация конструкторов для сохранения цепочки причин.</p>
+<h4>1. Базовая структура (4 конструктора — золотой стандарт)</h4>
+<pre><code>public class PaymentFailedException extends RuntimeException {
+    private final int errorCode;
+
+    public PaymentFailedException(String message) { super(message); }
+    public PaymentFailedException(String message, Throwable cause) { super(message, cause); }
+    public PaymentFailedException(Throwable cause) { super(cause); }
+    public PaymentFailedException(String message, Throwable cause,
+                                   boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
+    public int getErrorCode() { return errorCode; }
+}</code></pre>
+<h4>2. Checked или Unchecked?</h4>
+<p><strong>Checked (extends Exception):</strong> сбой ожидаем из-за внешнего мира, клиент может восстановиться.</p>
+<p><strong>Unchecked (extends RuntimeException):</strong> ошибка программиста, нарушение контракта API.</p>
+<p><strong>Современный тренд:</strong> unchecked для бизнес-логики.</p>
+<h4>3. Тонкости и антипаттерны</h4>
+<p>Не изобретайте велосипед — используйте стандартные исключения если они подходят. Не логируйте и не пробрасывайте одновременно. Всегда добавляйте контекст (ID заказа, логин).</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('custom-exceptions')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Когда стоит создавать свои исключения -->
+<details id="when-custom">
+<summary>Когда стоит создавать свои исключения?</summary>
+<div class="details-content">
+<p>Создавать кастомные исключения стоит тогда, когда стандартных недостаточно, чтобы однозначно описать проблему предметной области и позволить вызывающему коду принять осмысленное бизнес-решение.</p>
+<h4>Три главных критерия (когда точно ДА)</h4>
+<p><strong>1. Специфическая реакция клиента.</strong> Вызывающий код должен различать ошибки и действовать по-разному.</p>
+<pre><code>try {
+    paymentService.charge(card, amount);
+} catch (InsufficientFundsException e) {
+    redirectToTopUpPage();
+} catch (CardExpiredException e) {
+    askForNewCard();
+} catch (GatewayTimeoutException e) {
+    scheduleRetry(e);
+}</code></pre>
+<p><strong>2. Дополнительный контекст, важный для обработки.</strong> Ошибка несёт данные, которые нужны клиенту для восстановления или логирования.</p>
+<p><strong>3. Моделирование предметной области (иерархии).</strong> Когда ошибки образуют естественную иерархию.</p>
+<h4>Когда НЕ стоит</h4>
+<table>
+<tr><th>Ситуация</th><th>Используйте</th></tr>
+<tr><td>Невалидный аргумент метода</td><td>IllegalArgumentException</td></tr>
+<tr><td>Объект в неподходящем состоянии</td><td>IllegalStateException</td></tr>
+<tr><td>Операция не поддерживается</td><td>UnsupportedOperationException</td></tr>
+<tr><td>Нет специфической реакции клиента</td><td>Стандартное исключение с хорошим сообщением</td></tr>
+</table>
+<h4>Прагматичное правило</h4>
+<p>Создавайте кастомное исключение, если есть хотя бы два разных способа отреагировать на ошибку в зависимости от её типа.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('when-custom')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Что лучше: Exception или RuntimeException -->
+<details id="exception-vs-runtime">
+<summary>Что лучше: наследоваться от Exception или RuntimeException?</summary>
+<div class="details-content">
+<p>Выбор зависит от того, кто виноват в проблеме и может ли клиент её исправить.</p>
+<table>
+<tr><th>Критерий</th><th>RuntimeException (unchecked)</th><th>Exception (checked)</th></tr>
+<tr><td>Природа ошибки</td><td>Баг в коде/данных</td><td>Внештатная ситуация</td></tr>
+<tr><td>Кто виноват</td><td>Программист</td><td>Внешний мир</td></tr>
+<tr><td>Может ли клиент исправить?</td><td>Нет (нужно чинить код)</td><td>Да (retry, fallback)</td></tr>
+<tr><td>Обязан ли клиент ловить?</td><td>Нет</td><td>Да</td></tr>
+<tr><td>Совместимость с лямбдами</td><td>Отлично</td><td>Плохо</td></tr>
+<tr><td>Современный тренд</td><td>✅ Предпочтительнее</td><td>⚠️ Только для recoverable</td></tr>
+</table>
+<p><strong>Правило 1:</strong> Если вызывающий код может осмысленно восстановиться — Exception.</p>
+<p><strong>Правило 2:</strong> Если ошибка программиста или нарушение контракта API — RuntimeException.</p>
+<p><strong>Современный тренд:</strong> чаще использовать RuntimeException, чтобы не засорять сигнатуры. Без четкой необходимости восстановления лучше начинать с RuntimeException.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('exception-vs-runtime')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Что такое оборачивание исключений -->
+<details id="wrapping">
+<summary>Что такое оборачивание (wrapping) исключений?</summary>
+<div class="details-content">
+<p><strong>Оборачивание</strong> — это паттерн, при котором исключение одного типа перехватывается и пробрасывается дальше как исключение другого типа с сохранением исходного в качестве причины (cause).</p>
+<h4>1. Как это выглядит</h4>
+<pre><code>// Без оборачивания: SQLException просачивается через все слои
+public void saveUser(User user) throws SQLException { ... }
+
+// С оборачиванием: каждый слой говорит на своём языке
+public void saveUser(User user) {
+    try {
+        // низкоуровневый код
+    } catch (SQLException e) {
+        throw new DataAccessException("Failed to save user: " + user.getId(), e);
+    }
+}</code></pre>
+<h4>2. Зачем это нужно</h4>
+<ol>
+<li><strong>Сокрытие деталей реализации:</strong> вызывающий код не должен знать, что вы используете JDBC</li>
+<li><strong>Сохранение цепочки причин:</strong> исходное исключение доступно через getCause()</li>
+<li><strong>Преобразование checked → unchecked:</strong> для совместимости с лямбдами и Stream API</li>
+</ol>
+<h4>3. Антипаттерны</h4>
+<p>Потеря причины, пустое сообщение, многослойное оборачивание, оборачивание + логирование на каждом слое.</p>
+<h4>4. Когда оборачивать НЕ нужно</h4>
+<p>Если клиенту нужно различать конкретные типы исключений, если это граница одного модуля, если исключение уже имеет нужный уровень абстракции.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('wrapping')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Глотание исключений -->
+<details id="swallowing">
+<summary>Почему не стоит глотать исключения (catch empty)?</summary>
+<div class="details-content">
+<p><strong>Пустой catch-блок скрывает факт ошибки, делая систему непредсказуемой.</strong> Это одна из самых опасных практик в Java.</p>
+<h4>1. Что такое "глотание"</h4>
+<pre><code>// Антипаттерн: пустой catch
+try { criticalOperation(); }
+catch (Exception e) { }
+
+// Антипаттерн: printStackTrace() в продакшене
+catch (Exception e) { e.printStackTrace(); }
+
+// Антипаттерн: return null без индикации ошибки
+catch (IOException e) { return new Configuration(); }</code></pre>
+<h4>2. Цепочка последствий</h4>
+<p>Реальная проблема: база данных недоступна. Ближайшее проявление: NPE через 5 слоёв абстракции. Время на диагностику: часы вместо минут. Корректное состояние приложения: потеряно.</p>
+<h4>3. Скрупулёзный разбор всех последствий</h4>
+<ul>
+<li><strong>Потеря контекста ошибки:</strong> исключение содержит точное место сбоя, стек-трейс, причину</li>
+<li><strong>Распространение некорректного состояния:</strong> программа продолжает работу с частично инициализированными данными</li>
+<li><strong>Каскадное накопление ошибок:</strong> одна проглоченная ошибка порождает другие</li>
+<li><strong>Утечка ресурсов:</strong> connection, statement, resultSet остались открыты</li>
+<li><strong>Детерминированный баг становится недетерминированным</strong></li>
+</ul>
+<h4>4. Исключения из правила (очень редкие)</h4>
+<p>finally-подобная очистка (best effort), прерывание спящего потока (с восстановлением флага!), специфические системные вызовы с ложными сбоями. Любое исключение должно сопровождаться комментарием.</p>
+<h4>5. Правильные альтернативы</h4>
+<p>Проброс с сохранением контекста, логирование на верхнем уровне, try-with-resources для ресурсов, Optional для ожидаемых отсутствий.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('swallowing')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<h2>🟡 Диагностика</h2>
+<!-- Stack trace -->
+<details id="stack-trace">
+<summary>Что такое stack trace?</summary>
+<div class="details-content">
+<p><strong>Stack trace</strong> — это снимок состояния стека вызовов потока в момент создания объекта-исключения (Throwable). Он показывает полный путь выполнения: цепочку методов от точки входа в поток до места, где произошла ошибка.</p>
+<h4>1. Что именно он содержит</h4>
+<pre><code>// Типичная строка stack trace:
+// at com.example.service.PaymentService.charge(PaymentService.java:42)
+
+public final class StackTraceElement {
+    public String getClassName();   // com.example.service.PaymentService
+    public String getMethodName();  // charge
+    public String getFileName();    // PaymentService.java
+    public int    getLineNumber();  // 42
+}</code></pre>
+<h4>2. Когда и как создаётся</h4>
+<p><strong>Критически важный момент:</strong> Stack trace заполняется в момент вызова конструктора Throwable, а не в момент throw. Именно поэтому создание исключений — относительно дорогая операция.</p>
+<h4>3. Причины и подавленные исключения</h4>
+<p>В Java 7+ stack trace также учитывает Cause (причина) и Suppressed (подавленные исключения).</p>
+<h4>4. Антипаттерны</h4>
+<p>e.printStackTrace() в продакшене, log.error(e.getMessage()) без самого e, создание исключений ради stack trace.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('stack-trace')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- printStackTrace -->
+<details id="printstacktrace">
+<summary>Что делает метод printStackTrace()?</summary>
+<div class="details-content">
+<p><strong>printStackTrace()</strong> — это метод класса Throwable, который выводит полную информацию об исключении в стандартный поток ошибок System.err: тип исключения, сообщение, трассировку стека, цепочку причин и подавленные исключения.</p>
+<h4>1. Что именно выводится</h4>
+<pre><code>Exception in thread "main" java.lang.RuntimeException: Outer error
+    at com.example.Service.outer(Service.java:20)
+    at com.example.Main.main(Main.java:5)
+Caused by: java.io.IOException: File not found
+    at com.example.Service.readFile(Service.java:30)
+    ... 1 more
+    Suppressed: java.sql.SQLException: Connection closed
+        at com.example.Service.close(Service.java:35)</code></pre>
+<h4>2. Почему это не для продакшена</h4>
+<p>Выводит в System.err — неструктурированный поток, который не попадает в файлы логов, не имеет временных меток и контекста, теряется в контейнерах. Правильно — логировать через логер.</p>
+<h4>3. Когда использование оправдано</h4>
+<p>Отладка в IDE, одноразовые скрипты и утилиты, демонстрационные примеры и учебный код. В любом production-коде — только через логер.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('printstacktrace')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Как правильно логировать исключения -->
+<details id="logging">
+<summary>Как правильно логировать исключения?</summary>
+<div class="details-content">
+<p><strong>Золотое правило:</strong> Передавайте сам объект исключения в метод логгера, а не его сообщение (getMessage()) или результат printStackTrace().</p>
+<pre><code>// ❌ Неправильно -- стектрейс потерян
+log.error("Payment failed: " + e.getMessage());
+e.printStackTrace();
+
+// ✅ Правильно -- объект исключения отдельным аргументом
+log.error("Failed to process payment for order {}", orderId, e);</code></pre>
+<h4>1. Три главных правила</h4>
+<ol>
+<li><strong>Исключение — всегда последним аргументом.</strong> Любой современный логгер распознаёт Throwable и автоматически добавляет полный стектрейс.</li>
+<li><strong>Контекст важнее сообщения.</strong> Всегда включайте ключевые параметры (orderId, userId, gateway).</li>
+<li><strong>Не логируйте и не пробрасывайте одновременно.</strong> Ошибка должна быть залогирована ровно один раз — в том слое, который её окончательно обрабатывает.</li>
+</ol>
+<h4>2. Нестандартные ситуации</h4>
+<p><strong>Checked исключение, которое не ошибка:</strong> WARN ("Could not delete temporary file"). <strong>Событие безопасности:</strong> всегда WARN. <strong>Отказ внешнего сервиса:</strong> ERROR + детали.</p>
+<h4>3. Уровни логирования</h4>
+<table>
+<tr><th>Уровень</th><th>Когда использовать</th></tr>
+<tr><td>ERROR</td><td>Критический сбой, требует немедленного внимания</td></tr>
+<tr><td>WARN</td><td>Неожиданная ситуация, но система продолжает работу</td></tr>
+<tr><td>INFO</td><td>Нормальное событие в бизнес-процессе</td></tr>
+<tr><td>DEBUG</td><td>Детали для разработчика при отладке</td></tr>
+</table>
+<h4>4. Структурированное логирование (JSON)</h4>
+<p>Современный тренд — логи в JSON для автоматического парсинга системами мониторинга (Logstash, Elasticsearch).</p>
+<h4>5. Антипаттерны</h4>
+<table>
+<tr><th>Антипаттерн</th><th>Как надо</th></tr>
+<tr><td>e.printStackTrace()</td><td>log.error("msg", e)</td></tr>
+<tr><td>log.error(e.getMessage())</td><td>log.error("msg", e)</td></tr>
+<tr><td>Пустой catch блок</td><td>Минимум: log.error("msg", e)</td></tr>
+<tr><td>Логирование + проброс</td><td>Логировать только в финальном обработчике</td></tr>
+</table>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('logging')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<div style="text-align: center; margin-top: 20px; padding: 10px;">
+<a href="index.html" style="display: inline-block; background-color: var(--button-bg); color: var(--button-text); border: 1px solid var(--border); padding: 10px 24px; border-radius: 4px; text-decoration: none; font-size: 0.9em; transition: 0.2s;" onmouseover="this.style.backgroundColor='var(--button-hover)'" onmouseout="this.style.backgroundColor='var(--button-bg)'">⬅️ Назад к содержанию</a>
+</div>
+
+</div>
+
+<script>
+function setTheme(themeName) {
+document.body.className = themeName;
+}
+let currentFontSize = 16;
+function changeFontSize(delta) {
+currentFontSize = Math.min(24, Math.max(12, currentFontSize + delta));
+document.body.style.fontSize = currentFontSize + 'px';
+document.getElementById('fontSizeLabel').textContent = currentFontSize + 'px';
+}
+function closeDetails(id) {
+const details = document.getElementById(id);
+if (details) details.removeAttribute('open');
+}
+setTheme('dark');
+</script>
+</body>
+</html>

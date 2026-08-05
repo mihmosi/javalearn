@@ -1,0 +1,13 @@
+папка/
+├── index.html              ← обновлённая главная (11 карточек)
+├── chapter01.html          ← Основы и порождающие паттерны
+├── chapter02.html          ← Структурные паттерны
+├── chapter03.html          ← Поведенческие паттерны
+├── chapter04.html          ← Антипаттерны
+├── chapter05.html          ← HashMap / equals / hashCode
+├── chapter06.html          ← Java Collections
+├── chapter07.html          ← Исключения в Java
+├── chapter08.html          ← Stream API
+├── chapter09.html          ← String в Java
+├── chapter10.html          ← Многопоточность (заглушка)
+└── chapter11.html          ← Spring Framework (заглушка)

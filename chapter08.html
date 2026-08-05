@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stream API в Java: полный справочник</title>
+<style>
+:root {
+--bg: #1e1e1e;
+--text: #d4d4d4;
+--header-bg: #2d2d2d;
+--summary-bg: #333;
+--summary-hover: #3c3c3c;
+--border: #555;
+--code-bg: #252526;
+--code-border: #404040;
+--button-bg: #444;
+--button-text: #ddd;
+--button-hover: #555;
+--link: #569cd6;
+--scrollbar-thumb: #666;
+--scrollbar-track: #2d2d2d;
+--details-content-bg: var(--bg);
+--table-bg: #2a2a2a;
+--table-header: #3a3a3a;
+}
+
+body.light {
+--bg: #ffffff;
+--text: #1e1e1e;
+--header-bg: #f3f3f3;
+--summary-bg: #e8e8e8;
+--summary-hover: #ddd;
+--border: #ccc;
+--code-bg: #f9f9f9;
+--code-border: #ddd;
+--button-bg: #e0e0e0;
+--button-text: #000;
+--button-hover: #ccc;
+--link: #0451a5;
+--scrollbar-thumb: #aaa;
+--scrollbar-track: #f0f0f0;
+--details-content-bg: #fff;
+--table-bg: #fff;
+--table-header: #e0e0e0;
+}
+
+body.sepia {
+--bg: #f4ecd8;
+--text: #5b4636;
+--header-bg: #e8dcc8;
+--summary-bg: #ddd0b8;
+--summary-hover: #cfc1a8;
+--border: #b8a88a;
+--code-bg: #eee3d0;
+--code-border: #c0b090;
+--button-bg: #d6c9ae;
+--button-text: #3e2f22;
+--button-hover: #c2b498;
+--link: #8b5e3c;
+--scrollbar-thumb: #b8a080;
+--scrollbar-track: #e8dcc8;
+--details-content-bg: #f4ecd8;
+--table-bg: #f4ecd8;
+--table-header: #ddd0b8;
+}
+
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+
+body {
+background-color: var(--bg);
+color: var(--text);
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+line-height: 1.6;
+padding: 10px;
+transition: background-color 0.3s, color 0.3s;
+font-size: 16px;
+}
+
+header {
+background-color: var(--header-bg);
+padding: 15px;
+border-radius: 6px;
+margin-bottom: 20px;
+display: flex;
+flex-wrap: wrap;
+align-items: center;
+justify-content: space-between;
+gap: 10px;
+}
+
+.controls {
+display: flex;
+flex-wrap: wrap;
+gap: 8px;
+align-items: center;
+}
+
+button {
+background-color: var(--button-bg);
+color: var(--button-text);
+border: 1px solid var(--border);
+padding: 6px 12px;
+border-radius: 4px;
+cursor: pointer;
+font-size: 0.9em;
+transition: 0.2s;
+}
+
+button:hover {
+background-color: var(--button-hover);
+}
+
+.font-controls {
+display: flex;
+gap: 4px;
+}
+
+.font-size-label {
+align-self: center;
+margin: 0 4px;
+font-weight: bold;
+}
+
+.container {
+max-width: 1000px;
+margin: 0 auto;
+}
+
+h2 {
+border-bottom: 1px solid var(--border);
+padding-bottom: 5px;
+margin-top: 30px;
+margin-bottom: 15px;
+}
+
+h4 {
+margin-top: 15px;
+margin-bottom: 8px;
+color: var(--link);
+}
+
+details {
+background-color: var(--summary-bg);
+border: 1px solid var(--border);
+border-radius: 6px;
+margin-bottom: 10px;
+overflow: hidden;
+transition: 0.2s;
+}
+
+details[open] {
+background-color: var(--details-content-bg);
+}
+
+summary {
+padding: 12px 16px;
+font-weight: 600;
+cursor: pointer;
+background-color: var(--summary-bg);
+transition: background-color 0.2s;
+list-style-position: inside;
+font-size: 1.05em;
+}
+
+summary:hover {
+background-color: var(--summary-hover);
+}
+
+summary::-webkit-details-marker {
+color: var(--link);
+}
+
+.details-content {
+padding: 0 16px 16px 16px;
+max-height: 60vh;
+overflow-y: auto;
+scrollbar-width: thin;
+scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+.details-content::-webkit-scrollbar {
+width: 8px;
+}
+
+.details-content::-webkit-scrollbar-track {
+background: var(--scrollbar-track);
+}
+
+.details-content::-webkit-scrollbar-thumb {
+background-color: var(--scrollbar-thumb);
+border-radius: 4px;
+}
+
+.close-btn-container {
+text-align: right;
+position: sticky;
+bottom: 0;
+background: linear-gradient(transparent, var(--details-content-bg) 70%);
+padding: 15px 0 5px;
+margin-top: 10px;
+}
+
+.close-btn {
+font-size: 0.85em;
+padding: 5px 14px;
+}
+
+pre {
+background-color: var(--code-bg);
+border: 1px solid var(--code-border);
+border-radius: 4px;
+padding: 12px;
+overflow-x: auto;
+font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+font-size: 0.9em;
+margin: 10px 0;
+line-height: 1.5;
+white-space: pre-wrap;
+word-break: break-word;
+}
+
+code {
+font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+}
+
+.section-intro {
+margin-bottom: 20px;
+padding: 10px;
+background-color: var(--header-bg);
+border-radius: 5px;
+}
+
+p {
+margin: 10px 0;
+}
+
+ul, ol {
+margin: 10px 0 10px 20px;
+}
+
+li {
+margin: 5px 0;
+}
+
+table {
+width: 100%;
+border-collapse: collapse;
+margin: 10px 0;
+background-color: var(--table-bg);
+}
+
+th, td {
+border: 1px solid var(--border);
+padding: 8px 12px;
+text-align: left;
+}
+
+th {
+background-color: var(--table-header);
+font-weight: 600;
+}
+
+strong {
+color: var(--link);
+}
+
+.highlight-box {
+background-color: var(--code-bg);
+border: 1px solid var(--border);
+border-radius: 4px;
+padding: 10px;
+margin: 10px 0;
+}
+
+@media (max-width: 600px) {
+body {
+font-size: 14px;
+}
+header {
+flex-direction: column;
+align-items: flex-start;
+}
+.controls {
+width: 100%;
+}
+}
+</style>
+</head>
+<body class="dark">
+<header>
+<h1>📘 Stream API в Java</h1>
+<div class="controls">
+<div class="theme-controls">
+<button onclick="setTheme('dark')">🌙 Тёмная</button>
+<button onclick="setTheme('light')">☀️ Светлая</button>
+<button onclick="setTheme('sepia')">📜 Сепия</button>
+</div>
+<div class="font-controls">
+<button onclick="changeFontSize(-1)" title="Уменьшить шрифт">A-</button>
+<span class="font-size-label" id="fontSizeLabel">16px</span>
+<button onclick="changeFontSize(1)" title="Увеличить шрифт">A+</button>
+</div>
+</div>
+</header>
+
+<div class="container">
+<div class="section-intro">
+<p>Полный справочник по Stream API в Java: преимущества, intermediate и terminal операции, параллельные стримы, коллекторы, ленивые вычисления и многое другое. Каждый раздел включает краткий ответ и развёрнутое объяснение с примерами кода для уровня Middle+.</p>
+</div>
+
+<h2>🔷 Основы Stream API</h2>
+
+<!-- Преимущества Stream API -->
+<details id="stream-advantages">
+<summary>Какие преимущества даёт использование Stream API?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> Stream API даёт декларативный, лаконичный код, эффективное выполнение за счёт ленивости и внутренней оптимизации, простой параллелизм "из коробки", композицию операций без промежуточных коллекций и чистоту функционального стиля без побочных эффектов.</p>
+<h4>1. Декларативность: ЧТО, а не КАК</h4>
+<pre><code>// Императивный подход: КАК делать — циклы, условия, временные переменные
+List&lt;String&gt; adultNames = new ArrayList&lt;&gt;();
+for (User user : users) {
+    if (user.getAge() >= 18) {
+        String name = user.getName().toUpperCase();
+        if (!adultNames.contains(name)) {
+            adultNames.add(name);
+        }
+    }
+}
+Collections.sort(adultNames);
+
+// Декларативный подход: ЧТО нужно — filter, map, distinct, sorted
+List&lt;String&gt; adultNames = users.stream()
+    .filter(user -> user.getAge() >= 18)
+    .map(User::getName)
+    .map(String::toUpperCase)
+    .distinct()
+    .sorted()
+    .collect(Collectors.toList());</code></pre>
+<p>Декларативный код читается как спецификация: "взять пользователей → отфильтровать совершеннолетних → взять имена → заглавными → уникальные → отсортировать → собрать в список". Это радикально снижает когнитивную нагрузку при чтении и проверке кода.</p>
+<h4>2. Lazy evaluation и эффективность выполнения</h4>
+<p>Промежуточные операции не выполняются до вызова терминальной. Стрим строит план операций и выполняет их одним проходом по данным:</p>
+<pre><code>users.stream()
+    .filter(u -> expensiveCheck(u))  // Не выполняется сразу
+    .map(User::getName)               // Не выполняется сразу
+    .limit(3)                         // Не выполняется сразу
+    .collect(Collectors.toList());    // ВСЁ запускается здесь!
+
+// Благодаря limit(3) — expensiveCheck выполнится не для всех пользователей,
+// а только до нахождения трёх подходящих. Короткое замыкание!</code></pre>
+<h4>3. Параллелизм "из коробки"</h4>
+<pre><code>// Последовательный стрим
+users.stream().filter(...).collect(...);
+
+// Параллельный — меняем одно слово, использует ForkJoinPool
+users.parallelStream().filter(...).collect(...);</code></pre>
+<p>Никакого ручного управления потоками: не нужно создавать Thread, ExecutorService, делить данные.</p>
+<h4>4. Композиция без побочных эффектов</h4>
+<pre><code>// Без Stream API: побочные эффекты неизбежны
+List&lt;String&gt; results = new ArrayList&lt;&gt;();
+for (Item item : items) {
+    if (item.isValid()) {
+        results.add(transform(item));  // Мутация внешнего списка
+    }
+}
+
+// Со Stream API: чистая композиция функций
+List&lt;String&gt; results = items.stream()
+    .filter(Item::isValid)
+    .map(this::transform)
+    .collect(Collectors.toList());  // Без внешних переменных, без мутаций</code></pre>
+<p>Отсутствие побочных эффектов означает: код легко тестировать, код потокобезопасен, рефакторинг безопасен, параллелизация безопасна.</p>
+<h4>5. Богатая экосистема готовых операций</h4>
+<table>
+<tr><th>Задача</th><th>Императивный код</th><th>Stream API</th></tr>
+<tr><td>Фильтрация</td><td>if + continue</td><td>.filter()</td></tr>
+<tr><td>Трансформация</td><td>Создание нового списка + for</td><td>.map()</td></tr>
+<tr><td>Уникальные значения</td><td>Set + ручное добавление</td><td>.distinct()</td></tr>
+<tr><td>Первые N</td><td>break + счётчик</td><td>.limit(n)</td></tr>
+<tr><td>Агрегация</td><td>Переменная-аккумулятор</td><td>.reduce()</td></tr>
+<tr><td>Группировка</td><td>Ручное заполнение Map</td><td>.collect(groupingBy())</td></tr>
+</table>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('stream-advantages')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Intermediate vs Terminal -->
+<details id="intermediate-terminal">
+<summary>В чём разница между intermediate и terminal операциями?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> Intermediate (промежуточные) операции возвращают Stream и не выполняются до вызова терминальной (ленивые). Terminal (терминальные) операции возвращают НЕ Stream (коллекцию, Optional, примитив) или void, запускают выполнение всей цепочки и закрывают Stream.</p>
+<h4>Intermediate операции</h4>
+<ul>
+<li>Возвращают Stream — можно продолжать цепочку</li>
+<li><strong>Ленивые:</strong> не выполняются до вызова терминальной операции</li>
+<li>Примеры: filter, map, flatMap, distinct, sorted, limit, skip, peek</li>
+</ul>
+<h4>Terminal операции</h4>
+<ul>
+<li>Возвращают НЕ Stream (коллекцию, Optional, примитив) или void</li>
+<li><strong>Запускают выполнение всей цепочки</strong></li>
+<li>После вызова Stream больше недоступен</li>
+<li>Примеры: collect, forEach, reduce, count, anyMatch, findFirst</li>
+</ul>
+<pre><code>Stream&lt;String&gt; stream = names.stream()
+    .filter(n -> n.startsWith("A"))  // intermediate — ещё не выполняется
+    .map(String::toUpperCase);       // intermediate — ещё не выполняется
+
+// Ничего не произошло до этого момента!
+
+List&lt;String&gt; result = stream.collect(Collectors.toList());  // terminal — ЗАПУСК!</code></pre>
+<h4>Сравнительная таблица</h4>
+<table>
+<tr><th>Критерий</th><th>Intermediate</th><th>Terminal</th></tr>
+<tr><td>Возвращаемый тип</td><td>Stream</td><td>Не Stream (или void)</td></tr>
+<tr><td>Когда выполняется</td><td>Лениво, при вызове terminal</td><td>Немедленно</td></tr>
+<tr><td>Можно продолжить цепочку</td><td>Да</td><td>Нет</td></tr>
+<tr><td>Примеры</td><td>filter, map, sorted</td><td>collect, reduce, count</td></tr>
+</table>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('intermediate-terminal')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- filter() -->
+<details id="filter">
+<summary>Что делает операция filter()?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> filter() — это промежуточная операция, которая отбирает элементы потока по заданному предикату (условию). Возвращает новый Stream, содержащий только элементы, удовлетворяющие условию.</p>
+<pre><code>List&lt;User&gt; adults = users.stream()
+    .filter(u -> u.getAge() >= 18)   // Только совершеннолетние
+    .filter(User::isActive)           // Только активные
+    .collect(Collectors.toList());</code></pre>
+<p>filter() принимает Predicate&lt;T&gt; — функцию, возвращающую boolean. Элементы, для которых предикат вернул false, исключаются из дальнейшей обработки. Можно использовать цепочку из нескольких filter() — каждый сужает поток.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('filter')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- map() -->
+<details id="map">
+<summary>Что делает операция map()?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> map() — это промежуточная операция, которая преобразует каждый элемент стрима в другой элемент по заданной функции. Преобразование 1:1 — каждому элементу входного потока соответствует ровно один элемент выходного.</p>
+<pre><code>List&lt;String&gt; upperNames = users.stream()
+    .map(User::getName)        // User → String
+    .map(String::toUpperCase)  // String → String
+    .collect(Collectors.toList());</code></pre>
+<p>map() принимает Function&lt;T, R&gt; — функцию преобразования типа T в тип R. Тип стрима меняется: Stream&lt;User&gt; → Stream&lt;String&gt;. Каждый элемент обрабатывается независимо.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('map')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- collect() -->
+<details id="collect">
+<summary>Что делает операция collect()?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> collect() — это терминальная операция, которая собирает элементы стрима в результирующую структуру (List, Set, Map, String и т.д.) с помощью Collector'а. Это основной механизм материализации результатов стрима.</p>
+<pre><code>// Сборка в коллекции
+List&lt;String&gt; list = stream.collect(Collectors.toList());
+Set&lt;String&gt; set = stream.collect(Collectors.toSet());
+
+// Сборка в Map
+Map&lt;Long, User&gt; byId = stream.collect(Collectors.toMap(User::getId, Function.identity()));
+
+// Сборка строки
+String joined = stream.collect(Collectors.joining(", "));
+
+// Сборка с группировкой
+Map&lt;String, List&lt;User&gt;&gt; byDept = stream.collect(Collectors.groupingBy(User::getDepartment));</code></pre>
+<p>collect() — это изменяемая редукция: в отличие от reduce(), которая создаёт новый объект на каждом шагу, collect() добавляет элементы в существующий контейнер, что значительно эффективнее для коллекций.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('collect')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Collector и встроенные Collectors -->
+<details id="collector">
+<summary>Что такое Collector и какие есть встроенные Collectors?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> Collector — это интерфейс, описывающий стратегию мутабельной редукции элементов Stream в результирующий контейнер. Collectors — утилитный класс с набором готовых реализаций.</p>
+<h4>Интерфейс Collector&lt;T, A, R&gt;</h4>
+<pre><code>public interface Collector&lt;T, A, R&gt; {
+    Supplier&lt;A&gt; supplier();          // Создать новый аккумулятор
+    BiConsumer&lt;A, T&gt; accumulator();  // Добавить элемент в аккумулятор
+    BinaryOperator&lt;A&gt; combiner();    // Слить два аккумулятора (для parallel)
+    Function&lt;A, R&gt; finisher();       // Преобразовать аккумулятор в результат
+    Set&lt;Characteristics&gt; characteristics(); // Флаги оптимизации
+}</code></pre>
+<h4>Встроенные Collectors</h4>
+<table>
+<tr><th>Задача</th><th>Collector</th></tr>
+<tr><td>В список</td><td>toList()</td></tr>
+<tr><td>В множество</td><td>toSet()</td></tr>
+<tr><td>В конкретную коллекцию</td><td>toCollection(Supplier)</td></tr>
+<tr><td>В Map (ключ→значение)</td><td>toMap(keyMapper, valueMapper, mergeFn)</td></tr>
+<tr><td>В неизменяемую коллекцию</td><td>toUnmodifiableList/Set/Map()</td></tr>
+<tr><td>Группировка по ключу</td><td>groupingBy(classifier)</td></tr>
+<tr><td>Разделение на две группы</td><td>partitioningBy(predicate)</td></tr>
+<tr><td>Подсчёт</td><td>counting()</td></tr>
+<tr><td>Сумма чисел</td><td>summingInt/Long/Double()</td></tr>
+<tr><td>Среднее</td><td>averagingInt/Long/Double()</td></tr>
+<tr><td>Статистика</td><td>summarizingInt/Long/Double()</td></tr>
+<tr><td>Мин/макс</td><td>minBy/maxBy(comparator)</td></tr>
+<tr><td>Склеивание строк</td><td>joining(delimiter, prefix, suffix)</td></tr>
+<tr><td>Трансформация внутри</td><td>mapping(mapper, downstream)</td></tr>
+<tr><td>Постобработка</td><td>collectingAndThen(collector, finisher)</td></tr>
+</table>
+<h4>Пример создания своего Collector'а</h4>
+<pre><code>Collector&lt;String, StringJoiner, String&gt; toJsonArray = Collector.of(
+    () -> new StringJoiner(", ", "[", "]"),
+    StringJoiner::add,
+    (left, right) -> { left.merge(right); return left; },
+    StringJoiner::toString,
+    Characteristics.CONCURRENT
+);</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('collector')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- flatMap() -->
+<details id="flatmap">
+<summary>Что делает операция flatMap()?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> flatMap() — это промежуточная операция, которая преобразует каждый элемент в Stream и "сплющивает" все вложенные стримы в один плоский поток. Преобразование 1:N — одному элементу соответствует 0, 1 или много элементов в результирующем стриме.</p>
+<pre><code>// Список заказов → все товары из всех заказов
+List&lt;Item&gt; allItems = orders.stream()
+    .flatMap(order -> order.getItems().stream())  // Order → Stream&lt;Item&gt;
+    .collect(Collectors.toList());
+
+// Список предложений → все уникальные слова
+List&lt;String&gt; words = sentences.stream()
+    .flatMap(sentence -> Arrays.stream(sentence.split(" ")))
+    .distinct()
+    .collect(Collectors.toList());
+
+// Работа с Optional в стриме (JDK 9+)
+List&lt;Order&gt; orders = users.stream()
+    .map(User::getLastOrder)           // Stream&lt;Optional&lt;Order&gt;&gt;
+    .flatMap(Optional::stream)         // Stream&lt;Order&gt; — распаковка
+    .collect(Collectors.toList());</code></pre>
+<p>flatMap() принимает Function&lt;T, Stream&lt;R&gt;&gt;. Каждый элемент превращается в поток, и все эти потоки объединяются в один. Это ключевое отличие от map(), который дал бы Stream&lt;Stream&lt;R&gt;&gt;.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('flatmap')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- map() vs flatMap() -->
+<details id="map-vs-flatmap">
+<summary>В чём разница между map() и flatMap()?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> map() делает преобразование 1:1 (один элемент → один элемент), flatMap() делает преобразование 1:N (один элемент → 0, 1 или много элементов) и "сплющивает" результат в один поток.</p>
+<h4>Сравнение</h4>
+<table>
+<tr><th>Критерий</th><th>map()</th><th>flatMap()</th></tr>
+<tr><td>Сигнатура</td><td>Function&lt;T, R&gt;</td><td>Function&lt;T, Stream&lt;R&gt;&gt;</td></tr>
+<tr><td>Преобразование</td><td>1:1</td><td>1:N</td></tr>
+<tr><td>Результат</td><td>Stream&lt;R&gt;</td><td>Stream&lt;R&gt; (плоский)</td></tr>
+<tr><td>Если бы flatMap был map</td><td>—</td><td>Stream&lt;Stream&lt;R&gt;&gt;</td></tr>
+</table>
+<pre><code>// map: список имён → список длин (1:1)
+List&lt;Integer&gt; lengths = names.stream()
+    .map(String::length)
+    .collect(Collectors.toList());
+
+// flatMap: список заказов → все товары (1:N)
+List&lt;Item&gt; items = orders.stream()
+    .flatMap(order -> order.getItems().stream())
+    .collect(Collectors.toList());</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('map-vs-flatmap')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<h2>🔶 Параллельные стримы</h2>
+
+<!-- Что такое параллельные стримы -->
+<details id="parallel-streams">
+<summary>Что такое параллельные стримы?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> Параллельные стримы — это стримы, которые обрабатывают элементы параллельно в несколько потоков, используя ForkJoinPool. Они автоматически разбивают источник на части, выполняют операции над каждой частью в отдельном потоке и объединяют результаты.</p>
+<h4>Как создать</h4>
+<pre><code>// Из коллекции
+list.parallelStream()
+
+// Из любого стрима
+stream.parallel()
+
+// Проверка
+stream.isParallel()</code></pre>
+<h4>Как работает</h4>
+<ol>
+<li>Источник данных разбивается на части (splitting)</li>
+<li>Каждая часть обрабатывается в отдельном потоке ForkJoinPool</li>
+<li>Результаты объединяются (combining)</li>
+<li>По умолчанию используется ForkJoinPool.commonPool() с числом потоков = количество ядер - 1</li>
+</ol>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('parallel-streams')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Когда использовать parallel streams -->
+<details id="when-parallel">
+<summary>Когда использовать parallel streams?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> Parallel streams эффективны для CPU-интенсивных задач на больших объёмах данных (сотни тысяч+ элементов), где операции stateless и независимы. Не использовать для I/O операций, маленьких коллекций и операций с побочными эффектами.</p>
+<h4>Когда ИСПОЛЬЗОВАТЬ</h4>
+<ul>
+<li>Большие объёмы данных (сотни тысяч+ элементов)</li>
+<li>Операции CPU-интенсивные (сложные вычисления)</li>
+<li>Операции stateless и независимые</li>
+<li>Собственный ForkJoinPool для изоляции</li>
+</ul>
+<h4>Когда НЕ ИСПОЛЬЗОВАТЬ</h4>
+<ul>
+<li>Маленькие коллекции (оверхед на разбиение превышает выигрыш)</li>
+<li>Операции с побочными эффектами (изменение общей переменной)</li>
+<li>I/O операции (лучше асинхронность, CompletableFuture)</li>
+<li>Операции, зависящие от порядка (findFirst vs findAny)</li>
+</ul>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('when-parallel')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Как создать parallel stream -->
+<details id="create-parallel">
+<summary>Как создать parallel stream?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> Два способа: вызвать parallelStream() на коллекции или преобразовать существующий стрим методом parallel().</p>
+<pre><code>// Способ 1: из коллекции
+List&lt;String&gt; list = List.of("a", "b", "c");
+Stream&lt;String&gt; parallel = list.parallelStream();
+
+// Способ 2: из существующего стрима
+Stream&lt;String&gt; sequential = list.stream();
+Stream&lt;String&gt; parallel = sequential.parallel();
+
+// Способ 3: в собственном ForkJoinPool
+ForkJoinPool customPool = new ForkJoinPool(4);
+customPool.submit(() -> list.parallelStream()
+    .filter(...)
+    .map(...)
+    .collect(Collectors.toList())
+).get();</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('create-parallel')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Потенциальные проблемы -->
+<details id="parallel-problems">
+<summary>Какие потенциальные проблемы могут быть с параллельными стримами?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> Состояние гонки при изменении внешних переменных, непредсказуемый порядок обработки, дедлоки при использовании synchronized, общий ForkJoinPool может быть занят, ThreadLocal может давать неожиданные результаты.</p>
+<ul>
+<li><strong>Состояние гонки:</strong> изменение общих переменных из лямбд</li>
+<li><strong>Непредсказуемый порядок:</strong> forEach в параллельном стриме не гарантирует порядок</li>
+<li><strong>Дедлоки:</strong> synchronized внутри стрима + ограниченный пул потоков</li>
+<li><strong>Общий пул:</strong> другие параллельные стримы или CompletableFuture занимают потоки</li>
+<li><strong>ThreadLocal:</strong> значения не переносятся между потоками</li>
+<li><strong>Оверхед на разбиение:</strong> для маленьких коллекций медленнее последовательного</li>
+</ul>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('parallel-problems')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- ForkJoinPool -->
+<details id="forkjoinpool">
+<summary>Что такое ForkJoinPool и как он связан с parallel streams?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> ForkJoinPool — это реализация ExecutorService для параллельного выполнения задач по принципу "разделяй и властвуй" (fork/join). Parallel streams по умолчанию используют общий ForkJoinPool.commonPool().</p>
+<h4>Связь с parallel streams</h4>
+<ul>
+<li>По умолчанию используется ForkJoinPool.commonPool()</li>
+<li>Число потоков = Runtime.getRuntime().availableProcessors() - 1</li>
+<li>Можно задать свой пул через системное свойство java.util.concurrent.ForkJoinPool.common.parallelism</li>
+<li>Можно запустить стрим в собственном пуле через submit()</li>
+</ul>
+<pre><code>// Запуск parallel stream в собственном пуле
+ForkJoinPool customPool = new ForkJoinPool(4);
+customPool.submit(() -> {
+    list.parallelStream()
+        .filter(...)
+        .collect(Collectors.toList());
+}).get();
+customPool.shutdown();</code></pre>
+<h4>Work-stealing алгоритм</h4>
+<p>Потоки ForkJoinPool "воруют" задачи из очередей других потоков, когда свои закончены, обеспечивая максимальную утилизацию CPU.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('forkjoinpool')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Побочные эффекты -->
+<details id="side-effects">
+<summary>Что такое побочные эффекты в Stream и почему их следует избегать?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> Побочные эффекты — это изменение состояния вне стрима во время выполнения операций (модификация внешних коллекций, переменных, полей объектов). Их следует избегать, потому что они нарушают контракт функционального программирования, делают код непредсказуемым, ломают параллелизм и затрудняют тестирование.</p>
+<pre><code>// НАРУШЕНИЕ: побочные эффекты — изменение внешнего списка
+List&lt;String&gt; results = new ArrayList&lt;&gt;();
+users.stream()
+    .filter(u -> u.getAge() > 18)
+    .forEach(u -> results.add(u.getName()));  // Изменяет внешний список!
+
+// ПРАВИЛЬНО: без побочных эффектов
+List&lt;String&gt; results = users.stream()
+    .filter(u -> u.getAge() > 18)
+    .map(User::getName)
+    .collect(Collectors.toList());</code></pre>
+<h4>Почему избегать</h4>
+<ul>
+<li>В параллельных стримах — race condition</li>
+<li>Нарушает контракт функционального программирования</li>
+<li>Делает код менее предсказуемым и тестируемым</li>
+<li>Может сломаться при смене реализации стрима</li>
+</ul>
+<h4>Можно ли изменять состояние внешних переменных?</h4>
+<p><strong>Не рекомендуется.</strong> В последовательных стримах технически работает, но это плохая практика. В параллельных — гарантированный race condition. Всегда используйте collect() вместо forEach() с мутацией внешнего состояния.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('side-effects')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<h2>🟢 Операции Stream API</h2>
+
+<!-- reduce() -->
+<details id="reduce">
+<summary>Что делает операция reduce()?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> reduce() — это терминальная операция, которая выполняет свёртку всех элементов стрима в одно значение с помощью ассоциативной бинарной операции. Это иммутабельная редукция — на каждом шагу создаётся новое значение.</p>
+<pre><code>// Сумма: reduce(начальное значение, бинарный оператор)
+int sum = numbers.stream().reduce(0, Integer::sum);
+
+// Без начального значения — возвращает Optional
+Optional&lt;Integer&gt; max = numbers.stream().reduce(Integer::max);
+
+// Полная форма: reduce(identity, accumulator, combiner)
+int sum = numbers.parallelStream().reduce(0, Integer::sum, Integer::sum);</code></pre>
+<h4>Три формы reduce()</h4>
+<ol>
+<li><strong>reduce(identity, accumulator)</strong> — с начальным значением, всегда возвращает значение</li>
+<li><strong>reduce(accumulator)</strong> — без начального значения, возвращает Optional (пустой стрим → empty)</li>
+<li><strong>reduce(identity, accumulator, combiner)</strong> — полная форма для параллельных стримов</li>
+</ol>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('reduce')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- reduce() vs collect() -->
+<details id="reduce-vs-collect">
+<summary>В чём разница между reduce() и collect()?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> reduce() — иммутабельная свёртка (создаёт новый объект на каждом шагу). collect() — мутабельная сборка (добавляет элементы в существующий контейнер). collect() эффективнее для коллекций, reduce() — для примитивных значений.</p>
+<table>
+<tr><th>Критерий</th><th>reduce()</th><th>collect()</th></tr>
+<tr><td>Тип редукции</td><td>Иммутабельная</td><td>Мутабельная</td></tr>
+<tr><td>Создание объектов</td><td>На каждом шагу новый</td><td>Один контейнер на поток</td></tr>
+<tr><td>Эффективность для коллекций</td><td>Плохая (O(n²))</td><td>Хорошая (O(n))</td></tr>
+<tr><td>Для параллелизма</td><td>combiner создаёт новый объект</td><td>combiner сливает контейнеры</td></tr>
+</table>
+<pre><code>// reduce() для списков — плохо: создаёт новый список на каждом шагу
+List&lt;String&gt; bad = stream.reduce(
+    new ArrayList&lt;&gt;(),
+    (list, s) -> { list.add(s); return list; },     // Мутация + новый объект
+    (list1, list2) -> { list1.addAll(list2); return list1; }
+);  // O(n²)!
+
+// collect() — хорошо: мутабельная сборка
+List&lt;String&gt; good = stream.collect(Collectors.toList());  // O(n)</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('reduce-vs-collect')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- peek() -->
+<details id="peek">
+<summary>Что такое операция peek() и когда её использовать?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> peek() — это промежуточная операция для "подглядывания" за элементами стрима без их изменения. Предназначена ТОЛЬКО для отладки. Не использовать для модификации элементов в продакшене — поведение не гарантировано.</p>
+<pre><code>// Отладка: смотрим, какие элементы проходят через стрим
+List&lt;String&gt; result = users.stream()
+    .peek(u -> log.debug("Before filter: {}", u))
+    .filter(u -> u.getAge() > 18)
+    .peek(u -> log.debug("After filter: {}", u))
+    .map(User::getName)
+    .collect(Collectors.toList());
+
+// ❌ Неправильно: изменение элементов через peek()
+users.stream()
+    .peek(u -> u.setProcessed(true))  // Побочный эффект! Не гарантировано!
+    .collect(Collectors.toList());</code></pre>
+<p>В параллельных стримах порядок вызовов peek() не гарантирован. peek() может быть оптимизирован компилятором и не вызван вовсе для некоторых элементов.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('peek')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Повторное использование Stream -->
+<details id="reuse-stream">
+<summary>Можно ли повторно использовать Stream?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ: НЕТ.</strong> После вызова терминальной операции стрим считается потреблённым и больше недоступен. Попытка повторного использования вызовет IllegalStateException.</p>
+<pre><code>Stream&lt;String&gt; stream = names.stream();
+long count = stream.count();          // Ок — первая терминальная операция
+List&lt;String&gt; list = stream.collect(); // IllegalStateException: stream already operated upon!</code></pre>
+<p><strong>Решение:</strong> создать новый стрим от источника:</p>
+<pre><code>Supplier&lt;Stream&lt;String&gt;&gt; supplier = names::stream;
+long count = supplier.get().count();
+List&lt;String&gt; list = supplier.get().collect(Collectors.toList());</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('reuse-stream')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Lazy evaluation -->
+<details id="lazy-evaluation">
+<summary>Что такое lazy evaluation в Stream?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> Lazy evaluation (ленивые вычисления) — это свойство Stream API, при котором промежуточные операции не выполняются до вызова терминальной. Стрим "планирует" цепочку операций и выполняет их одним проходом по данным.</p>
+<pre><code>users.stream()
+    .filter(u -> expensiveCheck(u))  // Не выполняется
+    .map(User::getName)               // Не выполняется
+    .limit(3)                         // Не выполняется
+    .collect(Collectors.toList());    // ТУТ ВСЁ ЗАПУСКАЕТСЯ
+
+// Благодаря limit(3) — expensiveCheck выполнится только до нахождения трёх подходящих</code></pre>
+<h4>Когда начинается выполнение?</h4>
+<p>Только при вызове терминальной операции (collect, reduce, forEach, count, findFirst и т.д.).</p>
+<h4>Что это даёт</h4>
+<ul>
+<li>Оптимизация: не обрабатываются ненужные элементы (короткое замыкание)</li>
+<li>Экономия памяти: не создаются промежуточные коллекции</li>
+<li>Однопроходность: все операции выполняются за один проход по данным</li>
+</ul>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('lazy-evaluation')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- distinct, sorted, limit, skip -->
+<details id="other-operations">
+<summary>Что делают операции distinct(), sorted(), limit(), skip()?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> distinct() — удаляет дубликаты (по equals). sorted() — сортирует элементы. limit(n) — ограничивает поток первыми N элементами. skip(n) — пропускает первые N элементов. Все это intermediate-операции.</p>
+<pre><code>// distinct: уникальные элементы
+List&lt;String&gt; unique = stream.distinct().collect(Collectors.toList());
+
+// sorted: сортировка
+List&lt;String&gt; natural = stream.sorted().collect(Collectors.toList());
+List&lt;User&gt; byAge = stream.sorted(Comparator.comparing(User::getAge)).collect(Collectors.toList());
+
+// limit: первые N
+List&lt;String&gt; first10 = stream.limit(10).collect(Collectors.toList());
+
+// skip: пропустить первые N
+List&lt;String&gt; page2 = stream.skip(10).limit(10).collect(Collectors.toList()); // пагинация</code></pre>
+<h4>Короткое замыкание (short-circuiting)</h4>
+<p>limit(n) — intermediate-операция с коротким замыканием: после получения N элементов обработка останавливается, даже если источник содержит больше элементов.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('other-operations')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Короткое замыкание -->
+<details id="short-circuiting">
+<summary>Как работает короткое замыкание в Stream?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> Короткое замыкание (short-circuiting) — это механизм, при котором операция завершается досрочно, как только получен достаточный результат, не обрабатывая оставшиеся элементы.</p>
+<h4>Intermediate с коротким замыканием</h4>
+<ul>
+<li><strong>limit(n)</strong> — прекращает обработку после N элементов</li>
+</ul>
+<h4>Terminal с коротким замыканием</h4>
+<ul>
+<li><strong>anyMatch(predicate)</strong> — останавливается на первом true</li>
+<li><strong>allMatch(predicate)</strong> — останавливается на первом false</li>
+<li><strong>noneMatch(predicate)</strong> — останавливается на первом true</li>
+<li><strong>findFirst()</strong> — нужен только первый элемент</li>
+<li><strong>findAny()</strong> — нужен любой элемент</li>
+</ul>
+<pre><code>// anyMatch: останавливается на первом подходящем
+boolean hasAdmin = users.stream()
+    .anyMatch(User::isAdmin);  // Не проверяет всех, если админ найден быстро
+
+// limit + filter: эффективно вместе
+List&lt;String&gt; first3Adults = users.stream()
+    .filter(u -> u.getAge() >= 18)
+    .limit(3)
+    .collect(Collectors.toList());  // Останавливается после 3 найденных</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('short-circuiting')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- anyMatch, allMatch, noneMatch -->
+<details id="match-operations">
+<summary>Что такое операции anyMatch(), allMatch(), noneMatch()?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> Это терминальные операции с коротким замыканием, проверяющие элементы стрима на соответствие предикату.</p>
+<ul>
+<li><strong>anyMatch(predicate)</strong> — true, если хотя бы один элемент удовлетворяет условию</li>
+<li><strong>allMatch(predicate)</strong> — true, если ВСЕ элементы удовлетворяют условию</li>
+<li><strong>noneMatch(predicate)</strong> — true, если НИ ОДИН элемент не удовлетворяет условию</li>
+</ul>
+<pre><code>boolean hasAdults = users.stream().anyMatch(u -> u.getAge() >= 18);
+boolean allActive = users.stream().allMatch(User::isActive);
+boolean noBlocked = users.stream().noneMatch(User::isBlocked);
+
+// Короткое замыкание:
+// anyMatch — до первого true
+// allMatch — до первого false
+// noneMatch — до первого true</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('match-operations')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- findFirst и findAny -->
+<details id="find-operations">
+<summary>Что делают операции findFirst() и findAny()?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> findFirst() возвращает Optional с первым элементом стрима (важен порядок). findAny() возвращает Optional с любым элементом (порядок не важен). В параллельном стриме findAny() быстрее, так как не требует координации между потоками.</p>
+<pre><code>Optional&lt;User&gt; first = users.stream()
+    .filter(User::isAdmin)
+    .findFirst();  // Первый админ
+
+Optional&lt;User&gt; any = users.parallelStream()
+    .filter(User::isAdmin)
+    .findAny();    // Любой админ — в parallel быстрее, чем findFirst</code></pre>
+<h4>Разница в параллельных стримах</h4>
+<ul>
+<li><strong>findFirst()</strong> — требует сохранения порядка, медленнее в parallel</li>
+<li><strong>findAny()</strong> — порядок не важен, быстрее в parallel</li>
+</ul>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('find-operations')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<h2>🟣 Сборка в Map и Optional</h2>
+
+<!-- Сборка в Map -->
+<details id="collect-to-map">
+<summary>Как собрать Stream в Map?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> Использовать Collectors.toMap() с keyMapper и valueMapper. При возможности коллизий ключей — обязательно указывать mergeFunction.</p>
+<pre><code>// Простая сборка в Map
+Map&lt;Long, User&gt; byId = users.stream()
+    .collect(Collectors.toMap(User::getId, Function.identity()));
+
+// С обработкой коллизий
+Map&lt;String, User&gt; byEmail = users.stream()
+    .collect(Collectors.toMap(
+        User::getEmail,
+        Function.identity(),
+        (existing, replacement) -> replacement  // При дубликате: берём последнего
+    ));
+
+// С конкретной Map-реализацией
+Map&lt;Long, User&gt; linkedMap = users.stream()
+    .collect(Collectors.toMap(
+        User::getId, u -> u, (a, b) -> a, LinkedHashMap::new
+    ));
+
+// Группировка
+Map&lt;String, List&lt;User&gt;&gt; byDept = users.stream()
+    .collect(Collectors.groupingBy(User::getDepartment));</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('collect-to-map')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Коллизии ключей в Map -->
+<details id="map-collisions">
+<summary>Что делать при коллизиях ключей при сборке в Map?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> По умолчанию toMap() бросает IllegalStateException при дубликатах ключей. Решение — явно указать mergeFunction (третий аргумент), которая определяет, какое значение оставить.</p>
+<pre><code>// Без merge — исключение при дубликатах
+Map&lt;String, User&gt; bad = users.stream()
+    .collect(Collectors.toMap(User::getEmail, Function.identity()));
+// IllegalStateException: Duplicate key
+
+// Стратегия 1: Оставить первое значение
+(existing, replacement) -> existing
+
+// Стратегия 2: Оставить последнее значение
+(existing, replacement) -> replacement
+
+// Стратегия 3: Суммировать
+(existing, replacement) -> existing + replacement
+
+// Стратегия 4: Выбрать по условию
+(existing, replacement) -> 
+    existing.createdAt().isAfter(replacement.createdAt()) ? existing : replacement
+
+// Альтернатива: groupingBy сохраняет все значения
+Map&lt;String, List&lt;User&gt;&gt; byEmail = users.stream()
+    .collect(Collectors.groupingBy(User::getEmail));</code></pre>
+<h4>Сравнение подходов</h4>
+<table>
+<tr><th>Сценарий</th><th>Решение</th></tr>
+<tr><td>Уверен в уникальности</td><td>toMap без merge</td></tr>
+<tr><td>Оставить первое/последнее</td><td>toMap с merge (a,b) -> a / (a,b) -> b</td></tr>
+<tr><td>Сохранить все значения</td><td>groupingBy вместо toMap</td></tr>
+<tr><td>Объединить значения</td><td>toMap с merge-логикой</td></tr>
+</table>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('map-collisions')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Optional в Stream -->
+<details id="optional-in-stream">
+<summary>Как работать с Optional в Stream?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> Для распаковки Optional в Stream используйте flatMap(Optional::stream) (JDK 9+). Для JDK 8 — filter(Optional::isPresent).map(Optional::get).</p>
+<pre><code>// JDK 9+: элегантная распаковка
+List&lt;Order&gt; orders = users.stream()
+    .map(User::getLastOrder)           // Stream&lt;Optional&lt;Order&gt;&gt;
+    .flatMap(Optional::stream)         // Stream&lt;Order&gt;
+    .collect(Collectors.toList());
+
+// JDK 8: ручная распаковка
+List&lt;Order&gt; orders = users.stream()
+    .map(User::getLastOrder)
+    .filter(Optional::isPresent)
+    .map(Optional::get)
+    .collect(Collectors.toList());
+
+// findFirst/findAny возвращают Optional
+Optional&lt;User&gt; first = users.stream()
+    .filter(User::isAdmin)
+    .findFirst();
+String name = first.map(User::getName).orElse("No admin");</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('optional-in-stream')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<h2>🟡 Продвинутые вопросы (Middle+)</h2>
+
+<!-- Почему Stream ленивый -->
+<details id="why-lazy">
+<summary>Почему Stream ленивый и что это даёт?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> Ленивость Stream означает, что промежуточные операции не выполняются до вызова терминальной. Это даёт оптимизацию (короткое замыкание), экономию памяти и однопроходность — все операции выполняются за один проход по данным.</p>
+<h4>Что даёт ленивость</h4>
+<ol>
+<li><strong>Короткое замыкание:</strong> limit(n) или findFirst() прекращают обработку досрочно</li>
+<li><strong>Экономия памяти:</strong> не создаются промежуточные коллекции</li>
+<li><strong>Однопроходность:</strong> filter + map + collect выполняется за один проход</li>
+<li><strong>Оптимизация порядка операций:</strong> можно переставлять операции для эффективности</li>
+</ol>
+<pre><code>// Без ленивости: обработали бы ВСЕХ пользователей
+// С ленивостью: обрабатываем только до нахождения 3 подходящих
+List&lt;String&gt; result = users.stream()
+    .filter(u -> expensiveCheck(u))  // Вызывается только для нужных
+    .limit(3)                         // Останавливает обработку
+    .collect(Collectors.toList());</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('why-lazy')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Почему нельзя использовать Stream повторно -->
+<details id="why-no-reuse">
+<summary>Почему нельзя использовать Stream повторно?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> Stream спроектирован как одноразовый конвейер. После вызова терминальной операции он считается потреблённым (consumed). Это связано с тем, что Stream может представлять собой не коллекцию в памяти, а поток данных (из файла, сети, генератор), который невозможно "перемотать".</p>
+<h4>Причины</h4>
+<ol>
+<li><strong>Однопроходность:</strong> многие источники (InputStream, генераторы) нельзя перечитать</li>
+<li><strong>Ленивость:</strong> Stream не хранит данные — он их обрабатывает и передаёт дальше</li>
+<li><strong>Оптимизация:</strong> отсутствие хранения позволяет не расходовать память</li>
+</ol>
+<pre><code>// Решение: Supplier для создания нового стрима
+Supplier&lt;Stream&lt;String&gt;&gt; supplier = list::stream;
+long count = supplier.get().count();
+List&lt;String&gt; collected = supplier.get().collect(Collectors.toList());</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('why-no-reuse')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Почему parallelStream не всегда быстрее -->
+<details id="why-parallel-slower">
+<summary>Почему parallelStream() не всегда быстрее?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> Parallel stream несёт накладные расходы на разбиение данных (splitting), координацию потоков, слияние результатов и использование общего ForkJoinPool. Для маленьких коллекций и простых операций эти расходы превышают выигрыш от параллелизма.</p>
+<h4>Факторы, замедляющие parallel stream</h4>
+<ul>
+<li><strong>Оверхед на разбиение:</strong> разбиение коллекции на части и слияние результатов требуют ресурсов</li>
+<li><strong>Маленькие данные:</strong> для коллекций < 10K элементов оверхед перевешивает</li>
+<li><strong>Простые операции:</strong> если операция выполняется быстро, координация потоков дороже</li>
+<li><strong>Общий пул:</strong> другие задачи в commonPool() создают конкуренцию</li>
+<li><strong>Неделимые источники:</strong> например, Files.lines() плохо параллелится</li>
+<li><strong>Связанные данные:</strong> synchronized, общие переменные вызывают блокировки</li>
+</ul>
+<h4>Когда parallel stream ТОЧНО не поможет</h4>
+<ul>
+<li>I/O операции (диск, сеть — лучше CompletableFuture)</li>
+<li>Операции с побочными эффектами</li>
+<li>Операции, требующие порядка (sorted, findFirst)</li>
+</ul>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('why-parallel-slower')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- Почему collect() безопаснее forEach() -->
+<details id="collect-vs-foreach">
+<summary>Почему collect() безопаснее, чем forEach() с изменением внешней коллекции?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> collect() не имеет побочных эффектов и безопасен в параллельных стримах — он использует локальные аккумуляторы и корректно их сливает. forEach() с изменением внешней коллекции создаёт побочный эффект, не потокобезопасен и нарушает контракт Stream API.</p>
+<pre><code>// ❌ Опасно: forEach с мутацией внешней коллекции
+List&lt;String&gt; results = new ArrayList&lt;&gt;();
+users.parallelStream()
+    .filter(u -> u.getAge() > 18)
+    .forEach(u -> results.add(u.getName()));  // Race condition!
+
+// ✅ Безопасно: collect()
+List&lt;String&gt; results = users.parallelStream()
+    .filter(u -> u.getAge() > 18)
+    .map(User::getName)
+    .collect(Collectors.toList());  // Потокобезопасно даже в parallel</code></pre>
+<h4>Почему collect() потокобезопасен</h4>
+<ol>
+<li>Каждый поток создаёт свой локальный аккумулятор (supplier)</li>
+<li>Потоки независимо добавляют элементы в свои аккумуляторы</li>
+<li>При завершении аккумуляторы сливаются (combiner)</li>
+<li>Нет разделяемого изменяемого состояния</li>
+</ol>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('collect-vs-foreach')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<!-- groupingBy vs partitioningBy -->
+<details id="groupingby-vs-partitioningby">
+<summary>Чем groupingBy() отличается от partitioningBy()?</summary>
+<div class="details-content">
+<p><strong>Краткий ответ:</strong> groupingBy() группирует элементы по произвольному ключу (любое количество групп). partitioningBy() разделяет элементы на две группы по булеву предикату (true/false). partitioningBy() — частный случай groupingBy(), более эффективный для бинарных классификаций.</p>
+<table>
+<tr><th>Критерий</th><th>groupingBy()</th><th>partitioningBy()</th></tr>
+<tr><td>Ключ</td><td>Любой тип (Function&lt;T, K&gt;)</td><td>Boolean (Predicate&lt;T&gt;)</td></tr>
+<tr><td>Количество групп</td><td>Любое</td><td>Всегда 2 (true/false)</td></tr>
+<tr><td>Результирующая Map</td><td>Map&lt;K, List&lt;V&gt;&gt;</td><td>Map&lt;Boolean, List&lt;V&gt;&gt;</td></tr>
+<tr><td>Пустые группы</td><td>Не создаются</td><td>Обе создаются всегда</td></tr>
+</table>
+<pre><code>// groupingBy: группировка по отделу
+Map&lt;String, List&lt;User&gt;&gt; byDept = users.stream()
+    .collect(Collectors.groupingBy(User::getDepartment));
+
+// partitioningBy: разделение на активных/неактивных
+Map&lt;Boolean, List&lt;User&gt;&gt; byActive = users.stream()
+    .collect(Collectors.partitioningBy(User::isActive));
+// byActive.get(true) — активные
+// byActive.get(false) — неактивные (всегда есть, даже если пусто)</code></pre>
+<h4>Когда что использовать</h4>
+<ul>
+<li><strong>partitioningBy()</strong> — когда нужны только две группы на основе условия (быстрее, всегда две группы)</li>
+<li><strong>groupingBy()</strong> — когда групп больше двух или ключ не boolean</li>
+</ul>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('groupingby-vs-partitioningby')">⬆️ Свернуть</button></div>
+</div>
+</details>
+
+<div style="text-align: center; margin-top: 20px; padding: 10px;">
+<a href="index.html" style="display: inline-block; background-color: var(--button-bg); color: var(--button-text); border: 1px solid var(--border); padding: 10px 24px; border-radius: 4px; text-decoration: none; font-size: 0.9em; transition: 0.2s;" onmouseover="this.style.backgroundColor='var(--button-hover)'" onmouseout="this.style.backgroundColor='var(--button-bg)'">⬅️ Назад к содержанию</a>
+</div>
+
+</div>
+
+<script>
+function setTheme(themeName) {
+document.body.className = themeName;
+}
+let currentFontSize = 16;
+function changeFontSize(delta) {
+currentFontSize = Math.min(24, Math.max(12, currentFontSize + delta));
+document.body.style.fontSize = currentFontSize + 'px';
+document.getElementById('fontSizeLabel').textContent = currentFontSize + 'px';
+}
+function closeDetails(id) {
+const details = document.getElementById(id);
+if (details) details.removeAttribute('open');
+}
+setTheme('dark');
+</script>
+</body>
+</html>

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>String в Java: полный справочник вопросы и ответы на Java интервью</title>
+<style>
+:root {
+--bg: #1e1e1e; --text: #d4d4d4; --header-bg: #2d2d2d; --summary-bg: #333;
+--summary-hover: #3c3c3c; --border: #555; --code-bg: #252526; --code-border: #404040;
+--button-bg: #444; --button-text: #ddd; --button-hover: #555; --link: #569cd6;
+--scrollbar-thumb: #666; --scrollbar-track: #2d2d2d; --details-content-bg: var(--bg);
+--table-bg: #2a2a2a; --table-header: #3a3a3a;
+}
+body.light {
+--bg: #ffffff; --text: #1e1e1e; --header-bg: #f3f3f3; --summary-bg: #e8e8e8;
+--summary-hover: #ddd; --border: #ccc; --code-bg: #f9f9f9; --code-border: #ddd;
+--button-bg: #e0e0e0; --button-text: #000; --button-hover: #ccc; --link: #0451a5;
+--scrollbar-thumb: #aaa; --scrollbar-track: #f0f0f0; --details-content-bg: #fff;
+--table-bg: #fff; --table-header: #e0e0e0;
+}
+body.sepia {
+--bg: #f4ecd8; --text: #5b4636; --header-bg: #e8dcc8; --summary-bg: #ddd0b8;
+--summary-hover: #cfc1a8; --border: #b8a88a; --code-bg: #eee3d0; --code-border: #c0b090;
+--button-bg: #d6c9ae; --button-text: #3e2f22; --button-hover: #c2b498; --link: #8b5e3c;
+--scrollbar-thumb: #b8a080; --scrollbar-track: #e8dcc8; --details-content-bg: #f4ecd8;
+--table-bg: #f4ecd8; --table-header: #ddd0b8;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+background-color: var(--bg); color: var(--text);
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6;
+padding: 10px; transition: background-color 0.3s, color 0.3s; font-size: 16px;
+}
+header {
+background-color: var(--header-bg); padding: 15px; border-radius: 6px;
+margin-bottom: 20px; display: flex; flex-wrap: wrap; align-items: center;
+justify-content: space-between; gap: 10px;
+}
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+button {
+background-color: var(--button-bg); color: var(--button-text);
+border: 1px solid var(--border); padding: 6px 12px; border-radius: 4px;
+cursor: pointer; font-size: 0.9em; transition: 0.2s;
+}
+button:hover { background-color: var(--button-hover); }
+.font-controls { display: flex; gap: 4px; }
+.font-size-label { align-self: center; margin: 0 4px; font-weight: bold; }
+.container { max-width: 1000px; margin: 0 auto; }
+h2 { border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-top: 30px; margin-bottom: 15px; }
+h4 { margin-top: 15px; margin-bottom: 8px; color: var(--link); }
+details {
+background-color: var(--summary-bg); border: 1px solid var(--border);
+border-radius: 6px; margin-bottom: 10px; overflow: hidden; transition: 0.2s;
+}
+details[open] { background-color: var(--details-content-bg); }
+summary {
+padding: 12px 16px; font-weight: 600; cursor: pointer;
+background-color: var(--summary-bg); transition: background-color 0.2s;
+list-style-position: inside; font-size: 1.05em;
+}
+summary:hover { background-color: var(--summary-hover); }
+summary::-webkit-details-marker { color: var(--link); }
+.details-content {
+padding: 0 16px 16px 16px; max-height: 60vh; overflow-y: auto;
+scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+.details-content::-webkit-scrollbar { width: 8px; }
+.details-content::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+.details-content::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 4px; }
+.close-btn-container {
+text-align: right; position: sticky; bottom: 0;
+background: linear-gradient(transparent, var(--details-content-bg) 70%);
+padding: 15px 0 5px; margin-top: 10px;
+}
+.close-btn { font-size: 0.85em; padding: 5px 14px; }
+pre {
+background-color: var(--code-bg); border: 1px solid var(--code-border);
+border-radius: 4px; padding: 12px; overflow-x: auto;
+font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+font-size: 0.9em; margin: 10px 0; line-height: 1.5; white-space: pre-wrap; word-break: break-word;
+}
+code { font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace; }
+.section-intro { margin-bottom: 20px; padding: 10px; background-color: var(--header-bg); border-radius: 5px; }
+p { margin: 10px 0; }
+ul, ol { margin: 10px 0 10px 20px; }
+li { margin: 5px 0; }
+table { width: 100%; border-collapse: collapse; margin: 10px 0; background-color: var(--table-bg); }
+th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+th { background-color: var(--table-header); font-weight: 600; }
+strong { color: var(--link); }
+@media (max-width: 600px) {
+body { font-size: 14px; }
+header { flex-direction: column; align-items: flex-start; }
+.controls { width: 100%; }
+}
+</style>
+</head>
+<body class="dark">
+<header>
+<h1>📘 String в Java</h1>
+<div class="controls">
+<div class="theme-controls">
+<button onclick="setTheme('dark')">🌙 Тёмная</button>
+<button onclick="setTheme('light')">☀️ Светлая</button>
+<button onclick="setTheme('sepia')">📜 Сепия</button>
+</div>
+<div class="font-controls">
+<button onclick="changeFontSize(-1)">A-</button>
+<span class="font-size-label" id="fontSizeLabel">16px</span>
+<button onclick="changeFontSize(1)">A+</button>
+</div>
+</div>
+</header>
+<div class="container">
+<div class="section-intro">
+<p>Полный справочник по классу String в Java: String Pool, иммутабельность, конкатенация, кодировки, Compact Strings, рефлексия и многое другое. Каждый раздел включает краткий ответ и развёрнутое объяснение с примерами кода для уровня Middle+.</p>
+</div>
+
+<h2>🔷 String Pool и создание строк</h2>
+
+<details id="string-pool"><summary>Как работает String Pool?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> String Pool — это специализированный кеш строк в Heap, реализованный как хеш-таблица. Его задача — экономия памяти за счет переиспользования неизменяемых строковых литералов.</p>
+<h4>1. Литералы — compile-time разрешение</h4>
+<pre><code>String a = "hello"; // объект в пуле
+String b = "hello"; // ссылка на тот же объект
+System.out.println(a == b); // true</code></pre>
+<h4>2. Оператор new — принудительное создание объекта</h4>
+<pre><code>String c = new String("hello"); // новый объект в куче (литерал уже в пуле)</code></pre>
+<h4>3. Метод intern()</h4>
+<pre><code>String s1 = new String("hello");        // 2 объекта
+String s2 = s1.intern();                // 0 новых объектов
+String s3 = "hello";                    // 0 новых объектов
+System.out.println(s1 == s2);           // false
+System.out.println(s2 == s3);           // true</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('string-pool')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="string-pool-storage"><summary>Где хранится сама таблица String Pool?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Объекты String находятся в Java Heap. Структура StringTable (хеш-таблица со ссылками) находится в нативной памяти JVM (Native Memory).</p>
+<pre><code>Native Memory:
+┌─────────────────┐
+│  StringTable    │───> ссылки на объекты в Heap
+└─────────────────┘
+Java Heap:
+┌─────────────────┐
+│ String("Hello") │
+│ String("World") │
+└─────────────────┘</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('string-pool-storage')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="literal-vs-new"><summary>В чём разница между созданием String через литерал и через new?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Литерал берёт или создаёт объект в String Pool. new всегда создаёт новый объект в куче.</p>
+<pre><code>String a = "hello";            // 0 или 1 объект (из пула)
+String b = new String("hello"); // минимум 1 объект (или 2, если литерала нет в пуле)</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('literal-vs-new')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="when-intern"><summary>Когда стоит использовать intern()?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Точечно, когда много динамически создаваемых дублирующихся строк с длительным временем жизни. В большинстве случаев не нужен.</p>
+<p><strong>Когда ДА:</strong> парсинг CSV/JSON с повторяющимися полями, словари и справочники, дедупликация после десериализации.</p>
+<p><strong>Когда НЕТ:</strong> короткоживущие строки, уникальные строки (UUID, email), вместо G1 String Deduplication.</p>
+<pre><code>// Правильный паттерн — свой пул
+Map&lt;String, String&gt; manualPool = new ConcurrentHashMap&lt;&gt;(1024);
+String deduped = manualPool.putIfAbsent(s, s);</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('when-intern')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="why-immutable"><summary>Почему String является иммутабельным?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Ради безопасности, производительности и корректности в многопоточной среде.</p>
+<ul>
+<li><strong>Безопасность:</strong> невозможность подмены параметров (Class.forName, пути к файлам, JDBC URL)</li>
+<li><strong>Многопоточность:</strong> immutable-объекты не требуют синхронизации</li>
+<li><strong>String Pool:</strong> иммутабельность — необходимое условие существования пула</li>
+<li><strong>Кеширование хеш-кода:</strong> поле hash вычисляется один раз</li>
+<li><strong>Ключи в Map:</strong> безопасное использование в HashMap</li>
+</ul>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('why-immutable')">⬆️ Свернуть</button></div>
+</div></details>
+
+<h2>🔶 StringBuilder и StringBuffer</h2>
+
+<details id="stringbuilder-vs-stringbuffer"><summary>Когда использовать StringBuilder, а когда StringBuffer?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> StringBuilder — всегда (99% случаев). StringBuffer — практически никогда, сохранён для обратной совместимости.</p>
+<pre><code>// StringBuffer — synchronized
+public synchronized StringBuffer append(String str) { ... }
+
+// StringBuilder — без синхронизации
+public StringBuilder append(String str) { ... }</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('stringbuilder-vs-stringbuffer')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="why-stringbuffer-slower"><summary>Почему StringBuffer медленнее StringBuilder?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Из-за накладных расходов на synchronized: захват монитора, барьеры памяти, запрет оптимизаций JIT.</p>
+<table>
+<tr><th>Операция</th><th>StringBuilder</th><th>StringBuffer</th></tr>
+<tr><td>1M append()</td><td>~8 ms</td><td>~12 ms (~50% медленнее)</td></tr>
+</table>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('why-stringbuffer-slower')">⬆️ Свернуть</button></div>
+</div></details>
+
+<h2>🟢 Конкатенация строк</h2>
+
+<details id="string-concatenation"><summary>Что происходит при конкатенации строк через оператор +?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Компилятор преобразует + в цепочку StringBuilder.append(). Константы сворачиваются на этапе компиляции. В циклах += создаёт новый StringBuilder на каждой итерации (O(n²)).</p>
+<pre><code>// Константная свертка
+String s = "Hello, " + "World!"; // становится "Hello, World!"
+
+// Десахаринг в StringBuilder
+String result = "User: " + name + ", age: " + age;
+// → new StringBuilder().append("User: ").append(name).append(", age: ").append(age).toString()</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('string-concatenation')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="concat-optimization"><summary>Как компилятор Java оптимизирует конкатенацию строк?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Три уровня: константная свертка (compile-time), десахаринг в StringBuilder, а с JDK 9+ — invokedynamic с StringConcatFactory.</p>
+<h4>JEP 280 (JDK 9+): invokedynamic</h4>
+<pre><code>// Байт-код JDK 9+
+invokedynamic #0 &lt;makeConcatWithConstants, BootstrapMethods #0&gt;</code></pre>
+<p>Стратегии: MH_INLINE_SIZED_EXACT (самая быстрая, без StringBuilder), MH_SB_SIZED_EXACT, BC_SB (fallback).</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('concat-optimization')">⬆️ Свернуть</button></div>
+</div></details>
+
+<h2>🔵 Сравнение строк</h2>
+
+<details id="string-equals-operator"><summary>Можно ли использовать == для сравнения String?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Можно только если обе строки гарантированно из одного пула (литералы или intern()). В 99% случаев — equals().</p>
+<pre><code>String a = "hello";          // пул
+String b = "hello";          // пул
+String c = new String("hello"); // куча
+a == b   // true
+a == c   // false</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('string-equals-operator')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="equals-vs-operator"><summary>В чём разница между == и equals() для String?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> == сравнивает ссылки (адреса в памяти), equals() сравнивает содержимое (последовательность символов).</p>
+<table>
+<tr><th>Критерий</th><th>==</th><th>equals()</th></tr>
+<tr><td>Что сравнивает</td><td>Ссылки (O(1))</td><td>Содержимое (O(n))</td></tr>
+<tr><td>null-безопасность</td><td>s == null работает</td><td>"hello".equals(s) безопасно</td></tr>
+</table>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('equals-vs-operator')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="string-pool-location"><summary>Где хранится String Pool (в какой области памяти)?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> С JDK 7 — в Heap. До JDK 7 — в PermGen.</p>
+<table>
+<tr><th>JDK 6 и ранее</th><th>JDK 7+</th></tr>
+<tr><td>PermGen (фиксированный, строки не удалялись)</td><td>Heap (сборка мусора, размер -Xmx)</td></tr>
+</table>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('string-pool-location')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="string-pool-oom"><summary>Может ли String Pool вызвать OutOfMemoryError?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Да. До JDK 7 — OutOfMemoryError: PermGen space. С JDK 7+ — OutOfMemoryError: Java heap space.</p>
+<p>Причина: String Pool — GC Root. Интернированные строки не удаляются, пока запись в StringTable существует.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('string-pool-oom')">⬆️ Свернуть</button></div>
+</div></details>
+
+<h2>🟣 Методы String</h2>
+
+<details id="substring"><summary>Что делает метод substring() и как он работал до Java 7?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> До JDK 7 — разделял char[] с исходной строкой (O(1), но memory leak). С JDK 7 — копирует данные в новый массив (O(n), безопасно).</p>
+<pre><code>// JDK 6: утечка памяти
+String huge = load100MBFile();
+String tiny = huge.substring(0, 20); // tiny.value → 100 MB char[]!
+huge = null; // массив не собран — tiny держит ссылку</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('substring')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="why-substring-changed"><summary>Почему изменили реализацию substring() в Java 7?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Чтобы устранить скрытый memory leak. Маленькая подстрока удерживала огромный исходный char[].</p>
+<p>GC не умеет собирать части примитивных массивов. Решение — копирование данных в новый массив.</p>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('why-substring-changed')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="split"><summary>Как работает метод split()?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Разбивает строку по регулярному выражению. Параметр limit управляет отбрасыванием пустых строк в конце.</p>
+<pre><code>"a,,b,c,,".split(",");     // ["a", "", "b", "c"] — limit=0, хвост отброшен
+"a,,b,c,,".split(",", -1); // ["a", "", "b", "c", "", ""] — все сохранены</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('split')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="replace-vs-replaceall"><summary>В чём особенность метода replace() vs replaceAll()?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> replace() — литеральная замена. replaceAll() — регулярное выражение.</p>
+<pre><code>"a.b.c".replace(".", "/");    // "a/b/c" — точка это точка
+"a.b.c".replaceAll(".", "/"); // "/////" — точка = любой символ!
+"a.b.c".replaceAll("\\.", "/"); // "a/b/c" — правильное экранирование</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('replace-vs-replaceall')">⬆️ Свернуть</button></div>
+</div></details>
+
+<h2>🟡 Кодировки и преобразования</h2>
+
+<details id="string-encoding"><summary>Что такое String encoding (кодировка)?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Кодировка — это набор правил, отображающих символы в числовые коды и обратно, а также определяющих, как эти числа представить в виде байтов. Критична при переходе String ↔ byte[].</p>
+<h4>Внутреннее устройство String (JDK 9+)</h4>
+<pre><code>public final class String {
+    private final byte[] value;  // LATIN-1 (1 байт) или UTF-16 (2/4 байта)
+    private final byte coder;    // LATIN1 = 0, UTF16 = 1
+}</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('string-encoding')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="string-to-bytes"><summary>Как правильно конвертировать String в byte[] и обратно?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Всегда явно указывайте StandardCharsets.UTF_8. Никогда не полагайтесь на методы без параметра charset.</p>
+<pre><code>// ✅ Правильно
+byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
+String s = new String(bytes, StandardCharsets.UTF_8);
+
+// ❌ Опасно: platform-dependent!
+byte[] bytes = str.getBytes();  // Charset.defaultCharset()
+String s = new String(bytes);   // Charset.defaultCharset()</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('string-to-bytes')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="compact-strings"><summary>Что такое compact strings в Java 9+?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> JEP 254: замена char[] на byte[] + coder. LATIN-1 (1 байт/символ) для латиницы, UTF-16 для остальных. Экономия ~50% памяти на латинице.</p>
+<pre><code>"Hello"  → LATIN-1 (5 байт данных)
+"Привет" → UTF-16  (12 байт данных)</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('compact-strings')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="string-memory"><summary>Как узнать, сколько памяти занимает String?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Формула: ~40 + длина × (LATIN1 ? 1 : 2), округлить до кратного 8. Инструментально: JOL (GraphLayout.totalSize()) или heap dump.</p>
+<pre><code>"Hello"  → 40 + 5 = 45 → 48 байт (JDK 9+, LATIN-1)
+"Привет" → 40 + 12 = 52 → 56 байт (JDK 9+, UTF-16)</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('string-memory')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="string-reflection"><summary>Можно ли изменить содержимое String через рефлексию?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Технически да, но это опасно и ломает инварианты JVM. В JDK 17+ требует --add-opens.</p>
+<pre><code>// JDK 9+: изменение byte[] value через рефлексию
+Field field = String.class.getDeclaredField("value");
+field.setAccessible(true);
+byte[] value = (byte[]) field.get(s);
+value[0] = 'H'; // ломает пул, hashCode, потокобезопасность</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('string-reflection')">⬆️ Свернуть</button></div>
+</div></details>
+
+<h2>🟠 Интерфейсы и оптимизации</h2>
+
+<details id="comparable-charsequence"><summary>Почему String implements Comparable и CharSequence?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Comparable — для естественного порядка сортировки. CharSequence — для полиморфной работы с последовательностями символов.</p>
+<pre><code>// Comparable: сортировка, TreeMap, binarySearch
+Arrays.sort(names);
+
+// CharSequence: единый API для String, StringBuilder, CharBuffer
+void process(CharSequence cs) { ... }</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('comparable-charsequence')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="string-deduplication"><summary>Что такое String deduplication в G1 GC?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Механизм G1 GC, объединяющий внутренние массивы byte[] у разных String с одинаковым содержимым. Сами объекты String остаются разными (== не меняется).</p>
+<table>
+<tr><th>String Pool</th><th>String Deduplication</th></tr>
+<tr><td>Объединяет объекты String (== true)</td><td>Объединяет только byte[] (== false)</td></tr>
+<tr><td>intern() / литералы</td><td>Автоматически при G1 GC</td></tr>
+</table>
+<pre><code>// Включение
+-XX:+UseG1GC -XX:+UseStringDeduplication</code></pre>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('string-deduplication')">⬆️ Свернуть</button></div>
+</div></details>
+
+<div style="text-align: center; margin-top: 20px; padding: 10px;">
+<a href="index.html" style="display: inline-block; background-color: var(--button-bg); color: var(--button-text); border: 1px solid var(--border); padding: 10px 24px; border-radius: 4px; text-decoration: none; font-size: 0.9em; transition: 0.2s;" onmouseover="this.style.backgroundColor='var(--button-hover)'" onmouseout="this.style.backgroundColor='var(--button-bg)'">⬅️ Назад к содержанию</a>
+</div>
+
+</div>
+<script>
+function setTheme(t) { document.body.className = t; }
+let fs = 16;
+function changeFontSize(d) { fs = Math.min(24, Math.max(12, fs + d)); document.body.style.fontSize = fs + 'px'; document.getElementById('fontSizeLabel').textContent = fs + 'px'; }
+function closeDetails(id) { const d = document.getElementById(id); if (d) d.removeAttribute('open'); }
+setTheme('dark');
+</script>
+</body>
+</html>
