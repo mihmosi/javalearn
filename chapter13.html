@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Дженерики в Java: полный справочник</title>
+<style>
+:root {
+--bg: #1e1e1e; --text: #d4d4d4; --header-bg: #2d2d2d; --summary-bg: #333;
+--summary-hover: #3c3c3c; --border: #555; --code-bg: #252526; --code-border: #404040;
+--button-bg: #444; --button-text: #ddd; --button-hover: #555; --link: #569cd6;
+--scrollbar-thumb: #666; --scrollbar-track: #2d2d2d; --details-content-bg: var(--bg);
+--table-bg: #2a2a2a; --table-header: #3a3a3a; --accent: #e8c170;
+--resume-bg: #1e3a2e; --resume-border: #2ecc71; --interview-bg: #2e1e3a; --interview-border: #9b59b6;
+}
+body.light {
+--bg: #ffffff; --text: #1e1e1e; --header-bg: #f3f3f3; --summary-bg: #e8e8e8;
+--summary-hover: #ddd; --border: #ccc; --code-bg: #f9f9f9; --code-border: #ddd;
+--button-bg: #e0e0e0; --button-text: #000; --button-hover: #ccc; --link: #0451a5;
+--scrollbar-thumb: #aaa; --scrollbar-track: #f0f0f0; --details-content-bg: #fff;
+--table-bg: #fff; --table-header: #e0e0e0; --accent: #b8860b;
+--resume-bg: #e8f5e9; --resume-border: #27ae60; --interview-bg: #f3e5f5; --interview-border: #8e44ad;
+}
+body.sepia {
+--bg: #f4ecd8; --text: #5b4636; --header-bg: #e8dcc8; --summary-bg: #ddd0b8;
+--summary-hover: #cfc1a8; --border: #b8a88a; --code-bg: #eee3d0; --code-border: #c0b090;
+--button-bg: #d6c9ae; --button-text: #3e2f22; --button-hover: #c2b498; --link: #8b5e3c;
+--scrollbar-thumb: #b8a080; --scrollbar-track: #e8dcc8; --details-content-bg: #f4ecd8;
+--table-bg: #f4ecd8; --table-header: #ddd0b8; --accent: #6b4e16;
+--resume-bg: #e2ecd0; --resume-border: #5a8a3c; --interview-bg: #e8dae8; --interview-border: #7b4f8a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+background-color: var(--bg); color: var(--text);
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6;
+padding: 10px; transition: background-color 0.3s, color 0.3s; font-size: 16px;
+}
+header {
+background-color: var(--header-bg); padding: 15px; border-radius: 6px;
+margin-bottom: 20px; display: flex; flex-wrap: wrap; align-items: center;
+justify-content: space-between; gap: 10px;
+}
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+button {
+background-color: var(--button-bg); color: var(--button-text);
+border: 1px solid var(--border); padding: 6px 12px; border-radius: 4px;
+cursor: pointer; font-size: 0.9em; transition: 0.2s;
+}
+button:hover { background-color: var(--button-hover); }
+.font-controls { display: flex; gap: 4px; }
+.font-size-label { align-self: center; margin: 0 4px; font-weight: bold; }
+.container { max-width: 1000px; margin: 0 auto; }
+h2 { border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-top: 30px; margin-bottom: 15px; }
+h4 { margin-top: 15px; margin-bottom: 8px; color: var(--link); }
+details {
+background-color: var(--summary-bg); border: 1px solid var(--border);
+border-radius: 6px; margin-bottom: 10px; overflow: hidden; transition: 0.2s;
+}
+details[open] { background-color: var(--details-content-bg); }
+summary {
+padding: 12px 16px; font-weight: 600; cursor: pointer;
+background-color: var(--summary-bg); transition: background-color 0.2s;
+list-style-position: inside; font-size: 1.05em;
+}
+summary:hover { background-color: var(--summary-hover); }
+summary::-webkit-details-marker { color: var(--link); }
+.details-content {
+padding: 0 16px 16px 16px; max-height: 65vh; overflow-y: auto;
+scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+.details-content::-webkit-scrollbar { width: 8px; }
+.details-content::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+.details-content::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 4px; }
+.close-btn-container {
+text-align: right; position: sticky; bottom: 0;
+background: linear-gradient(transparent, var(--details-content-bg) 70%);
+padding: 15px 0 5px; margin-top: 10px;
+}
+.close-btn { font-size: 0.85em; padding: 5px 14px; }
+pre {
+background-color: var(--code-bg); border: 1px solid var(--code-border);
+border-radius: 4px; padding: 12px; overflow-x: auto;
+font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+font-size: 0.9em; margin: 10px 0; line-height: 1.5; white-space: pre-wrap; word-break: break-word;
+}
+code { font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace; }
+.section-intro { margin-bottom: 20px; padding: 10px; background-color: var(--header-bg); border-radius: 5px; }
+p { margin: 10px 0; }
+ul, ol { margin: 10px 0 10px 20px; }
+li { margin: 5px 0; }
+table { width: 100%; border-collapse: collapse; margin: 10px 0; background-color: var(--table-bg); }
+th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+th { background-color: var(--table-header); font-weight: 600; }
+strong { color: var(--link); }
+.resume-box {
+background-color: var(--resume-bg); border-left: 4px solid var(--resume-border);
+padding: 12px 16px; margin: 15px 0; border-radius: 0 6px 6px 0;
+}
+.resume-box strong { color: var(--resume-border); }
+.resume-box p, .resume-box ul { margin: 5px 0; }
+.resume-box ul { padding-left: 20px; }
+.interview-box {
+background-color: var(--interview-bg); border-left: 4px solid var(--interview-border);
+padding: 12px 16px; margin: 15px 0; border-radius: 0 6px 6px 0;
+}
+.interview-box strong { color: var(--interview-border); }
+.interview-box p, .interview-box ul { margin: 5px 0; }
+.interview-box ul { padding-left: 20px; }
+@media (max-width: 600px) {
+body { font-size: 14px; }
+header { flex-direction: column; align-items: flex-start; }
+.controls { width: 100%; }
+}
+</style>
+</head>
+<body class="dark">
+<header>
+<h1>📘 Дженерики в Java</h1>
+<div class="controls">
+<div class="theme-controls">
+<button onclick="setTheme('dark')">🌙 Тёмная</button>
+<button onclick="setTheme('light')">☀️ Светлая</button>
+<button onclick="setTheme('sepia')">📜 Сепия</button>
+</div>
+<div class="font-controls">
+<button onclick="changeFontSize(-1)">A-</button>
+<span class="font-size-label" id="fontSizeLabel">16px</span>
+<button onclick="changeFontSize(1)">A+</button>
+</div>
+</div>
+</header>
+<div class="container">
+<div class="section-intro">
+<p>Полный справочник по дженерикам в Java: что это такое, type erasure, wildcards, PECS, ограничения типов, bridge-методы, наследование дженериков и многое другое. Каждый раздел содержит развёрнутое объяснение, примеры кода, резюме для Middle+ и советы для собеседования.</p>
+</div>
+
+<h2>🔷 Основы дженериков</h2>
+
+<details id="generics-basics"><summary>Что такое дженерики (Generics) в Java?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Дженерики — это механизм Java, позволяющий создавать классы, интерфейсы и методы, параметризованные типами. Они обеспечивают типобезопасность на этапе компиляции и устраняют необходимость явного приведения типов.</p>
+<h4>Проблема до дженериков</h4>
+<pre><code>List list = new ArrayList();
+list.add("Hello");
+list.add(42);        // Можно добавить что угодно!
+String s = (String) list.get(1); // ClassCastException в runtime!</code></pre>
+<h4>С дженериками</h4>
+<pre><code>List&lt;String&gt; list = new ArrayList&lt;&gt;();
+list.add("Hello");
+// list.add(42); // Ошибка компиляции!
+String s = list.get(0); // Без cast!</code></pre>
+<h4>Тип-параметры и их нотация</h4>
+<table>
+<tr><th>Нотация</th><th>Назначение</th><th>Пример</th></tr>
+<tr><td>&lt;T&gt;</td><td>Произвольный тип</td><td>Box&lt;T&gt;</td></tr>
+<tr><td>&lt;E&gt;</td><td>Элемент коллекции</td><td>List&lt;E&gt;</td></tr>
+<tr><td>&lt;K, V&gt;</td><td>Ключ-значение</td><td>Map&lt;K, V&gt;</td></tr>
+<tr><td>&lt;T extends Number&gt;</td><td>Ограниченный тип</td><td>MathUtils&lt;T&gt;</td></tr>
+<tr><td>&lt;?&gt;</td><td>Wildcard</td><td>List&lt;?&gt;</td></tr>
+<tr><td>&lt;? extends T&gt;</td><td>Верхняя граница</td><td>List&lt;? extends Number&gt;</td></tr>
+<tr><td>&lt;? super T&gt;</td><td>Нижняя граница</td><td>List&lt;? super Integer&gt;</td></tr>
+</table>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Дженерики — механизм параметрического полиморфизма. Обеспечивают типобезопасность на этапе компиляции. Ключевые концепции: параметризованные классы/интерфейсы/методы, ограниченные типы, wildcards, type erasure. Правило PECS. Ограничения: нет примитивов, нет new T(), нет instanceof с параметризованными типами.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Разницу между кодом до и после Java 5</li>
+<li>Таблицу нотаций типа-параметров</li>
+<li>Понимание type erasure и его последствий</li>
+<li>Правило PECS на практике</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('generics-basics')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="generics-advantages"><summary>В чём преимущества использования дженериков?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Дженерики дают типобезопасность на этапе компиляции, устраняют явное приведение типов, улучшают читаемость и позволяют создавать переиспользуемый код.</p>
+<h4>Сравнительная таблица</h4>
+<table>
+<tr><th>Критерий</th><th>Без дженериков</th><th>С дженериками</th></tr>
+<tr><td>Обнаружение ошибок</td><td>В runtime (ClassCastException)</td><td>На этапе компиляции</td></tr>
+<tr><td>Явное приведение</td><td>Обязательно</td><td>Не нужно</td></tr>
+<tr><td>Читаемость</td><td>Непонятно, что хранит список</td><td>Тип виден из сигнатуры</td></tr>
+<tr><td>Переиспользование</td><td>Отдельные классы</td><td>Один generic-класс</td></tr>
+<tr><td>Безопасность</td><td>Риск ClassCastException</td><td>Практически исключён</td></tr>
+</table>
+<pre><code>// Один класс для ВСЕХ типов
+public class Box&lt;T&gt; {
+    public void put(T content) { ... }
+    public T get() { ... }
+}</code></pre>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Дженерики — фундаментальный механизм, делающий код безопаснее и понятнее. Ошибки типов обнаруживаются до запуска, код самодокументируем, один generic-класс заменяет множество классов. ClassCastException практически исключён.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Примеры ошибок до и после дженериков</li>
+<li>Самодокументируемость API</li>
+<li>Типобезопасные фабрики с Class&lt;T&gt;</li>
+<li>Интеграцию с Stream API и Optional</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('generics-advantages')">⬆️ Свернуть</button></div>
+</div></details>
+
+<h2>🟠 Type Erasure</h2>
+
+<details id="type-erasure"><summary>Что такое type erasure (стирание типов)?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Type erasure — механизм реализации дженериков, при котором информация о типах-параметрах удаляется компилятором после проверки. В байт-коде List&lt;String&gt; и List&lt;Integer&gt; — один и тот же List.</p>
+<pre><code>List&lt;String&gt; strings = new ArrayList&lt;&gt;();
+List&lt;Integer&gt; integers = new ArrayList&lt;&gt;();
+System.out.println(strings.getClass() == integers.getClass()); // true!</code></pre>
+<h4>Последствия type erasure</h4>
+<pre><code>// Нельзя использовать примитивы
+// List&lt;int&gt; list; // Ошибка!
+// Нельзя создавать экземпляры T
+// T t = new T(); // Ошибка!
+// Нельзя использовать instanceof с дженериками
+// if (obj instanceof List&lt;String&gt;) { } // Ошибка!
+// Нельзя создавать массивы дженериков
+// List&lt;String&gt;[] array = new List&lt;String&gt;[10]; // Ошибка!</code></pre>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Type erasure — фундаментальный механизм Java. Компилятор проверяет типы, затем удаляет информацию о них, заменяя T на Object (или верхнюю границу), и вставляет cast'ы. Причина выбора — обратная совместимость с кодом до Java 5.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Объяснить, почему дженерики работают именно так</li>
+<li>Перечислить ограничения (нет примитивов, нет new T(), нет instanceof)</li>
+<li>Показать bridge-методы как следствие type erasure</li>
+<li>Способы получения типа в рантайме (Class&lt;T&gt;, TypeToken)</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('type-erasure')">⬆️ Свернуть</button></div>
+</div></details>
+
+<h2>🟡 Массивы и ограничения</h2>
+
+<details id="generic-array"><summary>Можно ли создать массив дженерик-типа?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Нет, нельзя. Компилятор запрещает new T[], new List&lt;String&gt;[]. Причина — type erasure и несовместимость ковариантных массивов с инвариантными дженериками.</p>
+<pre><code>// ❌ Все запрещены:
+// T[] array = new T[10];
+// List&lt;String&gt;[] array = new List&lt;String&gt;[10];
+
+// ✅ Обходной путь:
+@SuppressWarnings("unchecked")
+T[] array = (T[]) java.lang.reflect.Array.newInstance(type, 10);</code></pre>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Создание массивов дженериков запрещено. Обходные пути: Object[] с приведением, Array.newInstance через рефлексию, или коллекции (List&lt;List&lt;String&gt;&gt;). ArrayList внутри использует Object[], а не E[].</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Объяснить почему (type erasure + ковариантность массивов)</li>
+<li>Предложить правильные альтернативы</li>
+<li>Показать, что ArrayList использует Object[] внутри</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('generic-array')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="bounded-type-params"><summary>Что такое bounded type parameters?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Bounded type parameters ограничивают тип-параметр верхней границей: &lt;T extends Number&gt;, &lt;T extends Comparable&lt;T&gt;&gt;. Позволяют вызывать методы граничного типа.</p>
+<pre><code>public class NumberBox&lt;T extends Number&gt; {
+    public double sum(T a, T b) {
+        return a.doubleValue() + b.doubleValue(); // ✅ метод Number!
+    }
+}</code></pre>
+<h4>Multiple bounds</h4>
+<pre><code>// Один класс (первый) + интерфейсы:
+&lt;T extends Number &amp; Comparable&lt;T&gt;&gt;
+// Нельзя: &lt;T extends Number &amp; String&gt; // Два класса!</code></pre>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Bounded type parameters позволяют вызывать методы граничного типа. Синтаксис: один класс + интерфейсы через &amp;. Отличие от wildcards: bounded type parameter позволяет и читать, и писать; ? extends — только читать; ? super — только писать.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Разницу между &lt;T extends Number&gt; и &lt;? extends Number&gt;</li>
+<li>Multiple bounds с классом и интерфейсами</li>
+<li>Когда использовать bounded type parameter vs wildcard</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('bounded-type-params')">⬆️ Свернуть</button></div>
+</div></details>
+
+<h2>🟢 Wildcards</h2>
+
+<details id="extends-vs-super"><summary>В чём разница между &lt;? extends T&gt; и &lt;? super T&gt;?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> &lt;? extends T&gt; — верхняя граница, для чтения. &lt;? super T&gt; — нижняя граница, для записи. Правило PECS.</p>
+<table>
+<tr><th>Характеристика</th><th>&lt;? extends T&gt;</th><th>&lt;? super T&gt;</th></tr>
+<tr><td>Граница</td><td>Верхняя</td><td>Нижняя</td></tr>
+<tr><td>Чтение</td><td>✅ Как T</td><td>❌ Только как Object</td></tr>
+<tr><td>Запись</td><td>❌ Запрещена</td><td>✅ Как T</td></tr>
+<tr><td>PECS</td><td>Producer Extends</td><td>Consumer Super</td></tr>
+</table>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>&lt;? extends T&gt; для чтения (производители), &lt;? super T&gt; для записи (потребители). Если нужны и чтение, и запись — &lt;T&gt; без wildcards.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Почему нельзя писать в extends (неизвестен тип)</li>
+<li>Почему нельзя читать из super (может быть Object)</li>
+<li>Пример copy() с обоими wildcards</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('extends-vs-super')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="pecs"><summary>Что такое PECS (Producer Extends Consumer Super)?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> PECS — правило выбора wildcard: Producer — ? extends T (чтение), Consumer — ? super T (запись).</p>
+<pre><code>public static &lt;T&gt; void copy(
+    List&lt;? extends T&gt; source,  // PRODUCER — читаем
+    List&lt;? super T&gt; target     // CONSUMER — пишем
+) {
+    for (T item : source) target.add(item);
+}</code></pre>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>PECS — инструмент проектирования API. Показывает намерения: "этот метод только читает", "этот метод только пишет". Если и то, и другое — используйте &lt;T&gt;.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Правило на примере Collections.copy()</li>
+<li>Почему нельзя писать в extends и читать из super</li>
+<li>Как определить, что использовать</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('pecs')">⬆️ Свернуть</button></div>
+</div></details>
+
+<h2>🔵 Ограничения и особенности</h2>
+
+<details id="primitives"><summary>Можно ли использовать примитивные типы как параметры дженериков?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Нет. Дженерики работают только со ссылочными типами. Используйте классы-обёртки: Integer для int, Long для long, Double для double.</p>
+<pre><code>// ❌ List&lt;int&gt; list = new ArrayList&lt;&gt;();
+// ✅ List&lt;Integer&gt; list = new ArrayList&lt;&gt;();</code></pre>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Примитивы не могут быть параметрами дженериков из-за type erasure. Используйте обёртки. Для производительности — примитивные стримы или сторонние коллекции (Trove, Fastutil).</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Причину (type erasure → Object)</li>
+<li>Таблицу примитивов и обёрток</li>
+<li>Проблему производительности и альтернативы</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('primitives')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="raw-types"><summary>Что такое raw types и почему их следует избегать?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Raw type — использование дженерик-класса без указания типа-параметра (List вместо List&lt;String&gt;). Отключает проверку типов.</p>
+<pre><code>// ⚠️ Raw type
+List rawList = new ArrayList();
+rawList.add(42); // Компилятор не предупредит!
+
+// ✅ Параметризованный тип
+List&lt;String&gt; list = new ArrayList&lt;&gt;();</code></pre>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Raw types отключают проверку типов, приводят к ClassCastException в рантайме. Существуют только для обратной совместимости. Используйте diamond-оператор или wildcard List&lt;?&gt;.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Разницу между raw type и wildcard (raw опаснее)</li>
+<li>Смешивание raw и параметризованных типов</li>
+<li>Статические анализаторы (SonarQube, IntelliJ)</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('raw-types')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="new-t"><summary>Что произойдёт при попытке создать экземпляр дженерик-типа через new T()?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Компилятор откажется компилировать. Ошибка: "Type parameter 'T' cannot be instantiated directly". Причина — type erasure.</p>
+<pre><code>// ❌ Ошибка!
+public T createInstance() {
+    return new T(); // Error!
+}
+
+// ✅ Правильно: Class&lt;T&gt; или Supplier&lt;T&gt;
+public T create(Class&lt;T&gt; clazz) throws Exception {
+    return clazz.getDeclaredConstructor().newInstance();
+}</code></pre>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>new T() невозможен из-за type erasure. Правильные подходы: Class&lt;T&gt; (рефлексия), Supplier&lt;T&gt; (функциональный), статические методы с Class&lt;T&gt;.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Не просто "нельзя", а предложить альтернативы</li>
+<li>Объяснить, почему Class&lt;T&gt; и Supplier&lt;T&gt; работают</li>
+<li>Связанные ограничения (new T[], instanceof T)</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('new-t')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="list-wildcard-vs-object"><summary>В чём разница между List&lt;?&gt; и List&lt;Object&gt;?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> List&lt;Object&gt; — конкретный тип для хранения любых объектов. List&lt;?&gt; — wildcard неизвестного типа для чтения.</p>
+<table>
+<tr><th>Характеристика</th><th>List&lt;Object&gt;</th><th>List&lt;?&gt;</th></tr>
+<tr><td>Тип элементов</td><td>Конкретный Object</td><td>Неизвестный</td></tr>
+<tr><td>Добавление</td><td>✅ Любые</td><td>❌ Только null</td></tr>
+<tr><td>Чтение</td><td>✅ Как Object</td><td>✅ Как Object</td></tr>
+<tr><td>Присвоение</td><td>Только List&lt;Object&gt;</td><td>Любой список</td></tr>
+</table>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>List&lt;Object&gt; — для хранения, List&lt;?&gt; — для чтения. Ключевое: List&lt;String&gt; ≠ List&lt;Object&gt; (инвариантность), но List&lt;String&gt; = List&lt;?&gt; (wildcard принимает всё).</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Инвариантность дженериков</li>
+<li>Гибкость wildcards</li>
+<li>Практические примеры использования</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('list-wildcard-vs-object')">⬆️ Свернуть</button></div>
+</div></details>
+
+<h2>🟣 Наследование и методы</h2>
+
+<details id="overload-generics"><summary>Можно ли перегружать методы, отличающиеся только дженерик-параметрами?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Нет. После type erasure сигнатуры совпадают, компилятор выдаёт ошибку "name clash".</p>
+<pre><code>// ❌ Ошибка!
+public void process(List&lt;String&gt; strings) { }
+public void process(List&lt;Integer&gt; integers) { }
+// Оба становятся: process(List)</code></pre>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Нельзя перегружать методы, отличающиеся только дженерик-параметрами. Для перегрузки: разные типы коллекций (List vs Set), разное количество параметров, разные имена методов.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Причину (type erasure)</li>
+<li>Правильные способы перегрузки</li>
+<li>Связь с bridge-методами</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('overload-generics')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="recursive-type-bound"><summary>Что такое recursive type bound?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Recursive type bound — ограничение типа, которое ссылается на себя: &lt;T extends Comparable&lt;T&gt;&gt;.</p>
+<pre><code>public class SortedList&lt;T extends Comparable&lt;T&gt;&gt; {
+    public T max() {
+        // item.compareTo(max) — принимает T, а не Object!
+    }
+}</code></pre>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Recursive type bound решает проблему типобезопасности: compareTo(T) вместо compareTo(Object). Используется в Comparable, Enum. Связан с паттерном CRTP.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Пример с Comparable&lt;T&gt;</li>
+<li>Проблему без recursive bound (небезопасный compareTo)</li>
+<li>Паттерн self-referential generics</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('recursive-type-bound')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="generics-inheritance"><summary>Как работают дженерики с наследованием (является ли List&lt;String&gt; подтипом List&lt;Object&gt;)?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Нет. List&lt;String&gt; НЕ является подтипом List&lt;Object&gt;. Дженерики инвариантны.</p>
+<pre><code>// ❌ Ошибка!
+List&lt;String&gt; strings = new ArrayList&lt;&gt;();
+// List&lt;Object&gt; objects = strings;
+
+// ✅ Гибкость через wildcards
+List&lt;?&gt; wildcard = new ArrayList&lt;String&gt;();
+List&lt;? extends Number&gt; numbers = new ArrayList&lt;Integer&gt;();</code></pre>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Дженерики инвариантны (в отличие от массивов). Причина — типобезопасность. Для гибкости — wildcards. Инвариантность — фича, а не ограничение.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Разницу между массивами (ковариантны) и дженериками (инвариантны)</li>
+<li>Почему инвариантность защищает безопасность</li>
+<li>Иерархию типов с wildcards</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('generics-inheritance')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="bridge-methods"><summary>Что такое bridge methods и зачем они нужны?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Bridge methods — синтетические методы, добавляемые компилятором для сохранения полиморфизма после type erasure.</p>
+<pre><code>class Node&lt;T&gt; {
+    public void setData(T data) { } // T → Object после стирания
+}
+class StringNode extends Node&lt;String&gt; {
+    @Override public void setData(String data) { }
+    // Bridge: public void setData(Object data) { setData((String) data); }
+}</code></pre>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Bridge-методы решают проблему: после стирания типов метод подкласса не переопределяет метод родителя. Bridge-метод приводит параметры и делегирует вызов. Синтетические — видны через рефлексию.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Проблему type erasure (переопределение ломается)</li>
+<li>Как bridge-метод решает (cast + делегирование)</li>
+<li>Примеры генерации (наследование, интерфейсы, ковариантные возвраты)</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('bridge-methods')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="multiple-bounds"><summary>Можно ли использовать несколько ограничений (bounds) для одного параметра типа?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Да. Синтаксис: &lt;T extends ClassA &amp; InterfaceB &amp; InterfaceC&gt;. Один класс (первый) + интерфейсы.</p>
+<pre><code>public class SmartNumber&lt;T extends Number &amp; Comparable&lt;T&gt;&gt; {
+    public boolean isBetween(T min, T max) {
+        return value.compareTo(min) &gt;= 0 &amp;&amp; value.compareTo(max) &lt;= 0;
+    }
+}</code></pre>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Multiple bounds позволяют использовать методы из разных типов. Правила: один класс (первый), интерфейсы в любом количестве. Wildcards не поддерживают multiple bounds.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Синтаксис и правила</li>
+<li>Почему класс должен быть первым</li>
+<li>Практический пример SmartNumber</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('multiple-bounds')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="singleton-record"><summary>Как реализовать шаблон Singleton с помощью Record?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Record НЕ предназначен для Singleton. Его конструктор создаёт новый объект при каждом вызове, и его нельзя сделать private.</p>
+<pre><code>// ❌ Record не может быть Singleton:
+public record Config(String url) { }
+Config c1 = new Config("localhost");
+Config c2 = new Config("localhost");
+System.out.println(c1 == c2); // false!</code></pre>
+<h4>Правильные альтернативы</h4>
+<pre><code>// Enum (рекомендуется)
+public enum Config { INSTANCE; }
+
+// Классический Singleton
+public class Config {
+    private static final Config INSTANCE = new Config();
+    private Config() { }
+    public static Config getInstance() { return INSTANCE; }
+}
+
+// Комбинация: Record для данных + enum для Singleton
+public record ConfigData(String url) { }
+public enum Config { INSTANCE; private ConfigData data; }</code></pre>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Record не может быть Singleton: публичный конструктор, создание новых объектов. Используйте enum или классический Singleton. Для иммутабельных данных — Record + enum.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li>Почему Record не подходит (публичный конструктор)</li>
+<li>Правильные альтернативы (enum, classic, Bill Pugh)</li>
+<li>Комбинацию Record + enum для иммутабельного Singleton</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('singleton-record')">⬆️ Свернуть</button></div>
+</div></details>
+
+<div style="text-align: center; margin-top: 20px; padding: 10px;">
+<a href="index.html" style="display: inline-block; background-color: var(--button-bg); color: var(--button-text); border: 1px solid var(--border); padding: 10px 24px; border-radius: 4px; text-decoration: none; font-size: 0.9em; transition: 0.2s;" onmouseover="this.style.backgroundColor='var(--button-hover)'" onmouseout="this.style.backgroundColor='var(--button-bg)'">⬅️ Назад к содержанию</a>
+</div>
+
+</div>
+<script>
+function setTheme(t) { document.body.className = t; }
+let fs = 16;
+function changeFontSize(d) { fs = Math.min(24, Math.max(12, fs + d)); document.body.style.fontSize = fs + 'px'; document.getElementById('fontSizeLabel').textContent = fs + 'px'; }
+function closeDetails(id) { const d = document.getElementById(id); if (d) d.removeAttribute('open'); }
+setTheme('dark');
+</script>
+</body>
+</html>
