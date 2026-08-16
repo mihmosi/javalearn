@@ -1,0 +1,1036 @@
+Вот **Часть 1** HTML-файла с дополненным блоком **"Что показать на собеседовании"** для каждого вопроса — с конкретными примерами, формулировками и раскрытием, как отвечать.
+
+```html
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Память и Garbage Collection в Java: полный справочник (Часть 1)</title>
+<style>
+:root {
+--bg: #1e1e1e; --text: #d4d4d4; --header-bg: #2d2d2d; --summary-bg: #333;
+--summary-hover: #3c3c3c; --border: #555; --code-bg: #252526; --code-border: #404040;
+--button-bg: #444; --button-text: #ddd; --button-hover: #555; --link: #569cd6;
+--scrollbar-thumb: #666; --scrollbar-track: #2d2d2d; --details-content-bg: var(--bg);
+--table-bg: #2a2a2a; --table-header: #3a3a3a; --accent: #e8c170;
+--resume-bg: #1e3a2e; --resume-border: #2ecc71; --interview-bg: #2e1e3a; --interview-border: #9b59b6;
+}
+body.light {
+--bg: #ffffff; --text: #1e1e1e; --header-bg: #f3f3f3; --summary-bg: #e8e8e8;
+--summary-hover: #ddd; --border: #ccc; --code-bg: #f9f9f9; --code-border: #ddd;
+--button-bg: #e0e0e0; --button-text: #000; --button-hover: #ccc; --link: #0451a5;
+--scrollbar-thumb: #aaa; --scrollbar-track: #f0f0f0; --details-content-bg: #fff;
+--table-bg: #fff; --table-header: #e0e0e0; --accent: #b8860b;
+--resume-bg: #e8f5e9; --resume-border: #27ae60; --interview-bg: #f3e5f5; --interview-border: #8e44ad;
+}
+body.sepia {
+--bg: #f4ecd8; --text: #5b4636; --header-bg: #e8dcc8; --summary-bg: #ddd0b8;
+--summary-hover: #cfc1a8; --border: #b8a88a; --code-bg: #eee3d0; --code-border: #c0b090;
+--button-bg: #d6c9ae; --button-text: #3e2f22; --button-hover: #c2b498; --link: #8b5e3c;
+--scrollbar-thumb: #b8a080; --scrollbar-track: #e8dcc8; --details-content-bg: #f4ecd8;
+--table-bg: #f4ecd8; --table-header: #ddd0b8; --accent: #6b4e16;
+--resume-bg: #e2ecd0; --resume-border: #5a8a3c; --interview-bg: #e8dae8; --interview-border: #7b4f8a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+background-color: var(--bg); color: var(--text);
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6;
+padding: 10px; transition: background-color 0.3s, color 0.3s; font-size: 16px;
+}
+header {
+background-color: var(--header-bg); padding: 15px; border-radius: 6px;
+margin-bottom: 20px; display: flex; flex-wrap: wrap; align-items: center;
+justify-content: space-between; gap: 10px;
+}
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+button {
+background-color: var(--button-bg); color: var(--button-text);
+border: 1px solid var(--border); padding: 6px 12px; border-radius: 4px;
+cursor: pointer; font-size: 0.9em; transition: 0.2s;
+}
+button:hover { background-color: var(--button-hover); }
+.font-controls { display: flex; gap: 4px; }
+.font-size-label { align-self: center; margin: 0 4px; font-weight: bold; }
+.container { max-width: 1000px; margin: 0 auto; }
+h2 { border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-top: 30px; margin-bottom: 15px; }
+h4 { margin-top: 15px; margin-bottom: 8px; color: var(--link); }
+details {
+background-color: var(--summary-bg); border: 1px solid var(--border);
+border-radius: 6px; margin-bottom: 10px; overflow: hidden; transition: 0.2s;
+}
+details[open] { background-color: var(--details-content-bg); }
+summary {
+padding: 12px 16px; font-weight: 600; cursor: pointer;
+background-color: var(--summary-bg); transition: background-color 0.2s;
+list-style-position: inside; font-size: 1.05em;
+}
+summary:hover { background-color: var(--summary-hover); }
+summary::-webkit-details-marker { color: var(--link); }
+.details-content {
+padding: 0 16px 16px 16px; max-height: 65vh; overflow-y: auto;
+scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+.details-content::-webkit-scrollbar { width: 8px; }
+.details-content::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+.details-content::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 4px; }
+.close-btn-container {
+text-align: right; position: sticky; bottom: 0;
+background: linear-gradient(transparent, var(--details-content-bg) 70%);
+padding: 15px 0 5px; margin-top: 10px;
+}
+.close-btn { font-size: 0.85em; padding: 5px 14px; }
+pre {
+background-color: var(--code-bg); border: 1px solid var(--code-border);
+border-radius: 4px; padding: 12px; overflow-x: auto;
+font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+font-size: 0.9em; margin: 10px 0; line-height: 1.5; white-space: pre-wrap; word-break: break-word;
+}
+code { font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace; }
+.section-intro { margin-bottom: 20px; padding: 10px; background-color: var(--header-bg); border-radius: 5px; }
+p { margin: 10px 0; }
+ul, ol { margin: 10px 0 10px 20px; }
+li { margin: 5px 0; }
+table { width: 100%; border-collapse: collapse; margin: 10px 0; background-color: var(--table-bg); }
+th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+th { background-color: var(--table-header); font-weight: 600; }
+strong { color: var(--link); }
+.resume-box {
+background-color: var(--resume-bg); border-left: 4px solid var(--resume-border);
+padding: 12px 16px; margin: 15px 0; border-radius: 0 6px 6px 0;
+}
+.resume-box strong { color: var(--resume-border); }
+.resume-box p, .resume-box ul { margin: 5px 0; }
+.resume-box ul { padding-left: 20px; }
+.interview-box {
+background-color: var(--interview-bg); border-left: 4px solid var(--interview-border);
+padding: 12px 16px; margin: 15px 0; border-radius: 0 6px 6px 0;
+}
+.interview-box strong { color: var(--interview-border); }
+.interview-box p, .interview-box ul { margin: 5px 0; }
+.interview-box ul { padding-left: 20px; }
+.interview-box li { margin: 8px 0; }
+@media (max-width: 600px) {
+body { font-size: 14px; }
+header { flex-direction: column; align-items: flex-start; }
+.controls { width: 100%; }
+}
+</style>
+</head>
+<body class="dark">
+<header>
+<h1>📘 Память и Garbage Collection: Часть 1</h1>
+<div class="controls">
+<div class="theme-controls">
+<button onclick="setTheme('dark')">🌙 Тёмная</button>
+<button onclick="setTheme('light')">☀️ Светлая</button>
+<button onclick="setTheme('sepia')">📜 Сепия</button>
+</div>
+<div class="font-controls">
+<button onclick="changeFontSize(-1)">A-</button>
+<span class="font-size-label" id="fontSizeLabel">16px</span>
+<button onclick="changeFontSize(1)">A+</button>
+</div>
+</div>
+</header>
+<div class="container">
+<div class="section-intro">
+<p><strong>Часть 1:</strong> Heap vs Stack, что где хранится, Garbage Collection, достижимость объектов, утечки памяти, поколения GC (Young, Old, Metaspace), алгоритмы GC. Каждый раздел содержит развёрнутое объяснение, примеры кода, таблицы, резюме для Middle+ и конкретные советы "Что показать на собеседовании".</p>
+</div>
+
+<h2>🔷 Heap и Stack</h2>
+
+<details id="heap-vs-stack"><summary>В чём разница между Heap и Stack?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Heap (куча) — область памяти для <strong>долгоживущих объектов</strong>, доступная из любого потока, управляется Garbage Collector. Stack (стек) — область памяти для <strong>локальных переменных и вызовов методов</strong>, у каждого потока свой стек, работает по LIFO.</p>
+<h4>Ключевые различия</h4>
+<table>
+<tr><th>Характеристика</th><th>Heap</th><th>Stack</th></tr>
+<tr><td>Назначение</td><td>Объекты, массивы</td><td>Локальные переменные, вызовы методов</td></tr>
+<tr><td>Потоки</td><td>Общая для всех потоков</td><td>У каждого потока свой</td></tr>
+<tr><td>Управление</td><td>Garbage Collector</td><td>Автоматически (LIFO)</td></tr>
+<tr><td>Скорость</td><td>Медленнее</td><td>Быстрее</td></tr>
+<tr><td>Размер</td><td>Большой (-Xmx)</td><td>Малый (~1MB/поток)</td></tr>
+<tr><td>Хранение</td><td>Объекты (new)</td><td>Примитивы, ссылки</td></tr>
+<tr><td>Ошибки</td><td>OutOfMemoryError</td><td>StackOverflowError</td></tr>
+<tr><td>Упорядоченность</td><td>Неупорядоченная</td><td>LIFO</td></tr>
+</table>
+<pre><code>// Демонстрация:
+public class Demo {
+    public static void main(String[] args) {
+        int x = 42;              // Stack: x = 42 (примитив)
+        User user = new User();  // Stack: user → ссылка, Heap: объект User
+        String s = "Hello";      // Stack: s → ссылка, Heap: "Hello"
+    }
+}</code></pre>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Heap хранит все объекты (через <code>new</code>), управляется GC. Stack хранит локальные переменные и фреймы, у каждого потока свой. Локальные примитивы — в Stack, ссылки — в Stack, сами объекты — в Heap. Ошибки: StackOverflowError (рекурсия), OutOfMemoryError (Heap).</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li><strong>Схему памяти:</strong> нарисовать Stack (фреймы main → method1 → method2) и Heap (объекты User, String, массивы). Показать стрелку: Stack-переменная <code>user</code> → объект в Heap.</li>
+<li><strong>Пример на Java:</strong> <code>int x = 42</code> — примитив в Stack; <code>User user = new User()</code> — ссылка в Stack, объект в Heap. Объяснить, что <code>user</code> и объект — это разные вещи в разных областях.</li>
+<li><strong>Ошибки:</strong> бесконечная рекурсия → StackOverflowError (стек переполнен); создание объектов в бесконечном цикле → OutOfMemoryError (Heap переполнен).</li>
+<li><strong>Потокобезопасность:</strong> локальные переменные автоматически потокобезопасны (у каждого потока свой Stack). Поля объектов в Heap — общие, требуют синхронизации.</li>
+<li><strong>Настройка:</strong> <code>-Xmx</code> для Heap, <code>-Xss</code> для Stack. Пример: <code>java -Xmx2g -Xss1m MyApp</code>.</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('heap-vs-stack')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="what-in-heap"><summary>Что хранится в Heap?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> В Heap хранятся <strong>все объекты Java</strong> — экземпляры классов, массивы, строки, коллекции. Всё, что создаётся через <code>new</code>, попадает в Heap. Примитивные поля внутри объектов также хранятся в Heap.</p>
+<pre><code>String s = new String("Hello");        // String
+List&lt;Integer&gt; list = new ArrayList&lt;&gt;(); // коллекция
+int[] numbers = new int[100];           // массив
+User user = new User();                  // свой класс
+Integer wrapped = Integer.valueOf(42);   // обёртка</code></pre>
+<h4>Что НЕ хранится в Heap</h4>
+<pre><code>// Локальные примитивные переменные — в Stack:
+int x = 42;
+// Ссылки на объекты — в Stack:
+String s = "Hello"; // s — ссылка в Stack, "Hello" — объект в Heap</code></pre>
+<h4>Таблица: что где</h4>
+<table>
+<tr><th>Данные</th><th>Где</th></tr>
+<tr><td>Объекты (new)</td><td>Heap</td></tr>
+<tr><td>Массивы</td><td>Heap</td></tr>
+<tr><td>Коллекции</td><td>Heap</td></tr>
+<tr><td>Примитивные поля внутри объектов</td><td>Heap (внутри объекта)</td></tr>
+<tr><td>Локальные примитивы</td><td>Stack</td></tr>
+<tr><td>Локальные ссылки</td><td>Stack</td></tr>
+<tr><td>Параметры методов</td><td>Stack</td></tr>
+</table>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Heap хранит все объекты Java. Примитивные поля — внутри объектов в Heap. Локальные примитивы и ссылки — в Stack. Переполнение → OutOfMemoryError. Настройка: -Xms, -Xmx.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li><strong>Перечислить категории:</strong> экземпляры классов, массивы, строки, коллекции, обёртки, enum-константы.</li>
+<li><strong>Пример:</strong> <code>User user = new User("Alice", 25)</code> — объект User в Heap, внутри него поля name (ссылка на String в Heap) и age (примитив внутри объекта в Heap).</li>
+<li><strong>Отличие:</strong> <code>int fieldAge = 25</code> (поле класса) → Heap внутри объекта; <code>int localAge = 30</code> (локальная переменная) → Stack. Локальная исчезает при выходе из метода, поле живёт пока живёт объект.</li>
+<li><strong>Настройка:</strong> <code>-Xms512m -Xmx2048m</code> — начальный и максимальный Heap. Объяснить, что при <code>-Xmx</code> → OutOfMemoryError.</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('what-in-heap')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="what-in-stack"><summary>Что хранится в Stack?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> В Stack хранятся <strong>локальные переменные примитивных типов</strong>, <strong>ссылки на объекты</strong> (не сами объекты), <strong>параметры методов</strong> и <strong>фреймы вызовов методов</strong>.</p>
+<pre><code>int x = 42;                // Примитив — в Stack
+String s = "Hello";        // Ссылка s — в Stack, "Hello" — в Heap
+User user = new User();    // Ссылка user — в Stack, объект — в Heap</code></pre>
+<h4>Что НЕ хранится в Stack</h4>
+<pre><code>// Сами объекты — в Heap
+// Поля объектов — в Heap
+// Массивы — в Heap
+// Статические переменные — в Metaspace</code></pre>
+<h4>Фреймы методов</h4>
+<pre><code>// Каждый вызов метода создаёт фрейм в Stack:
+public void method1(int param) {  // фрейм: param + локальные
+    int local = param * 2;         // local — в Stack
+}</code></pre>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Stack хранит локальные примитивы, ссылки, параметры и фреймы. Каждый поток имеет собственный стек (LIFO). Локальные переменные автоматически потокобезопасны. Переполнение → StackOverflowError. Настройка: -Xss.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li><strong>Стек вызовов:</strong> нарисовать Stack с фреймами main → method1 → method2. Объяснить, что каждый фрейм содержит параметры и локальные переменные.</li>
+<li><strong>Жизненный цикл:</strong> <code>int x = 42</code> создаётся при входе в метод, исчезает при выходе. Локальные переменные живут только внутри метода.</li>
+<li><strong>Потокобезопасность:</strong> <code>int localVar = 42</code> в двух разных потоках — это две независимые переменные в двух разных стеках. Нет гонок данных.</li>
+<li><strong>StackOverflowError:</strong> <code>factorial(100000)</code> — глубокая рекурсия, каждый вызов — новый фрейм, стек переполняется.</li>
+<li><strong>Настройка:</strong> <code>-Xss1m</code> — размер стека потока. Уменьшить для большего количества потоков, увеличить для глубокой рекурсии.</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('what-in-stack')">⬆️ Свернуть</button></div>
+</div></details>
+
+<h2>🟠 Garbage Collection</h2>
+
+<details id="gc-basics"><summary>Что такое Garbage Collection?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Garbage Collection (GC) — автоматический процесс управления памятью в JVM, который <strong>находит и удаляет объекты, которые больше не используются</strong> (недостижимы), освобождая память Heap.</p>
+<h4>Основные шаги GC</h4>
+<ol>
+<li><strong>Mark (Пометка):</strong> Определить живые объекты</li>
+<li><strong>Sweep (Очистка):</strong> Удалить недостижимые</li>
+<li><strong>Compact (Компактизация):</strong> Дефрагментировать (опционально)</li>
+</ol>
+<h4>Виды сборщиков</h4>
+<table>
+<tr><th>Сборщик</th><th>Особенности</th><th>Когда</th></tr>
+<tr><td>Serial GC</td><td>Один поток</td><td>-XX:+UseSerialGC</td></tr>
+<tr><td>Parallel GC</td><td>Много потоков</td><td>-XX:+UseParallelGC</td></tr>
+<tr><td>G1 GC</td><td>Регионы, предсказуемые паузы</td><td>-XX:+UseG1GC (дефолт Java 9+)</td></tr>
+<tr><td>ZGC</td><td>Паузы &lt;1ms</td><td>-XX:+UseZGC</td></tr>
+<tr><td>Shenandoah</td><td>Низкие паузы</td><td>-XX:+UseShenandoahGC</td></tr>
+</table>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>GC автоматически удаляет недостижимые объекты. Шаги: Mark, Sweep, Compact. Поколения: Young (Eden, Survivor), Old. Виды: Minor GC, Major GC, Full GC. Не вызывать System.gc() вручную.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li><strong>Проблема:</strong> сравнить с C/C++ — в Java нет ручного <code>delete</code>, GC автоматически освобождает память. Пример: <code>user = null</code> → GC удалит объект.</li>
+<li><strong>Три шага:</strong> объяснить Mark (пометка живых), Sweep (удаление мёртвых), Compact (дефрагментация).</li>
+<li><strong>Поколения:</strong> Young (Eden + Survivor), Old, Metaspace. Объект мигрирует: Eden → Survivor → Old после 15 сборок.</li>
+<li><strong>Типы GC:</strong> Minor (Young, быстрая), Major (Old, медленнее), Full (всё, самая медленная).</li>
+<li><strong>Сборщики:</strong> перечислить Serial, Parallel, G1, ZGC, Shenandoah и когда какой использовать.</li>
+<li><strong>Best Practices:</strong> не вызывать System.gc(), использовать try-with-resources, настраивать -Xmx.</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('gc-basics')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="gc-candidate"><summary>Когда объект становится кандидатом на удаление GC?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Объект становится кандидатом на удаление, когда он <strong>недостижим</strong> — на него больше нет ссылок из <strong>GC Roots</strong> (локальные переменные, статические поля, активные потоки, JNI-ссылки).</p>
+<h4>Способы сделать объект недостижимым</h4>
+<table>
+<tr><th>Способ</th><th>Пример</th></tr>
+<tr><td>Обнулить ссылку</td><td><code>user = null;</code></td></tr>
+<tr><td>Перезаписать ссылку</td><td><code>user = new User();</code></td></tr>
+<tr><td>Выйти из метода</td><td><code>method() { User u = new User(); }</code></td></tr>
+<tr><td>Удалить из коллекции</td><td><code>list.remove(user);</code></td></tr>
+<tr><td>Очистить коллекцию</td><td><code>list.clear();</code></td></tr>
+</table>
+<p><strong>Ключевое:</strong> циклические ссылки НЕ предотвращают удаление — GC работает по достижимости, а не по подсчёту ссылок.</p>
+<pre><code>// Циклические ссылки — GC удалит оба:
+Node a = new Node(); Node b = new Node();
+a.next = b; b.next = a;
+a = null; b = null; // оба недостижимы → удалены</code></pre>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Объект удаляется, когда недостижим из GC Roots. Циклические ссылки не создают утечек. Объект жив, пока есть хотя бы одна сильная ссылка. WeakReference позволяет GC удалить объект даже при наличии ссылки.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li><strong>GC Roots:</strong> перечислить виды — локальные переменные (Stack), статические поля, активные потоки, JNI-ссылки. Объяснить, что GC начинает обход от них.</li>
+<li><strong>Циклические ссылки:</strong> пример Node a→b→a. Объяснить, что GC удалит оба, потому что они недостижимы от GC Roots. Это ключевое отличие от C/C++ (в Python используется подсчёт ссылок, поэтому циклы — проблема).</li>
+<li><strong>Сильные ссылки:</strong> <code>user1 = null</code> но <code>user2 = user1</code> — объект всё ещё достижим через user2. Удаление только когда ВСЕ ссылки исчезли.</li>
+<li><strong>Reference-типы:</strong> WeakReference (удаляется при GC), SoftReference (при OOM), PhantomReference (для очистки). Пример: WeakHashMap для кешей.</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('gc-candidate')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="memory-leak"><summary>Что такое утечка памяти в Java?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Утечка памяти в Java — ситуация, когда объекты <strong>остаются достижимыми</strong> (на них есть ссылки), но <strong>больше не нужны</strong> программе. GC не может удалить такие объекты, они накапливаются в Heap → OutOfMemoryError.</p>
+<pre><code>// Утечка: статический список
+public class Cache {
+    private static List&lt;User&gt; users = new ArrayList&lt;&gt;();
+    public static void addUser(User user) {
+        users.add(user); // Объект никогда не будет удалён!
+    }
+}</code></pre>
+<h4>Признаки утечки</h4>
+<ul>
+<li>Постоянный рост Old Generation</li>
+<li>Частые Full GC</li>
+<li>OutOfMemoryError после длительной работы</li>
+<li>Увеличение времени отклика</li>
+</ul>
+<h4>Обнаружение</h4>
+<pre><code>jstat -gcutil &lt;pid&gt; 1000          # мониторинг
+jmap -dump:live,file=heap.hprof &lt;pid&gt;  # снятие дампа
+# Анализ в Eclipse MAT → Leak Suspects Report</code></pre>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Утечка — достижимые, но ненужные объекты. Источники: статические коллекции, слушатели, ThreadLocal, кеши, inner-классы. Обнаружение: jstat, heap dump, MAT. Предотвращение: try-with-resources, WeakHashMap, Guava Cache.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li><strong>Отличие от C/C++:</strong> в C/C++ утечка — забыли free(); в Java — забыли обнулить ссылку. Объект достижим через статический список → GC не удаляет.</li>
+<li><strong>Конкретный пример:</strong> <code>static List&lt;User&gt; cache</code> — каждый <code>addUser()</code> добавляет объект навсегда. Память растёт → OOM.</li>
+<li><strong>График:</strong> при утечке Heap растёт и НЕ уменьшается после GC (в отличие от нормального поведения, когда GC освобождает память и график пилообразный).</li>
+<li><strong>Обнаружение:</strong> показать команды jstat (мониторинг), jmap (дамп), MAT (Leak Suspects Report). Пример: миллион объектов User в дампе — подозрительно.</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('memory-leak')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="how-leak"><summary>Как может возникнуть утечка памяти в Java?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Утечка возникает, когда объекты <strong>остаются достижимыми</strong>, но <strong>больше не нужны</strong>. Основные сценарии: статические коллекции, незакрытые ресурсы, слушатели без удаления, ThreadLocal без remove(), нестатические inner-классы, кеши без ограничений.</p>
+<h4>Карта источников</h4>
+<table>
+<tr><th>Источник</th><th>Решение</th></tr>
+<tr><td>Статические коллекции</td><td>WeakHashMap, ограничение размера</td></tr>
+<tr><td>Слушатели</td><td>removeListener()</td></tr>
+<tr><td>ThreadLocal</td><td>finally { remove(); }</td></tr>
+<tr><td>Незакрытые ресурсы</td><td>Try-with-resources</td></tr>
+<tr><td>Inner-классы</td><td>Static inner-класс</td></tr>
+<tr><td>Кеши</td><td>Guava Cache, LRU</td></tr>
+<tr><td>Коллекции</td><td>Ограничение размера</td></tr>
+</table>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Основные источники: статика, слушатели, ThreadLocal, ресурсы, inner-классы, кеши, коллекции. Обнаружение: heap dump + MAT. Предотвращение: try-with-resources, WeakHashMap, static inner-классы, ограничения.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li><strong>Каждый сценарий с примером кода:</strong> показать 1-2 конкретных примера (например, ThreadLocal без remove() в сервлете, или статический список).</li>
+<li><strong>ThreadLocal в сервлетах:</strong> пул потоков переиспользует потоки → ThreadLocal остаётся → <code>finally { threadLocal.remove(); }</code> решает.</li>
+<li><strong>Нестатические inner-классы:</strong> <code>new Runnable() { }</code> удерживает внешний класс. Исправить: <code>private static class MyRunnable implements Runnable</code>.</li>
+<li><strong>Кеши:</strong> показать Guava Cache с <code>maximumSize(100)</code> и <code>expireAfterWrite()</code>.</li>
+<li><strong>Строковый String Pool:</strong> <code>intern()</code> на динамических строках — утечка. Решение: не интернировать или G1 String Deduplication.</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('how-leak')">⬆️ Свернуть</button></div>
+</div></details>
+
+<h2>🟢 Поколения GC</h2>
+
+<details id="generations"><summary>Что такое поколения в GC (young, old, metaspace)?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Поколения — разделение Heap по <strong>возрасту объектов</strong>: Young Generation — новые, Old Generation — долгоживущие, Metaspace — метаданные классов (вне Heap).</p>
+<h4>Структура</h4>
+<pre><code>YOUNG GENERATION: Eden + Survivor 0 + Survivor 1
+OLD GENERATION: долгоживущие
+METASPACE: метаданные классов (вне Heap)</code></pre>
+<h4>Типы GC</h4>
+<table>
+<tr><th>Тип GC</th><th>Что собирает</th><th>Скорость</th></tr>
+<tr><td>Minor GC</td><td>Young Generation</td><td>Быстрая</td></tr>
+<tr><td>Major GC</td><td>Old Generation</td><td>Медленная</td></tr>
+<tr><td>Full GC</td><td>Всё + Metaspace</td><td>Самая медленная</td></tr>
+</table>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Поколения разделяют Heap по возрасту. Minor GC — Young (часто, быстро), Major GC — Old (реже, медленнее), Full GC — всё. Объект мигрирует: Eden → Survivor 0 → Survivor 1 → Old. Современные GC (G1, ZGC) используют регионы вместо поколений.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li><strong>Схему:</strong> нарисовать Heap с Young (Eden + 2 Survivor) и Old, отдельно Metaspace. Показать стрелку миграции.</li>
+<li><strong>Гипотезу поколений:</strong> большинство объектов умирают молодыми (~90%). Поэтому Young собирается чаще и быстрее.</li>
+<li><strong>Типы GC:</strong> Minor (Young), Major (Old), Full (всё). Сравнить по скорости и частоте.</li>
+<li><strong>Настройки:</strong> <code>-XX:NewRatio=2</code> (Old=2x Young), <code>-XX:MaxTenuringThreshold=15</code> (порог в Old), <code>-XX:SurvivorRatio=8</code> (Eden=8x Survivor).</li>
+<li><strong>Современные GC:</strong> G1, ZGC, Shenandoah используют регионы, не классические поколения.</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('generations')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="young-gen"><summary>Что такое Young Generation?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Young Generation — область Heap, где <strong>создаются новые объекты</strong>. Состоит из Eden и двух Survivor (S0, S1). Собирается часто и быстро (Minor GC).</p>
+<pre><code>Eden (новые) + Survivor 0 + Survivor 1</code></pre>
+<h4>Миграция</h4>
+<pre><code>Eden → Survivor 0 → Survivor 1 → Old Generation (после 15 сборок)</code></pre>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Young Generation — для новых объектов. Minor GC собирает Young часто и быстро. Большинство объектов умирают здесь. Настройка: -XX:NewSize, -XX:SurvivorRatio, -XX:MaxTenuringThreshold.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li><strong>Структуру:</strong> Eden (рождение) + два Survivor (выжившие). Один Survivor всегда пуст.</li>
+<li><strong>Пример миграции:</strong> объект рождается в Eden → Minor GC №1 → Survivor 0 → Minor GC №2 → Survivor 1 → ... → после 15 сборок → Old Generation.</li>
+<li><strong>Minor GC:</strong> собирает только Young, быстрая пауза (миллисекунды), большинство объектов мёртвые.</li>
+<li><strong>Настройки:</strong> <code>-XX:SurvivorRatio=8</code> (Eden=8x Survivor), <code>-XX:MaxTenuringThreshold=15</code> (порог перехода в Old).</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('young-gen')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="old-gen"><summary>Что такое Old Generation (Tenured)?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Old Generation — область Heap для <strong>долгоживущих объектов</strong>, переживших много сборок в Young. Собирается реже (Major GC / Full GC), но медленнее.</p>
+<pre><code>Что попадает в Old:
+- Объекты, пережившие 15 Minor GC
+- Статические объекты
+- Большие объекты (при -XX:PretenureSizeThreshold)
+- Кеши, пулы, синглтоны</code></pre>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Old Generation — для долгоживущих. Major GC собирает медленнее, но реже. Проблемы: фрагментация, утечки, преждевременное продвижение. Настройка: -XX:NewRatio, -XX:MaxTenuringThreshold.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li><strong>Что попадает в Old:</strong> объекты после 15 Minor GC, статика, большие объекты (PretenureSizeThreshold), кеши, синглтоны.</li>
+<li><strong>Major GC:</strong> собирает Old Generation, медленнее Minor GC, но реже. Пауза — десятки-сотни миллисекунд.</li>
+<li><strong>Настройки:</strong> <code>-XX:NewRatio=2</code> (Old=2x Young), <code>-XX:MaxTenuringThreshold=15</code>.</li>
+<li><strong>Проблемы:</strong> преждевременное продвижение (объект попадает в Old слишком рано → Minor GC не может удалить).</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('old-gen')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="metaspace"><summary>Что такое Metaspace (или PermGen)?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Metaspace — область нативной памяти JVM (вне Heap) для <strong>метаданных классов</strong>. Введена в Java 8, заменив устаревший PermGen.</p>
+<h4>PermGen vs Metaspace</h4>
+<table>
+<tr><th>Характеристика</th><th>PermGen (Java 7-)</th><th>Metaspace (Java 8+)</th></tr>
+<tr><td>Расположение</td><td>Внутри Heap</td><td>Вне Heap</td></tr>
+<tr><td>Размер</td><td>Фиксированный</td><td>Динамический</td></tr>
+<tr><td>Ошибка</td><td>OutOfMemoryError: PermGen space</td><td>OutOfMemoryError: Metaspace</td></tr>
+</table>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Metaspace хранит метаданные классов. Динамически растёт. Ошибка: OutOfMemoryError: Metaspace. Утечки: незакрытые класслоадеры, динамические прокси, лямбды. Настройка: -XX:MetaspaceSize, -XX:MaxMetaspaceSize.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li><strong>Эволюцию:</strong> PermGen (Java 7-) → Metaspace (Java 8+). Объяснить, что PermGen был в Heap с фиксированным размером, а Metaspace — в нативной памяти и динамический.</li>
+<li><strong>Что хранится:</strong> определения классов, байт-код, константы, рефлексия, аннотации.</li>
+<li><strong>Утечки классов:</strong> динамические Proxy, лямбды, незакрытые URLClassLoader — всё создаёт новые классы в Metaspace.</li>
+<li><strong>Настройка:</strong> <code>-XX:MaxMetaspaceSize=512m</code>. Ошибка: <code>OutOfMemoryError: Metaspace</code>.</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('metaspace')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="gc-algorithms"><summary>Какие алгоритмы GC существуют?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Serial GC (однопоточный), Parallel GC (многопоточный), CMS (устарел), G1 GC (регионы, дефолт Java 9+), ZGC (<1ms паузы), Shenandoah (низкие паузы).</p>
+<h4>Сравнение</h4>
+<table>
+<tr><th>Сборщик</th><th>Паузы</th><th>Throughput</th><th>Heap size</th></tr>
+<tr><td>Serial</td><td>Короткие</td><td>Низкий</td><td>&lt;100MB</td></tr>
+<tr><td>Parallel</td><td>Средние</td><td>Высокий</td><td>1-4GB</td></tr>
+<tr><td>G1</td><td>Предсказуемые</td><td>Средний</td><td>4-64GB</td></tr>
+<tr><td>ZGC</td><td>&lt;1ms</td><td>Средний</td><td>До 16TB</td></tr>
+<tr><td>Shenandoah</td><td>Низкие</td><td>Средний</td><td>Большие</td></tr>
+</table>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Каждый GC — компромисс между throughput, latency, footprint. Serial — для малых, Parallel — для batch, G1 — дефолт, ZGC/Shenandoah — для больших Heap с минимальными паузами.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li><strong>Перечислить все 6:</strong> Serial, Parallel, CMS (удалён), G1, ZGC, Shenandoah.</li>
+<li><strong>Выбор по сценарию:</strong> маленькое приложение 1 ядро → Serial; batch с throughput → Parallel; сбалансированный → G1; минимальные паузы → ZGC/Shenandoah.</li>
+<li><strong>Пример настройки:</strong> <code>-XX:+UseG1GC -XX:MaxGCPauseMillis=100 -Xmx4g</code>.</li>
+<li><strong>Компромиссы:</strong> минимальные паузы → выше CPU и память. Максимальная throughput → Parallel.</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('gc-algorithms')">⬆️ Свернуть</button></div>
+</div></details>
+
+
+
+
+<h1>📘 Память и Garbage Collection: Часть 2</h1>
+
+<div class="container">
+<div class="section-intro">
+<p><strong>Часть 2:</strong> G1 GC, ZGC, Shenandoah GC, stop-the-world, GC минимизирующие паузы, -Xms и -Xmx, OutOfMemoryError и его типы, memory leak, инструменты анализа, heap dump, GC roots, reachability, ручной вызов GC. Каждый раздел содержит развёрнутое объяснение, примеры кода, таблицы, резюме для Middle+ и конкретные советы "Что показать на собеседовании".</p>
+</div>
+
+<h2>🔷 Современные сборщики мусора</h2>
+
+<details id="g1gc"><summary>Что такое G1 GC?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> G1 GC (Garbage First) — сборщик мусора, который разделяет Heap на <strong>регионы</strong> (вместо классических поколений) и собирает сначала регионы с <strong>наибольшим количеством мусора</strong>. Дефолтный GC в Java 9+. Обеспечивает <strong>предсказуемые паузы</strong> через <code>-XX:MaxGCPauseMillis</code>.</p>
+<h4>Типы регионов</h4>
+<table>
+<tr><th>Регион</th><th>Назначение</th></tr>
+<tr><td>Eden</td><td>Новые объекты</td></tr>
+<tr><td>Survivor</td><td>Выжившие после сборки</td></tr>
+<tr><td>Old</td><td>Долгоживущие</td></tr>
+<tr><td>Humongous</td><td>Большие объекты (>50% региона)</td></tr>
+</table>
+<h4>Цикл G1</h4>
+<pre><code>Young GC → Concurrent Marking → Mixed GC → Full GC (fallback)</code></pre>
+<h4>Ключевые параметры</h4>
+<pre><code>-XX:+UseG1GC               # включение
+-XX:MaxGCPauseMillis=200   # целевая пауза
+-XX:G1HeapRegionSize=2m    # размер региона</code></pre>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>G1 GC — сборщик, разделяющий Heap на регионы (~2MB). Собирает регионы с наибольшим мусором. Дефолт с Java 9. Ключевая фича — предсказуемые паузы через MaxGCPauseMillis. Преимущества: нет фрагментации, работает с большими Heap. Недостатки: накладные расходы, избыточен для малых Heap.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li><strong>Схему регионов:</strong> Heap разделён на регионы ~2MB, каждый может быть Eden, Survivor, Old, Humongous. Нет жёсткой границы между поколениями.</li>
+<li><strong>"Garbage First":</strong> G1 сначала собирает регионы с наибольшим количеством мёртвых объектов — отсюда название.</li>
+<li><strong>Цикл:</strong> Young GC → Concurrent Marking → Mixed GC → Full GC (fallback). Объяснить, что Mixed GC — это Young + часть Old-регионов.</li>
+<li><strong>Ключевой параметр:</strong> <code>-XX:MaxGCPauseMillis=200</code> — G1 старается укладываться в этот бюджет пауз. Меньше пауза → больше работы за цикл.</li>
+<li><strong>Когда использовать:</strong> Heap 4-64GB, сбалансированные требования. Для маленьких Heap — Serial/Parallel, для минимальных пауз — ZGC.</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('g1gc')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="zgc"><summary>Что такое ZGC?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> ZGC (Z Garbage Collector) — сборщик мусора, обеспечивающий <strong>сверхнизкие паузы</strong> (менее 1 мс) независимо от размера Heap. Работает с <strong>очень большими кучами</strong> (терабайты). Использует <strong>окрашенные указатели</strong> и <strong>параллельную сборку</strong>.</p>
+<h4>Ключевые характеристики</h4>
+<table>
+<tr><th>Характеристика</th><th>ZGC</th></tr>
+<tr><td>Паузы</td><td>&lt;1ms</td></tr>
+<tr><td>Размер Heap</td><td>До 16TB</td></tr>
+<tr><td>Компактизация</td><td>Да (без остановки)</td></tr>
+<tr><td>Статус</td><td>Production-ready (Java 15+)</td></tr>
+</table>
+<h4>Техники</h4>
+<ul>
+<li><strong>Colored Pointers</strong> — метаданные в неиспользуемых битах указателя</li>
+<li><strong>Load Barriers</strong> — проверка состояния объекта при доступе</li>
+<li><strong>Concurrent Compaction</strong> — перемещение объектов без остановки</li>
+</ul>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>ZGC — сборщик со сверхнизкими паузами (&lt;1ms), работающий с огромными Heap. Использует Colored Pointers и Load Barriers. Основные фазы выполняются параллельно с приложением. Накладные расходы ~4-5%. Идеален для real-time систем с большими Heap.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li><strong>Colored Pointers:</strong> ZGC использует неиспользуемые биты 64-битного указателя для хранения метаданных GC (Finalizable, Remapped, Marked0, Marked1). Не требует дополнительной памяти.</li>
+<li><strong>Load Barriers:</strong> при каждом доступе к объекту ZGC проверяет, не перемещён ли он, и при необходимости обновляет ссылку. Оверхед ~4-5%.</li>
+<li><strong>Фазы:</strong> Pause Mark Start → Concurrent Mark → Pause Mark End → Concurrent Relocate. Основная работа — без остановки приложения.</li>
+<li><strong>Когда:</strong> Heap > 8GB, паузы &lt;10ms, real-time системы. Настройка: <code>-XX:+UseZGC -Xmx16g</code>.</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('zgc')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="shenandoah"><summary>Что такое Shenandoah GC?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Shenandoah GC — сборщик мусора, обеспечивающий <strong>низкие паузы</strong> независимо от размера Heap. Использует <strong>параллельную сборку</strong> и <strong>компактизацию без остановки</strong>. Отличие от ZGC — использует <strong>Brooks Pointers</strong> вместо Colored Pointers. Разработан Red Hat.</p>
+<h4>Shenandoah vs ZGC</h4>
+<table>
+<tr><th>Аспект</th><th>Shenandoah</th><th>ZGC</th></tr>
+<tr><td>Паузы</td><td>Низкие (мс)</td><td>&lt;1ms</td></tr>
+<tr><td>Техника</td><td>Brooks Pointers</td><td>Colored Pointers</td></tr>
+<tr><td>Разработчик</td><td>Red Hat</td><td>Oracle</td></tr>
+<tr><td>Оверхед</td><td>~5%</td><td>~4-5%</td></tr>
+</table>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Shenandoah GC — сборщик с низкими паузами, использующий Brooks Pointers. Разработан Red Hat. Основные фазы выполняются параллельно с приложением. Похож на ZGC, но использует другую технику. Накладные расходы ~5%. На собеседовании важно показать понимание отличий от ZGC (Brooks Pointers vs Colored Pointers).</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li><strong>Brooks Pointers:</strong> каждый объект имеет указатель на себя (forwarding pointer). При перемещении объекта указатель обновляется, приложение обращается через него.</li>
+<li><strong>Фазы:</strong> Init Mark → Concurrent Mark → Final Mark → Concurrent Evacuation → Concurrent Cleanup. Без остановки приложения.</li>
+<li><strong>Отличие от ZGC:</strong> ZGC использует Colored Pointers (метаданные в битах указателя), Shenandoah — Brooks Pointers (дополнительный уровень косвенности).</li>
+<li><strong>Когда:</strong> низкие паузы, большие Heap, Red Hat экосистема. Настройка: <code>-XX:+UseShenandoahGC</code>.</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('shenandoah')">⬆️ Свернуть</button></div>
+</div></details>
+
+<h2>🟠 Stop-The-World и минимизация пауз</h2>
+
+<details id="stw"><summary>Что такое stop-the-world?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Stop-The-World (STW) — состояние JVM, при котором <strong>все рабочие потоки приложения приостанавливаются</strong> для выполнения сборки мусора. В это время приложение <strong>не отвечает на запросы</strong>.</p>
+<h4>Какие GC вызывают STW</h4>
+<table>
+<tr><th>Сборщик</th><th>STW-паузы</th><th>Длительность</th></tr>
+<tr><td>Serial GC</td><td>Да, на всех фазах</td><td>Короткие, но частые</td></tr>
+<tr><td>Parallel GC</td><td>Да, на всех фазах</td><td>Средние</td></tr>
+<tr><td>G1 GC</td><td>Частично</td><td>Предсказуемые</td></tr>
+<tr><td>ZGC</td><td>Минимальные</td><td>&lt;1ms</td></tr>
+<tr><td>Shenandoah</td><td>Минимальные</td><td>Короткие</td></tr>
+</table>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Stop-The-World — приостановка всех потоков JVM для безопасной сборки мусора. Причины: безопасное перемещение объектов, консистентность графа. Современные GC (G1, ZGC, Shenandoah) минимизируют паузы.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li><strong>Почему нужны:</strong> GC не может безопасно перемещать объекты, пока приложение использует ссылки на них. Если GC переместит объект в момент чтения ссылки — данные повреждены. STW решает проблему.</li>
+<li><strong>Влияние:</strong> E-commerce 1000 rps: Serial GC с паузой 200ms → 200 запросов ждут. G1 с паузой 50ms → 50 запросов. ZGC с паузой &lt;1ms → &lt;1 запроса.</li>
+<li><strong>Мониторинг:</strong> <code>-Xlog:gc*:file=gc.log</code>, поиск "Full GC" — длинные паузы.</li>
+<li><strong>Уменьшение:</strong> G1 (MaxGCPauseMillis), ZGC/Shenandoah, фиксированный Heap (-Xms == -Xmx).</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('stw')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="low-stw-gc"><summary>Какие GC минимизируют stop-the-world паузы?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> GC, минимизирующие STW-паузы: <strong>ZGC</strong> (&lt;1ms), <strong>Shenandoah GC</strong> (миллисекунды), <strong>G1 GC</strong> (предсказуемые десятки миллисекунд), <strong>CMS</strong> (устарел). Лучшие — <strong>ZGC</strong> и <strong>Shenandoah</strong>.</p>
+<h4>Рейтинг GC по минимальным паузам</h4>
+<table>
+<tr><th>Сборщик</th><th>STW-паузы</th><th>Техника</th><th>Статус</th></tr>
+<tr><td>ZGC</td><td>&lt;1ms</td><td>Colored Pointers</td><td>✅ Актуальный</td></tr>
+<tr><td>Shenandoah</td><td>~1-5ms</td><td>Brooks Pointers</td><td>✅ Актуальный</td></tr>
+<tr><td>G1 GC</td><td>10-50ms</td><td>Регионы</td><td>✅ Дефолт Java 9+</td></tr>
+<tr><td>CMS</td><td>Минимальные</td><td>Concurrent</td><td>❌ Удалён Java 14</td></tr>
+</table>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>ZGC и Shenandoah выполняют основную работу параллельно с приложением. G1 — дефолт с настраиваемыми паузами. CMS — устарел. Компромисс: минимальные паузы → выше CPU и память.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li><strong>Рейтинг:</strong> ZGC (&lt;1ms) → Shenandoah (~1-5ms) → G1 (10-50ms) → CMS (устарел).</li>
+<li><strong>Техники:</strong> ZGC — Colored Pointers; Shenandoah — Brooks Pointers; G1 — регионы; CMS — concurrent mark-sweep (без компактизации).</li>
+<li><strong>Выбор:</strong> нужны паузы &lt;1ms → ZGC; ~1-5ms → Shenandoah; предсказуемые до 100ms → G1; важна throughput → Parallel.</li>
+<li><strong>Настройка:</strong> <code>-XX:+UseZGC</code>, <code>-XX:+UseShenandoahGC</code>, <code>-XX:+UseG1GC -XX:MaxGCPauseMillis=100</code>.</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('low-stw-gc')">⬆️ Свернуть</button></div>
+</div></details>
+
+<h2>🟢 Параметры памяти и ошибки</h2>
+
+<details id="xms-xmx"><summary>Что такое параметры -Xms и -Xmx?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> <code>-Xms</code> — начальный размер Heap, <code>-Xmx</code> — максимальный размер Heap. Пример: <code>-Xms512m -Xmx2048m</code> — JVM стартует с Heap 512MB и может расширять до 2GB.</p>
+<h4>Как это работает</h4>
+<pre><code>// JVM с -Xms512m -Xmx2048m:
+// Старт: Heap = 512MB
+// Приложение создаёт объекты: Heap растёт
+// 512MB → 600MB → 800MB → ...
+// Максимум: Heap = 2048MB → OutOfMemoryError</code></pre>
+<h4>Сводная таблица</h4>
+<table>
+<tr><th>Параметр</th><th>Назначение</th><th>Пример</th></tr>
+<tr><td>-Xms</td><td>Начальный Heap</td><td>-Xms512m</td></tr>
+<tr><td>-Xmx</td><td>Максимальный Heap</td><td>-Xmx2g</td></tr>
+<tr><td>-Xss</td><td>Stack size</td><td>-Xss1m</td></tr>
+<tr><td>-XX:MaxMetaspaceSize</td><td>Metaspace</td><td>-XX:MaxMetaspaceSize=512m</td></tr>
+</table>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p><code>-Xms</code> — начальный Heap, <code>-Xmx</code> — максимальный. Heap растёт от Xms до Xmx. При достижении Xmx → OutOfMemoryError. Для production рекомендуется Xms == Xmx (фиксированный Heap). Правило: Xmx = 50-75% от RAM.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li><strong>Единицы измерения:</strong> k (KB), m (MB), g (GB). Пример: <code>-Xms512m -Xmx2g</code>.</li>
+<li><strong>Xms == Xmx:</strong> в production рекомендуется одинаковые значения — нет ресайза Heap, стабильная производительность.</li>
+<li><strong>Правило выбора:</strong> Xmx = 50-75% от RAM. Оставить ОС и другим процессам. Для микросервисов: <code>-Xms256m -Xmx512m</code>. Для монолитов: <code>-Xms1g -Xmx2g</code>.</li>
+<li><strong>Мониторинг:</strong> <code>Runtime.getRuntime().maxMemory()</code> показывает Xmx; <code>jstat -gc &lt;pid&gt;</code> — статистику Heap.</li>
+<li><strong>Типичная ошибка:</strong> Xms больше Xmx → ошибка запуска.</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('xms-xmx')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="oom"><summary>Что произойдёт при OutOfMemoryError?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> <code>OutOfMemoryError</code> — <strong>необратимая ошибка</strong>, возникающая когда JVM не может выделить память для нового объекта. Приложение <strong>обычно падает</strong>. Это не <code>Exception</code>, а <code>Error</code> — перехватывать и продолжать работу <strong>не рекомендуется</strong>.</p>
+<h4>Правильная реакция на OOM</h4>
+<pre><code>// Перехватить для ЛОГИРОВАНИЯ и завершения:
+catch (OutOfMemoryError e) {
+    logger.fatal("OutOfMemoryError occurred", e);
+    emergencySave();
+    System.exit(1); // Аварийное завершение
+}</code></pre>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>OutOfMemoryError — необратимая ошибка нехватки памяти. Перехватывать для продолжения работы — неправильно. Правильная реакция: логирование + аварийное завершение. Предотвращение: увеличить Xmx, найти утечки, ограничить коллекции, закрывать ресурсы.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li><strong>Это Error, а не Exception:</strong> JVM в нестабильном состоянии, продолжение работы опасно. Ловить только для логирования и System.exit(1).</li>
+<li><strong>Что происходит:</strong> Heap заполняется → GC пытается освободить (Full GC) → если не удаётся → OutOfMemoryError → приложение падает.</li>
+<li><strong>Предотвращение:</strong> увеличить -Xmx, найти утечку через heap dump, ограничить коллекции (<code>if (list.size() < 1000)</code>), try-with-resources.</li>
+<li><strong>Автоматический дамп:</strong> <code>-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/dumps/heap.hprof</code> — при OOM будет создан дамп для анализа.</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('oom')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="oom-types"><summary>Какие типы OutOfMemoryError существуют?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Основные типы: <strong>Java heap space</strong>, <strong>GC overhead limit exceeded</strong>, <strong>Metaspace</strong>, <strong>Unable to create native thread</strong>, <strong>Direct buffer memory</strong>, <strong>PermGen space</strong> (Java 7-, устарел).</p>
+<h4>Обзор всех типов</h4>
+<table>
+<tr><th>Тип OOM</th><th>Причина</th><th>Решение</th></tr>
+<tr><td>Java heap space</td><td>Heap переполнен</td><td>Увеличить -Xmx, найти утечку</td></tr>
+<tr><td>GC overhead</td><td>GC неэффективен</td><td>Найти утечку</td></tr>
+<tr><td>Metaspace</td><td>Метаданные классов</td><td>-XX:MaxMetaspaceSize</td></tr>
+<tr><td>Native thread</td><td>Лимит потоков ОС</td><td>ulimit, -Xss</td></tr>
+<tr><td>Direct buffer</td><td>NIO-буферы</td><td>-XX:MaxDirectMemorySize</td></tr>
+</table>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Самый частый — Java heap space (утечка или маленький Heap). Каждый тип — своя причина и решение. Диагностика: стек-трейс показывает тип, heap dump для анализа.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li><strong>Java heap space:</strong> <code>while (true) { list.add(new Object()); }</code> → Heap переполнен. Решение: -Xmx, найти утечку.</li>
+<li><strong>GC overhead:</strong> GC тратит >98% времени, освобождая <2%. Признак серьёзной утечки. Решение: heap dump.</li>
+<li><strong>Metaspace:</strong> динамические Proxy/лямбды создают классы → переполнение. Решение: <code>-XX:MaxMetaspaceSize=512m</code>.</li>
+<li><strong>Native thread:</strong> <code>while (true) { new Thread(...).start(); }</code> → лимит ОС. Решение: ulimit, -Xss, пулы потоков.</li>
+<li><strong>Direct buffer:</strong> <code>ByteBuffer.allocateDirect(1MB)</code> в цикле → нативная память. Решение: <code>-XX:MaxDirectMemorySize=256m</code>.</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('oom-types')">⬆️ Свернуть</button></div>
+</div></details>
+
+<h2>🟡 Анализ памяти</h2>
+
+<details id="memory-leak-detect"><summary>Что такое memory leak и как его обнаружить?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Memory leak в Java — ситуация, когда объекты <strong>остаются достижимыми</strong>, но <strong>больше не нужны</strong>. GC не может удалить их, они накапливаются в Heap → <code>OutOfMemoryError</code>. Обнаружить можно через <strong>мониторинг Heap</strong>, <strong>heap dump</strong> и <strong>анализ цепочек ссылок</strong>.</p>
+<h4>Пошаговое обнаружение</h4>
+<pre><code>// Шаг 1: Мониторинг Heap
+jstat -gcutil <pid> 1000
+// Old Generation растёт → возможна утечка
+
+// Шаг 2: Снятие heap dump
+jmap -dump:live,file=heap.hprof <pid>
+
+// Шаг 3: Анализ в Eclipse MAT
+// Leak Suspects Report → найти утечку</code></pre>
+<h4>Типичные источники</h4>
+<table>
+<tr><th>Источник</th><th>Решение</th></tr>
+<tr><td>Статические коллекции</td><td>WeakHashMap, ограничение</td></tr>
+<tr><td>Слушатели</td><td>removeListener()</td></tr>
+<tr><td>ThreadLocal</td><td>remove()</td></tr>
+<tr><td>Незакрытые ресурсы</td><td>Try-with-resources</td></tr>
+<tr><td>Inner-классы</td><td>Static inner-класс</td></tr>
+<tr><td>Кеши</td><td>Guava Cache, LRU</td></tr>
+</table>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Memory leak — достижимые, но ненужные объекты. Обнаружение: jstat (мониторинг), jmap (heap dump), MAT (анализ). Признаки: рост Old Generation, частые Full GC, OutOfMemoryError.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li><strong>Пример кода:</strong> <code>static List&lt;User&gt; cache = new ArrayList&lt;&gt;(); addUser()</code> — каждый вызов добавляет объект навсегда.</li>
+<li><strong>Признаки:</strong> рост Old Generation (jstat), частые Full GC, OutOfMemoryError после длительной работы.</li>
+<li><strong>График:</strong> при утечке Heap растёт и НЕ уменьшается после GC (нет пилообразного паттерна).</li>
+<li><strong>Инструменты:</strong> jstat (мониторинг), jmap (дамп), Eclipse MAT (Leak Suspects Report). Пример: миллион объектов User в дампе — утечка.</li>
+<li><strong>Предотвращение:</strong> try-with-resources, remove слушателей, WeakHashMap, Guava Cache с maximumSize.</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('memory-leak-detect')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="memory-tools"><summary>Какие инструменты помогают анализировать память?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Основные инструменты: <strong>jstat</strong> (статистика GC), <strong>jmap</strong> (heap dump), <strong>Eclipse MAT</strong> (анализ дампов), <strong>VisualVM</strong> (мониторинг + профилирование), <strong>JProfiler</strong> и <strong>YourKit</strong> (коммерческие), <strong>Arthas</strong> (реальное время).</p>
+<h4>Сравнительная таблица</h4>
+<table>
+<tr><th>Инструмент</th><th>Бесплатный</th><th>Анализ heap dump</th><th>Утечки</th><th>Мониторинг</th></tr>
+<tr><td>jstat</td><td>✅ Да</td><td>❌ Нет</td><td>Косвенно</td><td>✅</td></tr>
+<tr><td>jmap</td><td>✅ Да</td><td>✅ Снимает</td><td>Косвенно</td><td>❌</td></tr>
+<tr><td>Eclipse MAT</td><td>✅ Да</td><td>✅ Анализирует</td><td>✅ Авто</td><td>❌</td></tr>
+<tr><td>VisualVM</td><td>✅ Да</td><td>✅</td><td>Косвенно</td><td>✅</td></tr>
+<tr><td>JProfiler</td><td>❌ Нет</td><td>✅</td><td>✅ Авто</td><td>✅</td></tr>
+<tr><td>YourKit</td><td>❌ Нет</td><td>✅</td><td>✅ Авто</td><td>✅</td></tr>
+<tr><td>Arthas</td><td>✅ Да</td><td>✅</td><td>Косвенно</td><td>✅</td></tr>
+</table>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Для быстрой проверки — jstat. Для снятия дампа — jmap. Для анализа — MAT. Для глубокого профилирования — JProfiler/YourKit. Базовый цикл: мониторинг → дамп → анализ → исправление.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li><strong>jstat:</strong> <code>jstat -gcutil &lt;pid&gt; 1000</code> — статистика GC каждую секунду. Показывает использование поколений.</li>
+<li><strong>jmap:</strong> <code>jmap -dump:live,file=heap.hprof &lt;pid&gt;</code> — снятие дампа. <code>jmap -histo:live &lt;pid&gt;</code> — гистограмма объектов.</li>
+<li><strong>Eclipse MAT:</strong> Leak Suspects Report — автоматический поиск утечек. Dominator Tree — кто удерживает память.</li>
+<li><strong>VisualVM:</strong> GUI-мониторинг, графики Heap, профилирование CPU.</li>
+<li><strong>JProfiler/YourKit:</strong> коммерческие, автоматический поиск утечек, сравнение дампов до/после.</li>
+<li><strong>Arthas:</strong> <code>heapdump /tmp/heap.hprof</code> — снятие дампа в реальном времени.</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('memory-tools')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="heap-dump"><summary>Что такое heap dump?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Heap dump — <strong>снимок всех объектов в Heap</strong> на определённый момент времени. Содержит полную информацию о каждом объекте: тип, значения полей, размер, ссылки. Формат — HPROF (<code>.hprof</code>).</p>
+<h4>Что содержит</h4>
+<ul>
+<li>Все объекты в Heap</li>
+<li>Типы объектов</li>
+<li>Значения полей</li>
+<li>Размеры объектов (shallow size)</li>
+<li>Ссылки между объектами</li>
+<li>GC Roots</li>
+</ul>
+<h4>Shallow vs Retained size</h4>
+<pre><code>// Shallow Size: размер самого объекта без вложенных
+// Retained Size: память, которая освободится при удалении
+// Пример: User { name (String), age (int) }
+// Shallow: 24 байта
+// Retained: 24 + 40 (String) = 64 байта</code></pre>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Heap dump — снимок всех объектов в Heap. Снятие: jmap, jcmd, автоматически при OOM. Анализ: Eclipse MAT, VisualVM. Ключевые концепции: Shallow size vs Retained size.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li><strong>Что содержит:</strong> все объекты, их типы, поля, размеры, ссылки, GC Roots. Формат HPROF.</li>
+<li><strong>Shallow vs Retained:</strong> Shallow — размер самого объекта; Retained — память, которая освободится при его удалении (включая вложенные объекты).</li>
+<li><strong>Пример анализа:</strong> <code>static Map&lt;String, User&gt; cache</code> — в дампе миллион User, Retained 80MB. GC Root: Cache.class → HashMap → Node[] → User.</li>
+<li><strong>Сравнение дампов:</strong> снять до и после — увидеть, какие классы растут.</li>
+<li><strong>Ограничения:</strong> большой файл, пауза при снятии, нет информации о CPU.</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('heap-dump')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="get-heap-dump"><summary>Как получить heap dump?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Получить heap dump можно через: <strong>jmap</strong>, <strong>jcmd</strong>, <strong>автоматически при OOM</strong>, <strong>VisualVM</strong>, <strong>Arthas</strong>. Самый распространённый — jmap.</p>
+<h4>Основные способы</h4>
+<pre><code>// Способ 1: jmap
+jmap -dump:live,file=heap.hprof <pid>
+
+// Способ 2: jcmd (рекомендуемый)
+jcmd <pid> GC.heap_dump heap.hprof
+
+// Способ 3: Автоматически при OOM (для production)
+java -XX:+HeapDumpOnOutOfMemoryError \
+     -XX:HeapDumpPath=/dumps/heap.hprof \
+     MyApp
+
+// Способ 4: VisualVM (GUI)
+// Способ 5: Arthas: heapdump /tmp/heap.hprof</code></pre>
+<h4>Сравнение способов</h4>
+<table>
+<tr><th>Способ</th><th>Автоматический</th><th>Рекомендуется для</th></tr>
+<tr><td>jmap</td><td>❌</td><td>Быстрое снятие</td></tr>
+<tr><td>jcmd</td><td>❌</td><td>Стабильность</td></tr>
+<tr><td>OOM-дамп</td><td>✅</td><td>Production</td></tr>
+<tr><td>VisualVM</td><td>❌</td><td>Визуальный анализ</td></tr>
+<tr><td>Arthas</td><td>❌</td><td>Реальное время</td></tr>
+</table>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Самый надёжный для production — <code>-XX:+HeapDumpOnOutOfMemoryError</code>. Для ручного снятия — <code>jmap -dump:live,file=heap.hprof &lt;pid&gt;</code>. Опция live запускает Full GC перед дампом. После — анализ в Eclipse MAT.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li><strong>jmap:</strong> <code>jmap -dump:live,file=heap.hprof &lt;pid&gt;</code>. Опция <code>live</code> запускает Full GC — только живые объекты, но пауза.</li>
+<li><strong>jcmd:</strong> <code>jcmd &lt;pid&gt; GC.heap_dump heap.hprof</code> — стабильнее jmap в новых JDK.</li>
+<li><strong>Production:</strong> <code>-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/dumps/heap.hprof</code> — автоматический дамп при OOM.</li>
+<li><strong>Docker:</strong> <code>docker exec &lt;id&gt; jmap -dump:live,file=/tmp/heap.hprof &lt;pid&gt;</code>, затем <code>docker cp</code>.</li>
+<li><strong>После снятия:</strong> Eclipse MAT → Leak Suspects Report.</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('get-heap-dump')">⬆️ Свернуть</button></div>
+</div></details>
+
+<h2>🟣 Достижимость объектов</h2>
+
+<details id="gc-roots"><summary>Что такое GC roots?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> GC Roots — <strong>стартовые точки</strong> для определения достижимости объектов. Объекты, которые всегда считаются живыми и от которых GC начинает обход графа объектов.</p>
+<h4>Виды GC Roots</h4>
+<table>
+<tr><th>Тип</th><th>Пример</th><th>Когда перестаёт</th></tr>
+<tr><td>Локальные переменные</td><td><code>User user = new User()</code></td><td>При выходе из метода</td></tr>
+<tr><td>Статические поля</td><td><code>private static User user</code></td><td>Никогда</td></tr>
+<tr><td>Активные потоки</td><td><code>Thread.currentThread()</code></td><td>При завершении</td></tr>
+<tr><td>JNI-ссылки</td><td>Нативные ссылки</td><td>При освобождении</td></tr>
+</table>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>GC Roots — стартовые точки для обхода графа. Объект жив, если достижим от любого GC Root. Статические GC Roots — частая причина утечек. Локальные переменные перестают быть GC Roots при выходе из метода.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li><strong>Перечислить виды:</strong> локальные переменные (Stack), статические поля (Metaspace), активные потоки, JNI-ссылки.</li>
+<li><strong>Пример достижимости:</strong> GC Root → User → String "Alice" → char[]. Все объекты в цепочке живы.</li>
+<li><strong>Утечка:</strong> <code>static List&lt;User&gt; cache</code> — статический GC Root, объекты никогда не удаляются.</li>
+<li><strong>Локальные переменные:</strong> в циклах <code>User tempUser = new User()</code> — GC Root только в пределах итерации.</li>
+<li><strong>Heap dump:</strong> в MAT Dominator Tree показывает GC Root → объект → вложенные.</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('gc-roots')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="reachability"><summary>Что такое reachability в контексте GC?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> Reachability — свойство объекта, определяющее, может ли он быть достигнут от <strong>GC Roots</strong> через цепочку ссылок. Уровни: strongly reachable, softly reachable, weakly reachable, phantom reachable.</p>
+<h4>Уровни достижимости</h4>
+<table>
+<tr><th>Уровень</th><th>Тип ссылки</th><th>Удаление</th><th>Использование</th></tr>
+<tr><td>Strong</td><td><code>User user = new User()</code></td><td>Никогда</td><td>Обычные объекты</td></tr>
+<tr><td>Soft</td><td><code>SoftReference</code></td><td>При OOM</td><td>Кеши</td></tr>
+<tr><td>Weak</td><td><code>WeakReference</code></td><td>При GC</td><td>WeakHashMap</td></tr>
+<tr><td>Phantom</td><td><code>PhantomReference</code></td><td>При GC</td><td>Очистка ресурсов</td></tr>
+</table>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Reachability определяет, может ли GC удалить объект. 4 уровня: strong (не удаляются), soft (при OOM), weak (при GC), phantom (уже удалены). Понимание критично для кешей и предотвращения утечек.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li><strong>4 уровня:</strong> перечислить с примерами ссылок: strong (обычная), soft (SoftReference), weak (WeakReference), phantom (PhantomReference).</li>
+<li><strong>Код:</strong> <code>SoftReference&lt;User&gt; softRef = new SoftReference&lt;&gt;(new User())</code> — <code>softRef.get()</code> может вернуть null при OOM.</li>
+<li><strong>WeakHashMap:</strong> ключи удаляются при GC, если нет strong references. Идеален для кешей без утечек.</li>
+<li><strong>PhantomReference:</strong> get() всегда null, используется для очистки ресурсов перед освобождением.</li>
+<li><strong>Правило:</strong> объект достижим, если есть путь от GC Root. Недостижим — кандидат на удаление.</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('reachability')">⬆️ Свернуть</button></div>
+</div></details>
+
+<h2>🟠 Ручной вызов GC</h2>
+
+<details id="manual-gc"><summary>Можно ли вручную вызвать GC?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> <strong>Да, но не рекомендуется.</strong> Технически можно через <code>System.gc()</code> или <code>Runtime.getRuntime().gc()</code>. Однако это <strong>не гарантирует</strong> немедленного выполнения — это лишь <strong>запрос</strong> к JVM.</p>
+<pre><code>// Способы вызова:
+System.gc();
+Runtime.getRuntime().gc();
+// Оба — просто запрос, не гарантия!</code></pre>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>Ручной вызов GC возможен, но не рекомендуется. Это запрос, а не команда. Оправдан только в тестах. Альтернативы: довериться JVM, try-with-resources, ограничение коллекций, WeakHashMap.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li><strong>Способы:</strong> <code>System.gc()</code> и <code>Runtime.getRuntime().gc()</code>.</li>
+<li><strong>Не гарантия:</strong> JVM может проигнорировать (особенно с <code>-XX:+DisableExplicitGC</code>).</li>
+<li><strong>Когда оправдано:</strong> в тестах на утечки, перед измерением памяти, после критической операции.</li>
+<li><strong>Альтернативы:</strong> довериться JVM, try-with-resources, WeakHashMap, настройка -Xmx.</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('manual-gc')">⬆️ Свернуть</button></div>
+</div></details>
+
+<details id="why-not-system-gc"><summary>Почему не стоит вызывать System.gc()?</summary><div class="details-content">
+<p><strong>Краткий ответ:</strong> <code>System.gc()</code> не стоит вызывать, потому что: (1) <strong>не гарантирует</strong> немедленную сборку; (2) вызывает <strong>Stop-The-World паузы</strong>; (3) <strong>непредсказуем</strong>; (4) <strong>снижает производительность</strong> — мешает JIT; (5) <strong>не решает проблему</strong> утечки. Антипаттерн в production.</p>
+<h4>Сводная таблица проблем</h4>
+<table>
+<tr><th>Проблема</th><th>Описание</th></tr>
+<tr><td>Нет гарантии</td><td>Запрос, а не команда</td></tr>
+<tr><td>Паузы</td><td>Stop-The-World</td></tr>
+<tr><td>Непредсказуемость</td><td>JVM решает сам</td></tr>
+<tr><td>Производительность</td><td>Мешает JIT</td></tr>
+<tr><td>Не решает утечки</td><td>Достижимые объекты не удаляются</td></tr>
+</table>
+<div class="resume-box">
+<strong>📌 Резюме для Middle+</strong>
+<p>System.gc() — антипаттерн. Это запрос без гарантий, вызывает паузы, мешает JIT, не решает утечки. В production можно отключить через -XX:+DisableExplicitGC.</p>
+</div>
+<div class="interview-box">
+<strong>🎯 Что показать на собеседовании</strong>
+<ul>
+<li><strong>Каждую причину с примером:</strong> показать, что <code>System.gc()</code> — это запрос, а не команда. JVM может игнорировать.</li>
+<li><strong>Влияние на JIT:</strong> System.gc() может заставить JIT-компилятор сбросить оптимизации и пересобрать код — потеря производительности.</li>
+<li><strong>Не решает утечку:</strong> <code>List&lt;Object&gt; list = new ArrayList&lt;&gt;(); while(true) { list.add(new Object()); }</code> — System.gc() не поможет, объекты достижимы.</li>
+<li><strong>Отключение:</strong> <code>-XX:+DisableExplicitGC</code> — JVM игнорирует System.gc().</li>
+<li><strong>Альтернативы:</strong> try-with-resources, ограничение коллекций, WeakHashMap, настройка -Xmx.</li>
+</ul>
+</div>
+<div class="close-btn-container"><button class="close-btn" onclick="closeDetails('why-not-system-gc')">⬆️ Свернуть</button></div>
+</div></details>
+
+
+
+
+
+
+<div style="text-align: center; margin-top: 20px; padding: 10px;">
+<a href="index.html" style="display: inline-block; background-color: var(--button-bg); color: var(--button-text); border: 1px solid var(--border); padding: 10px 24px; border-radius: 4px; text-decoration: none; font-size: 0.9em; transition: 0.2s;" onmouseover="this.style.backgroundColor='var(--button-hover)'" onmouseout="this.style.backgroundColor='var(--button-bg)'">⬅️ Назад к содержанию</a>
+</div>
+
+</div>
+<script>
+function setTheme(t) { document.body.className = t; }
+let fs = 16;
+function changeFontSize(d) { fs = Math.min(24, Math.max(12, fs + d)); document.body.style.fontSize = fs + 'px'; document.getElementById('fontSizeLabel').textContent = fs + 'px'; }
+function closeDetails(id) { const d = document.getElementById(id); if (d) d.removeAttribute('open'); }
+setTheme('dark');
+</script>
+</body>
+</html>
